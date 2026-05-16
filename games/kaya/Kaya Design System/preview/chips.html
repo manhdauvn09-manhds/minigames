@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css"><style>
+body{margin:0;padding:24px;background:var(--bg);display:flex;gap:16px;align-items:center;justify-content:center}
+.chip{
+  font:600 12px var(--font-sans);
+  padding:4px 10px;
+  border-radius:var(--radius-xs);
+  letter-spacing:0.02em;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.turn-you{background:var(--sumi);color:#fff}
+.turn-bot{background:var(--paper-2);color:var(--fg);border:1px solid var(--border)}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.level{background:var(--accent-ghost);color:var(--sumi);font-family:var(--font-mono);letter-spacing:0.04em}
+.win-chip{background:var(--win);color:#fff}
+.loss-chip{background:var(--loss);color:#fff}
+.draw-chip{background:var(--draw);color:#fff}
+</style></head><body>
+<div class="chip turn-you"><span class="dot"></span>Your move</div>
+<div class="chip turn-bot"><span class="dot"></span>Bot is thinking</div>
+<div class="chip level">LEVEL 3</div>
+<div class="chip win-chip">Won</div>
+<div class="chip loss-chip">Lost</div>
+<div class="chip draw-chip">Draw</div>
+</body></html>

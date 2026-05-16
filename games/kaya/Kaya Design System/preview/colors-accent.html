@@ -1,0 +1,21 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css"><style>
+body{margin:0;padding:20px;background:var(--bg);display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:10px;align-items:stretch}
+.sw{flex:1;height:68px;border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;flex-direction:column;justify-content:flex-end;padding:8px}
+.sw .name{font:500 11px var(--font-mono);opacity:0.9}
+.sw .hex{font:400 10px var(--font-mono);opacity:0.6;margin-top:2px}
+.sw .use{font:500 11px var(--font-sans);opacity:0.7;margin-bottom:auto}
+h3{margin:0 0 4px;font:600 12px var(--font-sans);letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-subtle)}
+.note{font:400 12px var(--font-sans);color:var(--fg-muted);margin-top:4px}
+</style></head><body>
+<div>
+<h3>Sumi — the single accent</h3>
+<div class="row">
+  <div class="sw" style="background:var(--sumi);color:#fff"><div class="use">default</div><div class="name">--sumi</div><div class="hex">#A63C28</div></div>
+  <div class="sw" style="background:var(--sumi-hover);color:#fff"><div class="use">hover</div><div class="name">--sumi-hover</div><div class="hex">#94331F</div></div>
+  <div class="sw" style="background:var(--sumi-press);color:#fff"><div class="use">press</div><div class="name">--sumi-press</div><div class="hex">#7F2A18</div></div>
+  <div class="sw" style="background:var(--sumi-ghost);color:var(--sumi)"><div class="use">ghost</div><div class="name">--sumi-ghost</div><div class="hex">10% tint</div></div>
+</div>
+<div class="note">One accent. All interactive state (buttons, links, focus rings, win lines) derives from this ramp. If you reach for a second accent, solve the problem differently.</div>
+</div>
+</body></html>

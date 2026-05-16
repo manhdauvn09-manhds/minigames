@@ -1,0 +1,260 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0f0c29">
+<meta name="description" content="StackTower — Free tap-and-stack tower-building game. 30 progressive levels, perfect-stack bonuses, online leaderboard.">
+<meta name="keywords" content="tower stack, stack tower, building game, allin1site games, stacktower">
+<meta name="robots" content="index,follow">
+<meta name="referrer" content="no-referrer-when-downgrade">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://*.gstatic.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https:; connect-src 'self' https:; frame-src https://accounts.google.com; base-uri 'self'; form-action 'self';">
+<meta name="X-Content-Type-Options" content="nosniff">
+<meta name="gp-google-client-id" content="781592547104-970ld4c6lb6l8ev4hhvlg3k0943k8t3j.apps.googleusercontent.com">
+<meta name="gp-api-base" content="">
+<title>StackTower — Build to the Sky | allin1site Games</title>
+<link rel="canonical" href="/games/stacktower/">
+<link rel="stylesheet" href="../../game-platform.css?v=11">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"StackTower","genre":"Arcade","applicationCategory":"GameApplication","operatingSystem":"Web Browser","description":"Tap-and-stack tower game — 30 progressive levels, perfect-stack bonuses.","publisher":{"@type":"Organization","name":"allin1site.com"}}
+</script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--gp-stage-bg, linear-gradient(180deg, #1a1445 0%, #3a3075 50%, #2e2860 100%));
+  color: var(--gp-text-primary, #f8fafc);
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  color: white; padding: 10px 8px; overflow-x: hidden;
+}
+h1 { font-size:1.65em; color:#FFD32A; text-shadow:0 0 18px #FFD32A; margin-bottom:1px; }
+.subtitle { font-size:.78em; opacity:.7; margin-bottom:8px; }
+.hud { display:flex; gap:20px; margin-bottom:6px; align-items:center; }
+.hud-item { text-align:center; }
+.hud-label { font-size:.62em; text-transform:uppercase; opacity:.7; }
+.hud-value { font-size:1.5em; font-weight:800; color:#FFD32A; }
+.hud-btns { display:flex; gap:6px; margin-left:auto; }
+.hud-btn { min-width: 44px; height: 44px; padding: 0; border-radius:7px; border:1px solid rgba(255,255,255,.32); background:rgba(255,255,255,.14); color:#eee; font-size:.78em; font-weight:600; cursor:pointer; transition:background .18s; }
+.hud-btn:hover { background:rgba(255,255,255,.2); }
+.game-wrap { position:relative; border-radius:12px; overflow:hidden; border:2px solid rgba(255,255,255,.18); cursor:pointer; touch-action:none; }
+canvas { display:block; }
+</style>
+</head>
+<body>
+<h1>🏗️ StackTower</h1>
+<p class="subtitle">Drop the block — stack to the sky!</p>
+<div class="hud" id="hudRow" style="display:none">
+  <div class="hud-item"><div class="hud-label">Floor</div><div class="hud-value" id="hScore">0</div></div>
+  <div class="hud-item"><div class="hud-label">Target</div><div class="hud-value" id="hTarget">—</div></div>
+  <div class="hud-item"><div class="hud-label">Best</div><div class="hud-value" id="hBest">0</div></div>
+  <div class="hud-btns">
+    <button class="hud-btn" id="pauseBtn">⏸</button>
+    <button class="hud-btn" onclick="GamePlatform.showHome()">🏠</button>
+  </div>
+</div>
+<div class="game-wrap" id="wrap" style="display:none">
+  <canvas id="gc"></canvas>
+</div>
+
+<script src="../../game-platform.js?v=11"></script>
+<script>
+// 30 progressive levels — narrower start, faster slide, higher targets
+const LEVELS = (() => {
+  const arr = [];
+  for (let i = 0; i < 30; i++) {
+    // Exponential difficulty: narrower blocks, much faster, many more floors
+    const initW = Math.max(40, Math.round(220 * Math.pow(0.94, i)));    // exponential shrink
+    const initSpd = +Math.min(1.5 * Math.pow(1.08, i), 12).toFixed(2); // cap at 12
+    const targetFloors = Math.min(Math.round(15 + 5 * Math.pow(1.18, i)), 250); // 10x base · cap raised to 250
+    const perfectThresh = Math.max(2, 6 - Math.floor(i/5));             // tighter perfect window
+    arr.push({ initW, initSpd, targetFloors, perfectThresh });
+  }
+  return arr;
+})();
+
+const W=320, H=480, FH=24;
+let PERFECT_THRESH=6;
+const PALETTE=['#FF6B6B','#FF9F43','#FFD32A','#2ECC71','#4ECDC4','#45B7D1','#764BA2','#667EEA','#FD79A8','#A29BFE','#00CEC9','#E17055'];
+
+let floors, slider, falling, score, best, camY, targetCamY, spd, dead, raf;
+let perfectMsg={text:'',alpha:0,y:0}, shakeY=0;
+let gameRunning=false, paused=false, currentMode='normal', currentLevel=0;
+let targetFloors=0, initW=220, initSpd=2.0;
+
+const canvas=document.getElementById('gc');
+const ctx=canvas.getContext('2d');
+canvas.width=W; canvas.height=H;
+
+GamePlatform.init({
+  id:'stacktower',
+  name:'🏗️ StackTower',
+  icon:'🏗️',
+  description:{en:'Watch the block slide and tap at the right moment to stack it perfectly!',vi:'Xem khối trượt và nhấn đúng lúc để xếp chồng hoàn hảo!',ja:'ブロックのスライドを見て、タイミングよくタップして完璧に積み上げよう！'},
+  levels: LEVELS,
+  howto:{
+    en:`<h3>🏗️ StackTower</h3><ul>
+<li><b>Watch</b> the block slide left and right</li>
+<li><b>Tap / click / Space</b> to drop it on the stack</li>
+<li>Only the <b>overlapping part</b> stays — rest falls away</li>
+<li>Land <b>perfectly</b> (⭐ PERFECT!) to keep full width</li>
+<li>Block gets <b>faster</b> — how high can you go?</li>
+<li><b>Adventure:</b> reach the target floor count!</li></ul>`,
+    vi:`<h3>🏗️ StackTower</h3><ul>
+<li><b>Nhìn</b> khối trượt qua lại</li>
+<li><b>Chạm / click / Space</b> để thả xuống</li>
+<li>Chỉ phần <b>chồng lên</b> được giữ lại</li>
+<li>Đặt <b>chuẩn xác</b> (⭐ PERFECT!) để giữ nguyên độ rộng</li>
+<li>Khối ngày càng <b>nhanh hơn</b>!</li>
+<li><b>Adventure:</b> đạt số tầng mục tiêu!</li></ul>`,
+    ja:`<h3>🏗️ StackTower</h3><ul>
+<li>ブロックが<b>左右にスライド</b></li>
+<li><b>タップ/クリック/Space</b>で落下</li>
+<li><b>重なった部分だけ</b>残る</li>
+<li><b>ぴったり</b>合わせると⭐PERFECT！幅をキープ</li>
+<li>どんどん<b>速く</b>なる！</li>
+<li><b>アドベンチャー:</b> 目標階数を達成！</li></ul>`
+  },
+  onStart({mode, level, levelConfig}) {
+    currentMode=mode; currentLevel=level;
+    startGame(levelConfig);
+  },
+  onGetState() { return {score, level:currentLevel, mode:currentMode}; },
+  onRestoreState(snap, ctx2) { startGame(ctx2.levelConfig); }
+});
+
+function startGame(lc) {
+  lc=lc||{};
+  initW       = lc.initW    || 220;
+  initSpd     = lc.initSpd  || 2.0;
+  targetFloors= lc.targetFloors || 0;
+  PERFECT_THRESH = lc.perfectThresh || 6;
+
+  const baseY=2000;
+  floors=[{x:W/2-initW/2, w:initW, y:baseY, color:'#4ECDC4'}];
+  slider=null; falling=[];
+  score=0; camY=baseY-H+FH*4; targetCamY=camY;
+  spd=initSpd; dead=false; gameRunning=true; paused=false;
+  best=+localStorage.getItem('st_hs')||0;
+
+  document.getElementById('wrap').style.display='block';
+  document.getElementById('hudRow').style.display='flex';
+  document.getElementById('hTarget').textContent=targetFloors||'—';
+  document.getElementById('pauseBtn').textContent='⏸';
+
+  syncHUD(); spawnSlider();
+  if (raf) cancelAnimationFrame(raf);
+  loop();
+}
+
+function spawnSlider() {
+  const last=floors[floors.length-1];
+  slider={x:last.x>W/2?0:W-last.w, w:last.w, dir:last.x>W/2?1:-1, y:last.y-FH*2.2, color:PALETTE[floors.length%PALETTE.length]};
+}
+
+function drop() {
+  if (dead||!slider||paused) return;
+  const last=floors[floors.length-1], s=slider;
+  const ol=Math.max(s.x,last.x), or2=Math.min(s.x+s.w,last.x+last.w), ow=or2-ol;
+  if (ow<=0){dead=true;endGame();return;}
+  const perfect=Math.abs(ol-last.x)<PERFECT_THRESH&&Math.abs((s.x+s.w)-(last.x+last.w))<PERFECT_THRESH;
+  if (s.x<ol) falling.push({x:s.x,y:s.y,w:ol-s.x,color:s.color,vy:0,g:0.6});
+  if (s.x+s.w>or2) falling.push({x:or2,y:s.y,w:s.x+s.w-or2,color:s.color,vy:0,g:0.6});
+  const nw=perfect?last.w:ow, nx=perfect?last.x:ol;
+  floors.push({x:nx,w:nw,y:s.y,color:s.color});
+  score++;
+  if (score>best){best=score;localStorage.setItem('st_hs',best);}
+  syncHUD();
+  if (perfect){perfectMsg={text:'⭐ PERFECT!',alpha:1.0,y:s.y-20};shakeY=6;}
+  targetCamY=floors[floors.length-1].y-H*0.42;
+  spd=Math.min(initSpd+score*0.13,8);
+  if (targetFloors&&currentMode==='adventure'&&score>=targetFloors){dead=true;endGame(true);return;}
+  spawnSlider();
+}
+
+function syncHUD(){
+  document.getElementById('hScore').textContent=score;
+  document.getElementById('hBest').textContent=best;
+}
+
+function endGame(cleared) {
+  dead=true; gameRunning=false;
+  if (raf) cancelAnimationFrame(raf);
+  GamePlatform.recordResult({score, extra:cleared?`${score} floors — Target reached! 🎉`:(`${score} floors`)});
+}
+
+function loop(){if(!dead&&!paused)raf=requestAnimationFrame(loop);update();draw();}
+
+function update(){
+  if(dead||!slider||paused)return;
+  slider.x+=spd*slider.dir;
+  if(slider.x+slider.w>=W){slider.x=W-slider.w;slider.dir=-1;}
+  if(slider.x<=0){slider.x=0;slider.dir=1;}
+  camY+=(targetCamY-camY)*0.07;
+  if(shakeY>0.2)shakeY*=0.75;else shakeY=0;
+  falling.forEach(p=>{p.vy+=p.g;p.y+=p.vy;});
+  falling=falling.filter(p=>p.y-camY<H+60);
+  if(perfectMsg.alpha>0)perfectMsg.alpha-=0.025;
+}
+
+function draw(){
+  const sy=shakeY;
+  ctx.clearRect(0,0,W,H);
+  const prog=Math.max(0,Math.min(1,score/40));
+  const g2=ctx.createLinearGradient(0,0,0,H);
+  g2.addColorStop(0,lerpColor('#0f0c29','#1a0a3e',prog));
+  g2.addColorStop(1,lerpColor('#302b63','#0d2847',prog));
+  ctx.fillStyle=g2;ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.translate(0,-camY+sy);
+  floors.forEach(f=>{
+    ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(f.x+3,f.y+FH+2,f.w,4);
+    ctx.fillStyle=f.color;roundRect(ctx,f.x,f.y,f.w,FH,4);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.18)';roundRect(ctx,f.x,f.y,f.w,FH*0.35,4);ctx.fill();
+  });
+  falling.forEach(p=>{
+    ctx.globalAlpha=Math.max(0,1-(p.y-(camY+H-50))/80);
+    ctx.fillStyle=p.color;roundRect(ctx,p.x,p.y,p.w,FH,4);ctx.fill();ctx.globalAlpha=1;
+  });
+  if(!dead&&slider){
+    ctx.fillStyle=slider.color;ctx.shadowColor=slider.color;ctx.shadowBlur=12;
+    roundRect(ctx,slider.x,slider.y,slider.w,FH,4);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(255,255,255,0.2)';roundRect(ctx,slider.x,slider.y,slider.w,FH*0.35,4);ctx.fill();
+  }
+  if(paused){ctx.fillStyle='rgba(0,0,0,.72)';ctx.fillRect(0,camY,W,H);ctx.fillStyle='white';ctx.font='bold 22px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('⏸ PAUSED',W/2,camY+H/2);}
+  ctx.restore();
+  if(perfectMsg.alpha>0){
+    ctx.globalAlpha=perfectMsg.alpha;ctx.fillStyle='#FFD32A';ctx.shadowColor='#FFD32A';ctx.shadowBlur=20;
+    ctx.font='bold 22px sans-serif';ctx.textAlign='center';
+    ctx.fillText(perfectMsg.text,W/2,perfectMsg.y-camY+sy);ctx.shadowBlur=0;ctx.globalAlpha=1;
+  }
+  const spdPct=Math.min((spd-initSpd)/5,1);
+  ctx.fillStyle='rgba(255,255,255,0.08)';ctx.fillRect(8,H-18,W-16,6);
+  ctx.fillStyle=lerpColor('#00ff88','#ff6b6b',spdPct);ctx.fillRect(8,H-18,(W-16)*spdPct,6);
+  ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='9px sans-serif';ctx.textAlign='left';ctx.fillText('SPEED',8,H-22);
+}
+
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
+function lerpColor(a,b,t){const ah=[a.slice(1,3),a.slice(3,5),a.slice(5,7)].map(h=>parseInt(h,16));const bh=[b.slice(1,3),b.slice(3,5),b.slice(5,7)].map(h=>parseInt(h,16));return '#'+ah.map((v,i)=>Math.round(v+(bh[i]-v)*t).toString(16).padStart(2,'0')).join('');}
+
+// Pause
+document.getElementById('pauseBtn').addEventListener('click',()=>{
+  if(!gameRunning)return;
+  paused=!paused;
+  document.getElementById('pauseBtn').textContent=paused?'▶':'⏸';
+  if(paused){
+    if(raf){cancelAnimationFrame(raf);raf=null;}
+    GamePlatform.pause({score,level:currentLevel,mode:currentMode});
+    document.getElementById('hudRow').style.display='none';
+    document.getElementById('wrap').style.display='none';
+    gameRunning=false;
+  } else {
+    loop();
+  }
+});
+
+document.getElementById('wrap').addEventListener('click',drop);
+document.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();drop();}});
+document.getElementById('wrap').addEventListener('touchstart',e=>{e.preventDefault();drop();},{passive:false});
+</script>
+</body>
+</html>

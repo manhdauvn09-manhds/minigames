@@ -1,0 +1,27 @@
+.git
+.github
+.claude
+.vscode
+.idea
+node_modules
+npm-debug.log
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+Thumbs.db
+
+# Repo cruft we don't ship
+state/
+research/
+scripts/
+engine/
+daily/
+nginx/
+GameCheckList.md
+Skill.md
+.gitignore
+
+# Old game folders not on hub (keep image small)
+games/20260427_*

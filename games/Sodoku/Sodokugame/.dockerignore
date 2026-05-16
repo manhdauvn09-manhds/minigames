@@ -1,0 +1,45 @@
+# Build context for the multi-stage Sodoku image (Phase 6+).
+#
+# Stage 1 (Node builder) needs: package.json / package-lock.json,
+# tsconfig*, vite.config.ts, tailwind/postcss config, index.html,
+# src/, public/. Everything else slows the build context upload
+# without contributing to dist/.
+
+# npm — Docker installs fresh from package-lock.
+node_modules/
+
+# Vite output — Stage 1 generates this; sending a stale local build
+# would just be overwritten.
+dist/
+dist-ssr/
+
+# tsc -b project-reference cache; rebuilt inside the container.
+*.tsbuildinfo
+
+# tsc emits these for the referenced vite.config when run outside
+# --noEmit; local dev artefact, not needed in the image.
+vite.config.d.ts
+vite.config.js
+vitest.config.d.ts
+vitest.config.js
+
+# Phase 0 reference UI — Phase 6 ships dist/ instead. Keep in repo
+# for history but don't bloat the build context.
+Design/
+
+# Docs / planning — not needed in image.
+SUDOKU_PROJECT_PLAN.md
+DESIGN_TOKENS.md
+README.md
+
+# Test fixtures + coverage; image is production-only.
+src/**/__tests__/
+src/**/*.test.ts
+src/**/*.test.tsx
+coverage/
+.vitest/
+
+# Editor scratch
+.vscode/
+.idea/
+.DS_Store

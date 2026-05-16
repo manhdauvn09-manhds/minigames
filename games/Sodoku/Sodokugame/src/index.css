@@ -1,0 +1,156 @@
+/* ==========================================================================
+   Sodoku — global stylesheet
+   ==========================================================================
+   1. Tailwind layers (utilities + base reset)
+   2. Design tokens — mirrored from `Design/styles/tokens.css` so Phase 1
+      Tailwind utilities (bg-bg, text-fg, ...) resolve to the same values
+      the existing UMD bundle uses. Source: DESIGN_TOKENS.md.
+   ========================================================================== */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- Light theme (default) ---------- */
+:root {
+  /* Warm neutrals */
+  --paper-0:  oklch(99.2% 0.006 80);
+  --paper-1:  oklch(97.2% 0.010 82);
+  --paper-2:  oklch(94.5% 0.014 82);
+  --paper-3:  oklch(89.0% 0.020 80);
+
+  /* Wood ramp (board) */
+  --kaya-0:   oklch(88.0% 0.040 75);
+  --kaya-1:   oklch(82.0% 0.050 70);
+  --kaya-2:   oklch(72.0% 0.055 65);
+  --kaya-grid: oklch(55.0% 0.045 55);
+
+  /* Warm-ink ramp (foreground) */
+  --ink-0:    oklch(20.0% 0.012 55);
+  --ink-1:    oklch(35.0% 0.010 55);
+  --ink-2:    oklch(52.0% 0.008 55);
+  --ink-3:    oklch(70.0% 0.008 55);
+
+  /* Sumi accent */
+  --sumi:        oklch(50.0% 0.145 30);
+  --sumi-hover:  oklch(45.0% 0.150 30);
+  --sumi-press:  oklch(40.0% 0.155 30);
+  --sumi-ghost:  oklch(50.0% 0.145 30 / 0.10);
+  --sumi-ring:   oklch(50.0% 0.145 30 / 0.40);
+
+  /* Status */
+  --win:  oklch(55.0% 0.095 145);
+  --loss: var(--sumi);
+  --draw: var(--ink-2);
+
+  /* Semantic aliases */
+  --bg:            var(--paper-0);
+  --bg-elevated:   var(--paper-1);
+  --bg-sunken:     var(--paper-2);
+  --fg:            var(--ink-0);
+  --fg-muted:      var(--ink-1);
+  --fg-subtle:     var(--ink-2);
+  --fg-disabled:   var(--ink-3);
+  --border:        oklch(89.0% 0.020 80 / 0.8);
+  --border-strong: var(--paper-3);
+  --accent:        var(--sumi);
+  --accent-hover:  var(--sumi-hover);
+  --accent-press:  var(--sumi-press);
+  --accent-ghost:  var(--sumi-ghost);
+  --focus-ring:    var(--sumi-ring);
+  --scrim:         oklch(22.0% 0.012 50 / 0.52);
+
+  /* Radii */
+  --radius-xs: 2px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* Shadows — warm-brown-tinted, never neutral gray */
+  --shadow-1: 0 1px 2px rgba(40, 30, 20, 0.06);
+  --shadow-2: 0 4px 12px rgba(40, 30, 20, 0.08), 0 1px 3px rgba(40, 30, 20, 0.06);
+  --shadow-3: 0 16px 40px rgba(40, 30, 20, 0.14), 0 4px 12px rgba(40, 30, 20, 0.08);
+  --shadow-board: 0 2px 0 rgba(40, 30, 20, 0.04), 0 8px 24px rgba(40, 30, 20, 0.10);
+  --shadow-stone: 0 1px 2px rgba(20, 14, 8, 0.35), 0 0.5px 0.5px rgba(20, 14, 8, 0.25);
+
+  /* Motion */
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur-base: 220ms;
+  --dur-slow: 400ms;
+}
+
+/* ---------- Dark theme ---------- */
+:root[data-theme='dark'] {
+  --paper-0:  oklch(18.0% 0.012 55);
+  --paper-1:  oklch(22.0% 0.014 55);
+  --paper-2:  oklch(26.0% 0.016 55);
+  --paper-3:  oklch(34.0% 0.018 55);
+
+  --kaya-0:   oklch(42.0% 0.040 65);
+  --kaya-1:   oklch(36.0% 0.045 62);
+  --kaya-2:   oklch(28.0% 0.040 60);
+  --kaya-grid: oklch(70.0% 0.025 60);
+
+  --ink-0:    oklch(95.0% 0.010 85);
+  --ink-1:    oklch(82.0% 0.010 80);
+  --ink-2:    oklch(65.0% 0.010 75);
+  --ink-3:    oklch(45.0% 0.010 70);
+
+  --sumi:        oklch(65.0% 0.140 32);
+  --sumi-hover:  oklch(70.0% 0.140 32);
+  --sumi-press:  oklch(60.0% 0.140 32);
+
+  --border:        oklch(34.0% 0.018 55 / 0.8);
+  --scrim:         oklch(10.0% 0.010 50 / 0.65);
+  --shadow-stone:  oklch(8.0% 0.008 50 / 0.55);
+}
+
+/* ---------- Auto theme via prefers-color-scheme ---------- */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='auto'] {
+    --paper-0:  oklch(18.0% 0.012 55);
+    --paper-1:  oklch(22.0% 0.014 55);
+    --paper-2:  oklch(26.0% 0.016 55);
+    --paper-3:  oklch(34.0% 0.018 55);
+    --kaya-0:   oklch(42.0% 0.040 65);
+    --kaya-1:   oklch(36.0% 0.045 62);
+    --kaya-2:   oklch(28.0% 0.040 60);
+    --kaya-grid: oklch(70.0% 0.025 60);
+    --ink-0:    oklch(95.0% 0.010 85);
+    --ink-1:    oklch(82.0% 0.010 80);
+    --ink-2:    oklch(65.0% 0.010 75);
+    --ink-3:    oklch(45.0% 0.010 70);
+    --sumi:     oklch(65.0% 0.140 32);
+    --border:   oklch(34.0% 0.018 55 / 0.8);
+    --scrim:    oklch(10.0% 0.010 50 / 0.65);
+    --shadow-stone: oklch(8.0% 0.008 50 / 0.55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ease-spring: cubic-bezier(0.4, 0, 0.2, 1);
+    --dur-fast:  80ms;
+    --dur-base:  80ms;
+    --dur-slow: 120ms;
+  }
+}
+
+/* ---------- Base ---------- */
+html { color-scheme: light dark; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}

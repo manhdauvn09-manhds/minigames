@@ -1,0 +1,222 @@
+[
+  {
+    "id": "20260427_beatjump",
+    "title": "BeatJump",
+    "tagline": "Tap to jump on the rhythm! Dodge platforms and maintain your combo.",
+    "path": "/games/20260427_beatjump/index.html",
+    "date": "2026-04-27",
+    "inspiration": "Friday Night Funkin' + Geometry Dash"
+  },
+  {
+    "id": "20260427_fastletters",
+    "title": "FastLetters",
+    "tagline": "Type words from the letters! Speed and creativity = high scores.",
+    "path": "/games/20260427_fastletters/index.html",
+    "date": "2026-04-27",
+    "inspiration": "Wordle meets real-time word puzzle"
+  },
+  {
+    "id": "20260427_spacehopper",
+    "title": "SpaceHopper",
+    "tagline": "Jump on platforms to reach higher! Simple, addictive, endless.",
+    "path": "/games/20260427_spacehopper/index.html",
+    "date": "2026-04-27",
+    "inspiration": "Flappy Bird meets Doodle Jump"
+  },
+  {
+    "id": "20260427_stuntdash",
+    "title": "StuntDash",
+    "tagline": "Flip through obstacles! Sick tricks = big points.",
+    "path": "/games/20260427_stuntdash/index.html",
+    "date": "2026-04-27",
+    "inspiration": "Moto X3M physics-based runner"
+  },
+  {
+    "id": "20260427_tapfactory",
+    "title": "TapFactory",
+    "tagline": "Tap for cash! Buy upgrades! Watch the money grow.",
+    "path": "/games/20260427_tapfactory/index.html",
+    "date": "2026-04-27",
+    "inspiration": "Cookie Clicker idle game"
+  },
+  {
+    "id": "20260427_blobmerge",
+    "title": "BlobMerge",
+    "tagline": "Drag matching blobs to merge! Level up for big points.",
+    "path": "/games/20260427_blobmerge/index.html",
+    "date": "2026-04-27",
+    "inspiration": "Suika Game merge mechanics"
+  },
+  {
+    "id": "20260427_gemblast",
+    "title": "GemBlast",
+    "tagline": "Swap gems to match 3! Clear the board for points.",
+    "path": "/games/20260427_gemblast/index.html",
+    "date": "2026-04-27",
+    "inspiration": "Classic match-3 puzzle games"
+  },
+  {
+    "id": "20260427_spellduel",
+    "title": "SpellDuel",
+    "tagline": "Cast spells in tactical duels! Build your deck and dominate.",
+    "path": "/games/20260427_spellduel/index.html",
+    "date": "2026-04-27",
+    "inspiration": "Slay the Spire card strategy"
+  },
+  {
+    "id": "20260427_wavedefender",
+    "title": "WaveDefender",
+    "tagline": "Place towers to stop enemies! Build your defense!",
+    "path": "/games/20260427_wavedefender/index.html",
+    "date": "2026-04-27",
+    "inspiration": "Tower defense strategy games"
+  },
+  {
+    "id": "20260427_clicksync",
+    "title": "ClickSync",
+    "tagline": "Click on the beat! Perfect timing = perfect score.",
+    "path": "/games/20260427_clicksync/index.html",
+    "date": "2026-04-27",
+    "inspiration": "Rhythm click/timing mechanics"
+  },
+  {
+    "id": "20260427_taprunner",
+    "title": "TapRunner",
+    "path": "/games/20260427_taprunner/index.html",
+    "type": "platformer",
+    "date": "2026-04-28"
+  },
+  {
+    "id": "20260427_wordrush",
+    "title": "WordRush",
+    "path": "/games/20260427_wordrush/index.html",
+    "type": "word-puzzle",
+    "date": "2026-04-28"
+  },
+  {
+    "id": "20260427_ballmerge",
+    "title": "BallMerge",
+    "path": "/games/20260427_ballmerge/index.html",
+    "type": "merge",
+    "date": "2026-04-28"
+  },
+  {
+    "id": "20260427_clickempire",
+    "title": "ClickEmpire",
+    "path": "/games/20260427_clickempire/index.html",
+    "type": "clicker",
+    "date": "2026-04-28"
+  },
+  {
+    "id": "20260427_blockblitz",
+    "title": "BlockBlitz",
+    "path": "/games/20260427_blockblitz/index.html",
+    "type": "puzzle",
+    "date": "2026-04-28"
+  },
+  {
+    "id": "20260427_speeddash",
+    "title": "SpeedDash",
+    "path": "/games/20260427_speeddash/index.html",
+    "type": "runner",
+    "date": "2026-04-28"
+  },
+  {
+    "id": "20260427_chromamatch",
+    "title": "ChromaMatch",
+    "path": "/games/20260427_chromamatch/index.html",
+    "type": "match3",
+    "date": "2026-04-28"
+  },
+  {
+    "id": "20260427_magicduel",
+    "title": "MagicDuel",
+    "path": "/games/20260427_magicduel/index.html",
+    "type": "strategy",
+    "date": "2026-04-28"
+  },
+  {
+    "id": "20260427_defensegrid",
+    "title": "DefenseGrid",
+    "path": "/games/20260427_defensegrid/index.html",
+    "type": "tower-defense",
+    "date": "2026-04-28"
+  },
+  {
+    "id": "20260427_pulseclick",
+    "title": "PulseClick",
+    "path": "/games/20260427_pulseclick/index.html",
+    "type": "rhythm",
+    "date": "2026-04-28"
+  },
+  {
+    "id": "20260427_taprunner",
+    "title": "TapRunner",
+    "path": "/games/20260427_taprunner/index.html",
+    "type": "platformer",
+    "date": "2026-04-29"
+  },
+  {
+    "id": "20260427_wordrush",
+    "title": "WordRush",
+    "path": "/games/20260427_wordrush/index.html",
+    "type": "word-puzzle",
+    "date": "2026-04-29"
+  },
+  {
+    "id": "20260427_ballmerge",
+    "title": "BallMerge",
+    "path": "/games/20260427_ballmerge/index.html",
+    "type": "merge",
+    "date": "2026-04-29"
+  },
+  {
+    "id": "20260427_clickempire",
+    "title": "ClickEmpire",
+    "path": "/games/20260427_clickempire/index.html",
+    "type": "clicker",
+    "date": "2026-04-29"
+  },
+  {
+    "id": "20260427_blockblitz",
+    "title": "BlockBlitz",
+    "path": "/games/20260427_blockblitz/index.html",
+    "type": "puzzle",
+    "date": "2026-04-29"
+  },
+  {
+    "id": "20260427_speeddash",
+    "title": "SpeedDash",
+    "path": "/games/20260427_speeddash/index.html",
+    "type": "runner",
+    "date": "2026-04-29"
+  },
+  {
+    "id": "20260427_chromamatch",
+    "title": "ChromaMatch",
+    "path": "/games/20260427_chromamatch/index.html",
+    "type": "match3",
+    "date": "2026-04-29"
+  },
+  {
+    "id": "20260427_magicduel",
+    "title": "MagicDuel",
+    "path": "/games/20260427_magicduel/index.html",
+    "type": "strategy",
+    "date": "2026-04-29"
+  },
+  {
+    "id": "20260427_defensegrid",
+    "title": "DefenseGrid",
+    "path": "/games/20260427_defensegrid/index.html",
+    "type": "tower-defense",
+    "date": "2026-04-29"
+  },
+  {
+    "id": "20260427_pulseclick",
+    "title": "PulseClick",
+    "path": "/games/20260427_pulseclick/index.html",
+    "type": "rhythm",
+    "date": "2026-04-29"
+  }
+]

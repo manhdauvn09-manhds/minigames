@@ -1,0 +1,382 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#1a0a3e">
+<meta name="description" content="ArkanoidX — Free brick-breaker arcade. 30 progressive levels, 5 power-ups, online leaderboard.">
+<meta name="keywords" content="arkanoid, breakout, brick breaker, arcade, allin1site games, arkanoidx">
+<meta name="robots" content="index,follow">
+<meta name="referrer" content="no-referrer-when-downgrade">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://*.gstatic.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https:; connect-src 'self' https:; frame-src https://accounts.google.com; base-uri 'self'; form-action 'self';">
+<meta name="X-Content-Type-Options" content="nosniff">
+<meta name="gp-google-client-id" content="781592547104-970ld4c6lb6l8ev4hhvlg3k0943k8t3j.apps.googleusercontent.com">
+<meta name="gp-api-base" content="">
+<title>ArkanoidX — Break Everything | allin1site Games</title>
+<link rel="canonical" href="/games/arkanoidx/">
+<link rel="stylesheet" href="../../game-platform.css?v=11">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"ArkanoidX","genre":"Arcade","applicationCategory":"GameApplication","operatingSystem":"Web Browser","description":"Brick-breaker arcade — 30 progressive levels, 5 power-ups.","publisher":{"@type":"Organization","name":"allin1site.com"}}
+</script>
+<style>
+* {margin:0;padding:0;box-sizing:border-box;}
+body {
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--gp-stage-bg, linear-gradient(135deg,#251552 0%,#183560 50%,#124a4a 100%));
+  color:var(--gp-text-primary, #f8fafc);
+  min-height:100vh; display:flex; flex-direction:column; align-items:center;
+  color:white; padding:10px 6px; overflow-x:hidden;
+}
+h1{font-size:1.6em;color:#fd79a8;text-shadow:0 0 16px #fd79a8;margin-bottom:1px;}
+.subtitle{font-size:.76em;opacity:.7;margin-bottom:7px;}
+.hud{display:flex;gap:14px;margin-bottom:5px;align-items:center;}
+.hud-item{text-align:center;}
+.hud-label{font-size:.6em;text-transform:uppercase;opacity:.7;}
+.hud-value{font-size:1.25em;font-weight:800;color:#fd79a8;}
+.hud-btns{display:flex;gap:6px;margin-left:auto;}
+.hud-btn{padding:5px 11px;border-radius:7px;border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.14);color:#eee;font-size:.78em;font-weight:600;cursor:pointer;transition:background .18s;}
+.hud-btn:hover{background:rgba(255,255,255,.2);}
+.lives{display:flex;gap:4px;margin-bottom:5px;align-items:center;font-size:.82em;opacity:.85;}
+.active-pu{display:flex;gap:6px;margin-bottom:4px;flex-wrap:wrap;justify-content:center;min-height:20px;}
+.pu-active{padding:2px 8px;border-radius:5px;font-size:.7em;border:1px solid;animation:puPulse 1s ease infinite alternate;}
+@keyframes puPulse{from{opacity:.7}to{opacity:1;}}
+.game-wrap{position:relative;border-radius:12px;overflow:hidden;border:2px solid rgba(253,121,168,.35);cursor:none;touch-action:none;}
+canvas{display:block;}
+</style>
+</head>
+<body>
+<h1>🏓 ArkanoidX</h1>
+<p class="subtitle">Break every brick — 10 levels of chaos &amp; power-ups!</p>
+<div class="hud" id="hudRow" style="display:none">
+  <div class="hud-item"><div class="hud-label">Score</div><div class="hud-value" id="hScore">0</div></div>
+  <div class="hud-item"><div class="hud-label">Best</div><div class="hud-value" id="hBest">0</div></div>
+  <div class="hud-item"><div class="hud-label">Level</div><div class="hud-value" id="hLvl">1</div></div>
+  <div class="hud-item"><div class="hud-label">Combo</div><div class="hud-value" id="hCombo">×1</div></div>
+  <div class="hud-btns">
+    <button class="hud-btn" id="pauseBtn">⏸</button>
+    <button class="hud-btn" onclick="GamePlatform.showHome()">🏠</button>
+  </div>
+</div>
+<div class="lives" id="lives" style="display:none"></div>
+<div class="active-pu" id="activePU" style="display:none"></div>
+<div class="game-wrap" id="wrap" style="display:none">
+  <canvas id="gc"></canvas>
+</div>
+
+<script src="../../game-platform.js?v=11"></script>
+<script>
+// 30 progressive levels
+const PLEVELS = (() => {
+  const arr = [];
+  for (let i = 0; i < 30; i++) {
+    // Exponential difficulty: each level ~3x harder feel
+    const initLives      = Math.max(1, i < 3 ? 5 : i < 8 ? 4 : i < 14 ? 3 : i < 22 ? 2 : 1);
+    const ballSpeedBase  = +Math.min(6.0 + Math.pow(i, 1.4) * 0.18, 18).toFixed(2); // 10x feel: faster + cap 18
+    const layoutStart    = i % 10;
+    const puRate         = +(Math.max(0.02, 0.15 * Math.pow(0.88, i))).toFixed(3); // half power-ups, vanish fast
+    const brickHpMult    = i < 3 ? 2 : i < 8 ? 3 : i < 16 ? 5 : 7;     // tougher bricks at every tier
+    const extraRows      = Math.min(Math.floor(i / 3), 6);               // more brick rows
+    const paddleShrink   = Math.min(Math.floor(i / 5) * 5, 20);          // paddle gets smaller
+    arr.push({ initLives, ballSpeedBase, layoutStart, puRate, brickHpMult, extraRows, paddleShrink });
+  }
+  return arr;
+})();
+
+const W=340, H=520;
+const canvas=document.getElementById('gc');
+const ctx=canvas.getContext('2d');
+canvas.width=W; canvas.height=H;
+
+const BW=34, BH=16, COLS=8, BROWS=8;
+const BOFF_X=(W-COLS*BW)/2, BOFF_Y=50;
+
+const LAYOUTS=[
+  ['11111111','11111111','11111111','        ','        ','        '],
+  ['12121212','21212121','11111111','        ','22222222','        '],
+  ['12312312','31231231','12312312','        ','        ','        '],
+  ['11G11G11','1B1111B1','23123123','31231231','        ','        '],
+  ['G1G1G1G1','2B232B23','31313131','12121212','33333333','        '],
+  ['12321232','G2B2G2B2','32123212','13231321','11111111','22222222'],
+  ['G23B32G2','31213121','B2323B23','12121212','23232323','33333333'],
+  ['G3G3G3G3','3B3B3B3B','23232323','32323232','G2B2G2B2','33133133'],
+  ['G3B3G3B3','3333B333','G3G3G3G3','3B3B3B3B','23232323','G3G3G3G3'],
+  ['G3B3G3B3','3G3B3G3B','G3G3G3G3','B3B3B3B3','G3B3G3B3','G3G3G3G3'],
+];
+const BRICK_COLORS={1:'#ff6b6b',2:'#ff9f43',3:'#a29bfe',B:'#fd79a8',G:'#FFD32A'};
+const PU_DEFS=[
+  {type:'wide',icon:'🔴',color:'#ff6b6b',label:'Wide'},
+  {type:'multi',icon:'🔵',color:'#74b9ff',label:'Multi'},
+  {type:'slow',icon:'🟢',color:'#55efc4',label:'Slow'},
+  {type:'laser',icon:'🟡',color:'#fdcb6e',label:'Laser'},
+  {type:'life',icon:'❤️',color:'#fd79a8',label:'+Life'},
+];
+
+let balls,paddle,bricks,powerups,lasers,score,best,lives,level,combo,maxCombo,raf,pEffects;
+let activePUs={wide:0,multi:0,slow:0,laser:0};
+let cursorX=W/2, paused=false, gameRunning=false;
+let INIT_LIVES=3, BALL_SPEED_BASE=4.5, LAYOUT_START=0, PU_RATE=0.25;
+let BRICK_HP_MULT=1, EXTRA_ROWS=0, PADDLE_SHRINK=0;
+let currentMode='normal', currentLevel=0, layoutIndex=0;
+
+GamePlatform.init({
+  id:'arkanoidx',
+  name:'🏓 ArkanoidX',
+  icon:'🏓',
+  description:{en:'Move your paddle to bounce the ball. Break all bricks. Collect power-ups!',vi:'Di chuyển vợt để bật bóng. Phá hết gạch. Thu thập power-up!',ja:'パドルを動かしてボールを跳ね返し、全ブロックを破壊！パワーアップを集めよう！'},
+  levels: PLEVELS,
+  howto:{
+    en:`<h3>🏓 ArkanoidX</h3><ul>
+<li><b>Mouse / drag</b> to move the paddle left and right</li>
+<li>Bounce the ball to <b>break all bricks</b> and advance</li>
+<li>Hit bricks at the <b>edge of the paddle</b> for sharper angles</li>
+<li><b>Chain hits</b> without touching bottom = combo multiplier!</li>
+<li>Power-ups: 🔴 Wide · 🔵 Multi-ball · 🟢 Slow · 🟡 Laser · ❤️ +Life</li>
+<li><b>Adventure:</b> higher levels = faster ball, fewer lives!</li></ul>`,
+    vi:`<h3>🏓 ArkanoidX</h3><ul>
+<li><b>Chuột / kéo</b> để di chuyển vợt</li>
+<li>Bật bóng để <b>phá hết gạch</b> và qua màn</li>
+<li>Đánh vào <b>mép vợt</b> để đổi hướng bóng</li>
+<li><b>Đánh liên tiếp</b> không chạm đáy = nhân điểm!</li>
+<li>Power-up: 🔴 Rộng · 🔵 Nhiều bóng · 🟢 Chậm · 🟡 Laser · ❤️ Mạng</li></ul>`,
+    ja:`<h3>🏓 ArkanoidX</h3><ul>
+<li><b>マウス / ドラッグ</b>でパドルを操作</li>
+<li>ボールを跳ね返して<b>全ブロック破壊</b></li>
+<li>パドルの<b>端に当てる</b>と鋭い角度</li>
+<li>底に触れずに連続ヒット = <b>コンボ倍率アップ</b>！</li>
+<li>パワーアップ: 🔴 ワイド · 🔵 マルチ · 🟢 スロー · 🟡 レーザー · ❤️ ライフ</li></ul>`
+  },
+  onStart({mode, level, levelConfig}) {
+    currentMode=mode; currentLevel=level;
+    startGame(levelConfig);
+  },
+  onGetState() { return {mode:currentMode, level:currentLevel}; },
+  onRestoreState(snap, ctx2) { startGame(ctx2.levelConfig); }
+});
+
+function startGame(lc) {
+  lc=lc||{};
+  INIT_LIVES      = lc.initLives      || 3;
+  BALL_SPEED_BASE = lc.ballSpeedBase  || 4.5;
+  LAYOUT_START    = lc.layoutStart    || 0;
+  PU_RATE         = lc.puRate         || 0.25;
+  BRICK_HP_MULT   = lc.brickHpMult   || 1;
+  EXTRA_ROWS      = lc.extraRows     || 0;
+  PADDLE_SHRINK   = lc.paddleShrink  || 0;
+
+  level=1; layoutIndex=LAYOUT_START; score=0; lives=INIT_LIVES; combo=1; maxCombo=1; paused=false;
+  best=+localStorage.getItem('ak_hs')||0;
+  activePUs={wide:0,multi:0,slow:0,laser:0};
+
+  ['hudRow','lives','activePU','wrap'].forEach(id=>document.getElementById(id).style.display=id==='hudRow'?'flex':'block');
+  document.getElementById('lives').style.display='flex';
+  document.getElementById('activePU').style.display='flex';
+  document.getElementById('pauseBtn').textContent='⏸';
+
+  loadLevel();
+  gameRunning=true; syncHUD();
+  if(raf) cancelAnimationFrame(raf);
+  raf=requestAnimationFrame(loop);
+}
+
+function loadLevel(){
+  const layout=LAYOUTS[Math.min(layoutIndex,LAYOUTS.length-1)];
+  bricks=[];
+  for(let r=0;r<layout.length;r++){
+    const row=layout[r];
+    for(let c=0;c<COLS;c++){
+      const ch=row[c]||' ';
+      if(ch===' ') continue;
+      let hp=ch==='B'?2:ch==='G'?999:+ch;
+      if(ch!=='G') hp=Math.max(1,hp*BRICK_HP_MULT); // harder bricks
+      bricks.push({x:BOFF_X+c*BW,y:BOFF_Y+r*BH,w:BW-2,h:BH-2,hp,maxHp:hp,type:ch});
+    }
+  }
+  // Extra rows of random bricks for higher levels
+  for(let er=0;er<EXTRA_ROWS;er++){
+    const ry=BOFF_Y+(layout.length+er)*BH;
+    if(ry+BH>H-80) break; // don't overflow into paddle area
+    for(let c=0;c<COLS;c++){
+      if(Math.random()<0.3) continue; // some gaps
+      const hp=Math.max(1,Math.ceil(Math.random()*3)*BRICK_HP_MULT);
+      const types=['1','2','3','B']; const type=types[Math.floor(Math.random()*types.length)];
+      bricks.push({x:BOFF_X+c*BW,y:ry,w:BW-2,h:BH-2,hp,maxHp:hp,type});
+    }
+  }
+  powerups=[]; lasers=[]; pEffects=[]; resetBall();
+}
+
+function resetBall(){
+  const pw=activePUs.wide>0?90:(60-PADDLE_SHRINK);
+  paddle={x:W/2-pw/2,y:H-30,w:pw,h:12};
+  const spd=activePUs.slow>0?BALL_SPEED_BASE-1:BALL_SPEED_BASE;
+  balls=[{x:W/2,y:H-50,dx:spd*(Math.random()>.5?1:-1),dy:-spd,r:7}];
+}
+
+function syncHUD(){
+  document.getElementById('hScore').textContent=score;
+  document.getElementById('hBest').textContent=best;
+  document.getElementById('hLvl').textContent=level;
+  document.getElementById('hCombo').textContent='×'+combo;
+  document.getElementById('lives').textContent='❤️'.repeat(Math.max(0,lives));
+  const puEl=document.getElementById('activePU');
+  puEl.innerHTML='';
+  PU_DEFS.forEach(p=>{
+    if(activePUs[p.type]>0){
+      const s=document.createElement('span');s.className='pu-active';
+      s.style.cssText=`color:${p.color};border-color:${p.color};background:${p.color}22`;
+      s.textContent=`${p.icon} ${p.label} ${Math.ceil(activePUs[p.type]/60)}s`;
+      puEl.appendChild(s);
+    }
+  });
+}
+
+function loop(){
+  if(!gameRunning||paused){return;}
+  raf=requestAnimationFrame(loop);
+  update(); draw();
+}
+
+function update(){
+  const pw=activePUs.wide>0?90:60;
+  paddle.w=pw; paddle.x=Math.max(0,Math.min(W-pw,cursorX-pw/2));
+  Object.keys(activePUs).forEach(k=>{if(activePUs[k]>0)activePUs[k]--;});
+  let anyBall=false;
+  balls.forEach(b=>{
+    if(b.dead)return; anyBall=true;
+    const spd=activePUs.slow>0?BALL_SPEED_BASE-1:BALL_SPEED_BASE+level*0.2;
+    const mag=Math.hypot(b.dx,b.dy);
+    b.dx=b.dx/mag*spd; b.dy=b.dy/mag*spd;
+    b.x+=b.dx; b.y+=b.dy;
+    if(b.x-b.r<0){b.x=b.r;b.dx*=-1;}
+    if(b.x+b.r>W){b.x=W-b.r;b.dx*=-1;}
+    if(b.y-b.r<0){b.y=b.r;b.dy*=-1;}
+    if(b.dy>0&&b.x>paddle.x&&b.x<paddle.x+paddle.w&&b.y+b.r>paddle.y&&b.y-b.r<paddle.y+paddle.h){
+      b.dy=-Math.abs(b.dy);
+      const rel=(b.x-(paddle.x+paddle.w/2))/(paddle.w/2);
+      b.dx=rel*5.5; combo=Math.min(combo+0.5,8)|0; if(combo>maxCombo)maxCombo=combo; syncHUD();
+    }
+    if(b.y-b.r>H){b.dead=true;}
+    for(let i=bricks.length-1;i>=0;i--){
+      const br=bricks[i];
+      if(b.x+b.r>br.x&&b.x-b.r<br.x+br.w&&b.y+b.r>br.y&&b.y-b.r<br.y+br.h){
+        const fromLeft=Math.abs(b.x-(br.x+br.w)),fromRight=Math.abs(b.x-br.x);
+        const fromTop=Math.abs(b.y-(br.y+br.h)),fromBot=Math.abs(b.y-br.y);
+        const minD=Math.min(fromLeft,fromRight,fromTop,fromBot);
+        if(minD===fromTop||minD===fromBot)b.dy*=-1;else b.dx*=-1;
+        if(br.type!=='G'){
+          br.hp--;
+          pEffects.push({x:br.x+br.w/2,y:br.y+br.h/2,color:BRICK_COLORS[br.type]||'#fff',alpha:1,r:4});
+          const pts=(4-Math.min(br.hp,3))*10*combo*level;
+          score+=pts; if(score>best){best=score;localStorage.setItem('ak_hs',best);}
+          if(br.hp<=0){
+            if(Math.random()<PU_RATE){const puDef=PU_DEFS[Math.floor(Math.random()*PU_DEFS.length)];powerups.push({x:br.x+br.w/2,y:br.y,type:puDef.type,icon:puDef.icon,color:puDef.color,dy:2});}
+            bricks.splice(i,1);
+          }
+          syncHUD();
+        }
+        break;
+      }
+    }
+  });
+  balls=balls.filter(b=>!b.dead);
+  if(!anyBall||(balls.length===0)){
+    lives--; combo=1; syncHUD();
+    if(lives<=0){endGame();}else{setTimeout(()=>{resetBall();},400);}
+    balls=[];
+  }
+  if(activePUs.laser>0&&Math.random()<0.04){lasers.push({x:paddle.x+paddle.w*.3,y:paddle.y,dy:-10});lasers.push({x:paddle.x+paddle.w*.7,y:paddle.y,dy:-10});}
+  lasers.forEach(l=>{l.y+=l.dy;});
+  lasers=lasers.filter(l=>{
+    if(l.y<0) return false;
+    for(let i=bricks.length-1;i>=0;i--){const br=bricks[i];if(l.x>br.x&&l.x<br.x+br.w&&l.y>br.y&&l.y<br.y+br.h){if(br.type!=='G'){br.hp--;if(br.hp<=0)bricks.splice(i,1);}score+=5*combo*level;if(score>best){best=score;localStorage.setItem('ak_hs',best);}return false;}}
+    return true;
+  });
+  powerups.forEach(p=>{p.y+=p.dy;});
+  powerups=powerups.filter(p=>{
+    if(p.y>H)return false;
+    if(p.y+12>paddle.y&&p.y<paddle.y+paddle.h&&p.x>paddle.x&&p.x<paddle.x+paddle.w){activatePU(p.type);return false;}
+    return true;
+  });
+  const breakable=bricks.filter(b=>b.type!=='G');
+  if(breakable.length===0&&balls.length>0){
+    score+=2000+lives*500; if(score>best){best=score;localStorage.setItem('ak_hs',best);}
+    level++; layoutIndex++;
+    if(layoutIndex>=LAYOUTS.length){endGame(true);}
+    else{setTimeout(()=>{loadLevel();syncHUD();},500);}
+  }
+  pEffects.forEach(e=>{e.alpha-=0.07;e.r+=1;});
+  pEffects=pEffects.filter(e=>e.alpha>0);
+}
+
+function activatePU(type){
+  const dur=420;
+  if(type==='wide')activePUs.wide=dur;
+  else if(type==='multi'){const spd=BALL_SPEED_BASE;balls.push({x:balls[0]?.x||W/2,y:balls[0]?.y||H-100,dx:spd,dy:-spd,r:7});balls.push({x:balls[0]?.x||W/2,y:balls[0]?.y||H-100,dx:-spd,dy:-spd,r:7});}
+  else if(type==='slow')activePUs.slow=dur;
+  else if(type==='laser')activePUs.laser=dur;
+  else if(type==='life')lives=Math.min(5,lives+1);
+  syncHUD();
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#1a0a3e');bg.addColorStop(1,'#0a3d3d');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  bricks.forEach(br=>{
+    const c=BRICK_COLORS[br.type]||'#fff';
+    const alpha=br.type==='G'?1:0.4+0.6*(br.hp/br.maxHp);
+    ctx.globalAlpha=alpha;ctx.fillStyle=c;roundRect(ctx,br.x,br.y,br.w,br.h,3);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.2)';roundRect(ctx,br.x,br.y,br.w,br.h*.4,3);ctx.fill();
+    if(br.type==='G'){ctx.fillStyle='rgba(0,0,0,0.3)';ctx.font=`bold ${br.h*.65}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('★',br.x+br.w/2,br.y+br.h/2);}
+    if(br.type==='B'&&br.hp===2){ctx.fillStyle='rgba(0,0,0,0.3)';ctx.font=`${br.h*.65}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('💣',br.x+br.w/2,br.y+br.h/2);}
+    ctx.globalAlpha=1;
+  });
+  pEffects.forEach(e=>{ctx.globalAlpha=e.alpha;ctx.strokeStyle=e.color;ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;});
+  const pw=activePUs.wide>0?90:60;
+  const pgrd=ctx.createLinearGradient(paddle.x,paddle.y,paddle.x,paddle.y+paddle.h);
+  pgrd.addColorStop(0,'#fd79a8');pgrd.addColorStop(1,'#e84393');
+  ctx.fillStyle=pgrd;roundRect(ctx,paddle.x,paddle.y,pw,paddle.h,5);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.25)';roundRect(ctx,paddle.x+1,paddle.y+1,pw-2,paddle.h*.4,4);ctx.fill();
+  balls.forEach(b=>{
+    ctx.shadowColor='rgba(255,255,255,0.6)';ctx.shadowBlur=10;
+    const bg2=ctx.createRadialGradient(b.x-b.r*.3,b.y-b.r*.3,b.r*.1,b.x,b.y,b.r);
+    bg2.addColorStop(0,'#fff');bg2.addColorStop(1,'#a29bfe');
+    ctx.fillStyle=bg2;ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+  });
+  lasers.forEach(l=>{ctx.fillStyle='#fdcb6e';ctx.fillRect(l.x-2,l.y-8,4,16);});
+  powerups.forEach(p=>{ctx.fillStyle=p.color+'88';ctx.beginPath();ctx.arc(p.x,p.y,10,0,Math.PI*2);ctx.fill();ctx.font='13px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(p.icon,p.x,p.y+1);});
+  ctx.fillStyle='rgba(255,255,255,0.5)';ctx.beginPath();ctx.arc(cursorX,H-30,3,0,Math.PI*2);ctx.fill();
+}
+
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
+
+function endGame(win=false){
+  gameRunning=false;paused=false;
+  if(score>best){best=score;localStorage.setItem('ak_hs',best);}
+  GamePlatform.recordResult({score, extra: win?`All levels cleared! Max Combo: ×${maxCombo} 🎉`:`Reached level ${level} — Max Combo: ×${maxCombo}`});
+}
+
+// Pause
+document.getElementById('pauseBtn').addEventListener('click',()=>{
+  if(!gameRunning)return;
+  paused=!paused;
+  document.getElementById('pauseBtn').textContent=paused?'▶':'⏸';
+  if(paused){
+    if(raf){cancelAnimationFrame(raf);raf=null;}
+    ctx.fillStyle='rgba(0,0,0,.72)';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='white';ctx.font='bold 28px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('⏸ PAUSED',W/2,H/2-18);ctx.font='14px sans-serif';ctx.fillStyle='rgba(255,255,255,.6)';ctx.fillText('Press ▶ to resume',W/2,H/2+18);
+    GamePlatform.pause({mode:currentMode,level:currentLevel});
+    ['hudRow','lives','activePU','wrap'].forEach(id=>document.getElementById(id).style.display='none');
+    gameRunning=false;
+  }
+});
+document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();if(gameRunning||paused)document.getElementById('pauseBtn').click();}});
+
+const wrap=document.getElementById('wrap');
+wrap.addEventListener('mousemove',e=>{const r=wrap.getBoundingClientRect();cursorX=e.clientX-r.left;});
+wrap.addEventListener('touchmove',e=>{e.preventDefault();const r=wrap.getBoundingClientRect();cursorX=e.touches[0].clientX-r.left;},{passive:false});
+wrap.addEventListener('touchstart',e=>{e.preventDefault();const r=wrap.getBoundingClientRect();cursorX=e.touches[0].clientX-r.left;},{passive:false});
+</script>
+</body>
+</html>

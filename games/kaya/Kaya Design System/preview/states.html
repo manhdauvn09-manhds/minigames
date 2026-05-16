@@ -1,0 +1,16 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css"><style>
+body{margin:0;padding:22px;background:var(--bg);display:flex;flex-direction:column;gap:16px}
+.row{display:flex;gap:12px;align-items:center}
+.label{font:500 11px var(--font-mono);color:var(--fg-subtle);width:100px;flex:none}
+.box{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--paper-1);font:500 13px var(--font-sans);color:var(--fg)}
+.box.focus{outline:2px solid var(--focus-ring);outline-offset:2px}
+.box.hover{background:var(--paper-2)}
+.box.press{background:var(--paper-3)}
+.pbtn{padding:8px 16px;border:0;background:var(--sumi);color:#fff;border-radius:var(--radius-sm);font:600 13px var(--font-sans)}
+.pbtn.hover{background:var(--sumi-hover)}
+.pbtn.press{background:var(--sumi-press)}
+.pbtn.focus{outline:2px solid var(--focus-ring);outline-offset:2px}
+</style></head><body>
+<div class="row"><div class="label">default</div><div class="box">Button</div><div class="box hover">Hover · 6% darken</div><div class="box press">Press · 12% darken</div><div class="box focus">Focus · 2px ring</div></div>
+<div class="row"><div class="label">primary</div><div class="pbtn">Button</div><div class="pbtn hover">Hover</div><div class="pbtn press">Press</div><div class="pbtn focus">Focus</div></div>
+</body></html>

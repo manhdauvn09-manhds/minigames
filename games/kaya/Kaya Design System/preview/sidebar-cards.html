@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css"><style>
+body{margin:0;padding:22px;background:var(--bg);display:flex;gap:20px;align-items:stretch}
+.card{flex:1;background:var(--paper-1);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;box-shadow:var(--shadow-1)}
+.eyebrow{font:600 11px var(--font-sans);letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:8px}
+.big{font-family:var(--font-mono);font-size:32px;font-weight:500;color:var(--fg);letter-spacing:-0.01em;line-height:1}
+.score{display:flex;gap:16px;margin-top:6px}
+.score div{font:500 13px var(--font-mono);color:var(--fg-muted)}
+.score b{color:var(--fg);font-weight:600}
+.meter{display:flex;gap:4px;margin-top:10px}
+.meter div{flex:1;height:6px;border-radius:2px;background:var(--paper-3)}
+.meter div.on{background:var(--sumi)}
+</style></head><body>
+<div class="card">
+  <div class="eyebrow">Timer</div>
+  <div class="big">04:12</div>
+</div>
+<div class="card">
+  <div class="eyebrow">Level 3 of 5</div>
+  <div class="meter"><div class="on"></div><div class="on"></div><div class="on"></div><div></div><div></div></div>
+  <div style="font:500 13px var(--font-sans);color:var(--fg-muted);margin-top:10px">Measured. Blocks common threats.</div>
+</div>
+<div class="card">
+  <div class="eyebrow">Record</div>
+  <div class="score"><div><b>W</b> 12</div><div><b>L</b> 8</div><div><b>D</b> 2</div></div>
+  <div style="font:500 13px var(--font-sans);color:var(--fg-muted);margin-top:10px">55% win rate</div>
+</div>
+</body></html>

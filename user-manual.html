@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="User Manual & Game Guides — allin1site Games. How to play 8 free browser games (BallMerge, ChromaMatch, StackTower, MemoryFlip, SnakeRush, BubbleBlast, ArkanoidX, NumberSlide).">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#0f3460">
+<title>User Manual — allin1site Games</title>
+<link rel="canonical" href="/user-manual.html">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(160deg,#1a1a2e,#16213e 50%,#0f3460);color:#e5e7eb;line-height:1.6;min-height:100vh}
+  .wrap{max-width:880px;margin:0 auto;padding:32px 18px 60px}
+  header.top{text-align:center;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:24px}
+  h1{font-size:2rem;background:linear-gradient(90deg,#a78bfa,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+  h2{font-size:1.3rem;color:#a78bfa;margin:28px 0 10px;border-left:3px solid #a78bfa;padding-left:10px;scroll-margin-top:20px}
+  h3{font-size:1.05rem;color:#60a5fa;margin:14px 0 6px}
+  p,li{font-size:.93rem;color:#d1d5db}
+  ul,ol{padding-left:22px;margin:5px 0 10px}
+  li{margin:3px 0}
+  code,kbd{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;font-size:.85em;color:#fbbf24}
+  .lang-tabs{display:flex;gap:6px;margin:14px 0 20px;flex-wrap:wrap;justify-content:center}
+  .lang-tabs button{padding:7px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#cbd5e1;font-size:.85rem;cursor:pointer}
+  .lang-tabs button.active{border-color:#a78bfa;background:rgba(167,139,250,.18);color:#c4b5fd}
+  .toc{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 20px;padding:12px;background:rgba(255,255,255,.04);border-radius:10px;border:1px solid rgba(255,255,255,.08)}
+  .toc a{color:#93c5fd;text-decoration:none;font-size:.82rem;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+  .toc a:hover{background:rgba(167,139,250,.15);border-color:#a78bfa}
+  .game-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;margin-bottom:14px}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;background:rgba(96,165,250,.18);color:#93c5fd;margin-right:5px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:8px 0}
+  .feat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 12px}
+  .feat-t{color:#fbbf24;font-weight:700;font-size:.83rem;margin-bottom:3px}
+  .feat-d{font-size:.82rem;color:#9ca3af}
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid rgba(255,255,255,.08);text-align:center;color:#6b7280;font-size:.82rem}
+  a{color:#93c5fd}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div style="text-align: left; margin-bottom: 12px;">
+    <a href="index.html" style="color: #93c5fd; text-decoration: none; font-size: 0.9rem;">← Back to Home</a>
+  </div>
+  <h1>📖 allin1site Games — User Manual</h1>
+  <p style="opacity:.7;font-size:.9rem">How to play, features, and shortcuts for all 8 games</p>
+  <div class="lang-tabs" id="langTabs">
+    <button class="active" data-l="en">🇺🇸 English</button>
+    <button data-l="vi">🇻🇳 Tiếng Việt</button>
+    <button data-l="ja">🇯🇵 日本語</button>
+  </div>
+</header>
+
+<!-- ================= EN ================= -->
+<section data-lang="en">
+
+<h2>Platform Features</h2>
+<div class="grid">
+  <div class="feat"><div class="feat-t">📱 Phone-style status bar</div><div class="feat-d">Live clock, signal bars, network indicator, battery — just like your phone.</div></div>
+  <div class="feat"><div class="feat-t">⛶ Fullscreen mode</div><div class="feat-d">Tap "Fullscreen" in the footer. Status bar, footer, and ad slots stay visible.</div></div>
+  <div class="feat"><div class="feat-t">🌐 Auto language</div><div class="feat-d">Vietnamese for VN, Japanese for JP, English for everyone else. Switch anytime.</div></div>
+  <div class="feat"><div class="feat-t">🔑 Google login (optional)</div><div class="feat-d">Play as guest, or sign in with Google for cloud sync and online leaderboard.</div></div>
+  <div class="feat"><div class="feat-t">💾 Local-first storage</div><div class="feat-d">IndexedDB stores levels, history, progress on your device. Works offline.</div></div>
+  <div class="feat"><div class="feat-t">🏆 Online leaderboard</div><div class="feat-d">Top 20 scores per game, all-time and weekly.</div></div>
+  <div class="feat"><div class="feat-t">📲 Mobile-ready</div><div class="feat-d">Responsive layout. Native app = WebView wrapper of the same URL.</div></div>
+  <div class="feat"><div class="feat-t">🛡️ Privacy & security</div><div class="feat-d">CSP headers, no analytics by default, your scores belong to you.</div></div>
+</div>
+
+<h2>Account &amp; Login</h2>
+<ol>
+  <li><strong>Guest mode:</strong> tap "Play as Guest" + name. Scores saved on this device only.</li>
+  <li><strong>Google sign-in:</strong> profile pill → "Sign in with Google" → choose account. Name, avatar, and scores sync across devices.</li>
+  <li><strong>Sign out:</strong> profile → "Sign Out". Local data stays.</li>
+  <li><strong>Play without login:</strong> always works — login is 100% optional.</li>
+</ol>
+
+<div class="toc">
+  <strong style="font-size:.82rem;align-self:center;color:#9ca3af">Jump to game:</strong>
+  <a href="#g-ballmerge-en">🎱 BallMerge</a>
+  <a href="#g-chromamatch-en">🎨 ChromaMatch</a>
+  <a href="#g-stacktower-en">🏗️ StackTower</a>
+  <a href="#g-memoryflip-en">🃏 MemoryFlip</a>
+  <a href="#g-snakerush-en">🐍 SnakeRush</a>
+  <a href="#g-bubbleblast-en">🫧 BubbleBlast</a>
+  <a href="#g-arkanoidx-en">🏓 ArkanoidX</a>
+  <a href="#g-numberslide-en">🔢 NumberSlide</a>
+</div>
+
+<h2 id="g-ballmerge-en">🎱 BallMerge</h2>
+<div class="game-card">
+  <p><span class="badge">Puzzle</span><span class="badge">30 levels</span></p>
+  <h3>Goal</h3><p>Drop numbered balls into columns. Two same-number balls touching merge into the next number. Build chains and reach ★ (level 7). Game over when any column fills to the top.</p>
+  <h3>Controls</h3><ul><li><kbd>Click</kbd>/<kbd>tap</kbd> a column to drop the next ball</li><li>Mouse-hover shows preview placement</li></ul>
+  <h3>Scoring</h3><ul><li>Each merge = level² × 120 × bonus</li><li>Higher levels = bigger bonus multiplier</li></ul>
+  <h3>Adventure</h3><p>Hit the score target before any column overflows. 30 levels, fewer rows, more colors, higher targets.</p>
+  <h3>Tips</h3><ul><li>Stack same-number balls in adjacent columns to chain merges</li><li>Don't waste a column on lone balls — merge potential matters</li></ul>
+</div>
+
+<h2 id="g-chromamatch-en">🎨 ChromaMatch</h2>
+<div class="game-card">
+  <p><span class="badge">Match-3</span><span class="badge">30 levels</span><span class="badge">Timed</span></p>
+  <h3>Goal</h3><p>Swap adjacent tiles to match 3+ same color. Cleared tiles fall, new ones drop. Cascading combos = doubled scores!</p>
+  <h3>Controls</h3><ul><li><kbd>Tap</kbd> a tile to select (glows white)</li><li><kbd>Tap</kbd> an adjacent tile to swap</li></ul>
+  <h3>Scoring</h3><ul><li>Match-3 = 100, Match-4 = 300, Match-5+ = 600</li><li>Each cascade depth × 2 multiplier</li></ul>
+  <h3>Adventure</h3><p>Hit score target before timer runs out. 30 levels, bigger boards, more colors, less time.</p>
+</div>
+
+<h2 id="g-stacktower-en">🏗️ StackTower</h2>
+<div class="game-card">
+  <p><span class="badge">Arcade</span><span class="badge">30 levels</span><span class="badge">Reflex</span></p>
+  <h3>Goal</h3><p>Tap to drop a sliding block onto your tower. Only the overlap stays. Land a perfect (⭐ PERFECT!) to keep full width.</p>
+  <h3>Controls</h3><ul><li><kbd>Click</kbd>/<kbd>tap</kbd>/<kbd>Space</kbd> to drop</li></ul>
+  <h3>Scoring</h3><p>1 floor = 1 point. Adventure: hit target floor count.</p>
+  <h3>Tips</h3><ul><li>Time the drop on the slowest part of the slide</li><li>Perfect stacks stay full-width — chase them!</li></ul>
+</div>
+
+<h2 id="g-memoryflip-en">🃏 MemoryFlip</h2>
+<div class="game-card">
+  <p><span class="badge">Memory</span><span class="badge">30 levels</span><span class="badge">Timed</span></p>
+  <h3>Goal</h3><p>Flip cards two at a time to find matching pairs. Match all pairs before time runs out.</p>
+  <h3>Controls</h3><ul><li><kbd>Click</kbd>/<kbd>tap</kbd> a card to flip it</li></ul>
+  <h3>Scoring</h3><ul><li>Each pair = 100 × combo + remaining time bonus</li><li>Consecutive matches build combo (×2, ×3, …)</li></ul>
+  <h3>Adventure</h3><p>30 levels: 4×3 → 8×8 board. Higher levels = faster card flip-back.</p>
+</div>
+
+<h2 id="g-snakerush-en">🐍 SnakeRush</h2>
+<div class="game-card">
+  <p><span class="badge">Arcade</span><span class="badge">30 levels</span><span class="badge">Timed</span></p>
+  <h3>Goal</h3><p>Steer the snake. Eat 🍎 food to grow. Don't hit the walls or your tail. Beat the clock!</p>
+  <h3>Controls</h3><ul><li><kbd>Arrow keys</kbd> / <kbd>WASD</kbd> on desktop</li><li><kbd>Swipe</kbd> on mobile (or use the on-screen D-pad)</li></ul>
+  <h3>Power-ups</h3><ul><li>⚡ Slow — slows the snake briefly</li><li>⭐ Bonus — instant +50 points</li><li>✂️ Cut — halves your length (escape tight situations)</li></ul>
+  <h3>Adventure</h3><p>30 levels: faster base speed, tighter time limit, higher score target.</p>
+</div>
+
+<h2 id="g-bubbleblast-en">🫧 BubbleBlast</h2>
+<div class="game-card">
+  <p><span class="badge">Puzzle</span><span class="badge">30 levels</span></p>
+  <h3>Goal</h3><p>Aim and shoot bubbles at the cluster. Match 3+ same-color to pop. Clear the board to advance.</p>
+  <h3>Controls</h3><ul><li><kbd>Mouse move</kbd> / <kbd>drag</kbd> — aim</li><li><kbd>Click</kbd> / <kbd>tap</kbd> — fire</li></ul>
+  <h3>Specials (from level 3)</h3><ul><li>💣 Bomb — pops every neighbor</li><li>🌈 Rainbow — matches any color</li></ul>
+  <h3>Scoring</h3><ul><li>Match-3 = 30 × level · 5+ = ×2 · 8+ = ×3</li><li>Drops from ceiling = 5 × level each</li><li>Sub-level cleared = 2000 + 50 × shots remaining</li></ul>
+</div>
+
+<h2 id="g-arkanoidx-en">🏓 ArkanoidX</h2>
+<div class="game-card">
+  <p><span class="badge">Arcade</span><span class="badge">30 levels</span><span class="badge">Power-ups</span></p>
+  <h3>Goal</h3><p>Move the paddle to bounce the ball. Break all bricks to advance.</p>
+  <h3>Controls</h3><ul><li><kbd>Mouse</kbd> / <kbd>drag</kbd> — move paddle</li><li><kbd>Space</kbd> — pause</li></ul>
+  <h3>Power-ups</h3><ul><li>🔴 Wide paddle · 🔵 Multi-ball · 🟢 Slow · 🟡 Laser · ❤️ +Life</li></ul>
+  <h3>Scoring</h3><p>Brick HP × 10 × combo × level. Don't drop the ball — combo resets!</p>
+  <h3>Adventure</h3><p>30 levels: faster ball, fewer lives, harder layouts.</p>
+</div>
+
+<h2 id="g-numberslide-en">🔢 NumberSlide</h2>
+<div class="game-card">
+  <p><span class="badge">Puzzle</span><span class="badge">30 levels</span><span class="badge">Brain</span></p>
+  <h3>Goal</h3><p>Slide tiles into 1, 2, 3 … order. Empty space ends bottom-right.</p>
+  <h3>Controls</h3><ul><li><kbd>Click</kbd>/<kbd>tap</kbd> a tile next to the empty space</li><li><kbd>Arrow keys</kbd> on desktop</li></ul>
+  <h3>Scoring</h3><p>Score = 10000 / moves. Fewer moves = higher score.</p>
+  <h3>Adventure</h3><p>30 levels: 3×3 → 5×5. Some levels have time limits.</p>
+</div>
+
+<h2>FAQ</h2>
+<p><strong>Do I have to log in?</strong> No. Guest mode works forever.</p>
+<p><strong>Where are scores stored?</strong> IndexedDB on device. Google sign-in adds cloud sync.</p>
+<p><strong>Can I play on mobile?</strong> Yes. Open the URL in any browser, or wrap the URL in a WebView for native apps.</p>
+
+</section>
+
+<!-- ================= VI ================= -->
+<section data-lang="vi" class="hide">
+
+<h2>Tính năng nền tảng</h2>
+<div class="grid">
+  <div class="feat"><div class="feat-t">📱 Thanh trạng thái như điện thoại</div><div class="feat-d">Đồng hồ, sóng, mạng, pin — y hệt thanh trên cùng điện thoại.</div></div>
+  <div class="feat"><div class="feat-t">⛶ Toàn màn hình</div><div class="feat-d">Bấm "Fullscreen" ở footer. Status bar, footer, quảng cáo vẫn hiện.</div></div>
+  <div class="feat"><div class="feat-t">🌐 Tự động ngôn ngữ</div><div class="feat-d">VN→Việt, JP→Nhật, còn lại Anh. Đổi bất kỳ lúc nào.</div></div>
+  <div class="feat"><div class="feat-t">🔑 Đăng nhập Google (tùy chọn)</div><div class="feat-d">Chơi guest hoặc Google để sync cloud + bảng xếp hạng online.</div></div>
+  <div class="feat"><div class="feat-t">💾 Lưu trên máy</div><div class="feat-d">IndexedDB lưu cấp, lịch sử, tiến trình. Hoạt động offline.</div></div>
+  <div class="feat"><div class="feat-t">🏆 Bảng xếp hạng online</div><div class="feat-d">Top 20 mỗi game — tổng và theo tuần.</div></div>
+  <div class="feat"><div class="feat-t">📲 Sẵn sàng mobile</div><div class="feat-d">Layout co giãn. Native app = WebView trỏ URL.</div></div>
+  <div class="feat"><div class="feat-t">🛡️ Bảo mật &amp; riêng tư</div><div class="feat-d">CSP headers, không tracking mặc định.</div></div>
+</div>
+
+<h2>Tài khoản &amp; Đăng nhập</h2>
+<ol>
+  <li><strong>Guest:</strong> bấm "Chơi không đăng nhập" + nhập tên. Điểm chỉ trên máy.</li>
+  <li><strong>Google:</strong> avatar → "Đăng nhập Google" → chọn tài khoản. Tên, ảnh, điểm sync giữa thiết bị.</li>
+  <li><strong>Đăng xuất:</strong> hồ sơ → "Đăng xuất". Dữ liệu cục bộ vẫn còn.</li>
+  <li><strong>Chơi không cần đăng nhập:</strong> luôn được.</li>
+</ol>
+
+<div class="toc">
+  <strong style="font-size:.82rem;align-self:center;color:#9ca3af">Tới game:</strong>
+  <a href="#g-ballmerge-vi">🎱 BallMerge</a>
+  <a href="#g-chromamatch-vi">🎨 ChromaMatch</a>
+  <a href="#g-stacktower-vi">🏗️ StackTower</a>
+  <a href="#g-memoryflip-vi">🃏 MemoryFlip</a>
+  <a href="#g-snakerush-vi">🐍 SnakeRush</a>
+  <a href="#g-bubbleblast-vi">🫧 BubbleBlast</a>
+  <a href="#g-arkanoidx-vi">🏓 ArkanoidX</a>
+  <a href="#g-numberslide-vi">🔢 NumberSlide</a>
+</div>
+
+<h2 id="g-ballmerge-vi">🎱 BallMerge</h2>
+<div class="game-card">
+  <p><span class="badge">Giải đố</span><span class="badge">30 cấp</span></p>
+  <h3>Mục tiêu</h3><p>Thả bóng số vào cột. 2 bóng cùng số chạm nhau → gộp thành số tiếp theo. Liên hoàn để đạt ★ (cấp 7). Game over khi cột đầy đỉnh.</p>
+  <h3>Điều khiển</h3><ul><li><kbd>Click</kbd>/<kbd>chạm</kbd> cột để thả</li></ul>
+  <h3>Tính điểm</h3><p>Mỗi gộp = level² × 120 × bonus.</p>
+  <h3>Phiêu Lưu</h3><p>Đạt điểm mục tiêu trước khi cột tràn. 30 cấp.</p>
+</div>
+
+<h2 id="g-chromamatch-vi">🎨 ChromaMatch</h2>
+<div class="game-card">
+  <p><span class="badge">Match-3</span><span class="badge">30 cấp</span><span class="badge">Có giờ</span></p>
+  <h3>Mục tiêu</h3><p>Hoán đổi ô kế bên để khớp 3+ cùng màu. Combo dây chuyền nhân điểm.</p>
+  <h3>Điều khiển</h3><ul><li><kbd>Chạm</kbd> chọn ô (sáng) → <kbd>chạm</kbd> ô kế bên để hoán đổi</li></ul>
+  <h3>Phiêu Lưu</h3><p>Đạt điểm trước khi hết giờ. 30 cấp, bảng to dần, ít thời gian.</p>
+</div>
+
+<h2 id="g-stacktower-vi">🏗️ StackTower</h2>
+<div class="game-card">
+  <p><span class="badge">Arcade</span><span class="badge">30 cấp</span></p>
+  <h3>Mục tiêu</h3><p>Chạm để thả khối lên tháp. Phần chồng lên giữ lại. ⭐ PERFECT giữ nguyên độ rộng.</p>
+  <h3>Điều khiển</h3><ul><li><kbd>Click</kbd>/<kbd>chạm</kbd>/<kbd>Space</kbd> để thả</li></ul>
+  <h3>Phiêu Lưu</h3><p>Đạt số tầng mục tiêu. 30 cấp, càng cao càng nhanh.</p>
+</div>
+
+<h2 id="g-memoryflip-vi">🃏 MemoryFlip</h2>
+<div class="game-card">
+  <p><span class="badge">Trí nhớ</span><span class="badge">30 cấp</span><span class="badge">Có giờ</span></p>
+  <h3>Mục tiêu</h3><p>Lật 2 bài cùng lúc để tìm cặp. Tìm hết trước khi hết giờ.</p>
+  <h3>Tính điểm</h3><p>Mỗi cặp = 100 × combo + thời gian còn. Combo liên tiếp ×2, ×3,…</p>
+  <h3>Phiêu Lưu</h3><p>30 cấp, từ 4×3 đến 8×8. Cấp cao = lật lại nhanh hơn.</p>
+</div>
+
+<h2 id="g-snakerush-vi">🐍 SnakeRush</h2>
+<div class="game-card">
+  <p><span class="badge">Arcade</span><span class="badge">30 cấp</span></p>
+  <h3>Mục tiêu</h3><p>Lái rắn ăn 🍎 để dài. Tránh tường và đuôi. Đua thời gian.</p>
+  <h3>Điều khiển</h3><ul><li><kbd>Mũi tên</kbd>/<kbd>WASD</kbd> trên PC</li><li><kbd>Vuốt</kbd> trên mobile (hoặc D-pad trên màn)</li></ul>
+  <h3>Power-up</h3><ul><li>⚡ Chậm · ⭐ +50 điểm · ✂️ Cắt đuôi (cứu mạng)</li></ul>
+  <h3>Phiêu Lưu</h3><p>30 cấp, tốc độ tăng, thời gian ít hơn.</p>
+</div>
+
+<h2 id="g-bubbleblast-vi">🫧 BubbleBlast</h2>
+<div class="game-card">
+  <p><span class="badge">Giải đố</span><span class="badge">30 cấp</span></p>
+  <h3>Mục tiêu</h3><p>Ngắm bắn bóng vào cụm. Khớp 3+ cùng màu để nổ. Dọn sạch để qua cấp.</p>
+  <h3>Điều khiển</h3><ul><li><kbd>Di chuột</kbd>/<kbd>kéo</kbd> ngắm · <kbd>Click</kbd>/<kbd>chạm</kbd> bắn</li></ul>
+  <h3>Đặc biệt (từ cấp 3)</h3><ul><li>💣 Bom · 🌈 Cầu vồng</li></ul>
+</div>
+
+<h2 id="g-arkanoidx-vi">🏓 ArkanoidX</h2>
+<div class="game-card">
+  <p><span class="badge">Arcade</span><span class="badge">30 cấp</span></p>
+  <h3>Mục tiêu</h3><p>Di vợt bật bóng phá hết gạch.</p>
+  <h3>Điều khiển</h3><ul><li><kbd>Chuột</kbd>/<kbd>kéo</kbd> di vợt · <kbd>Space</kbd> tạm dừng</li></ul>
+  <h3>Power-up</h3><ul><li>🔴 Vợt rộng · 🔵 Nhiều bóng · 🟢 Chậm · 🟡 Laser · ❤️ +Mạng</li></ul>
+  <h3>Phiêu Lưu</h3><p>30 cấp: bóng nhanh hơn, ít mạng, layout khó hơn.</p>
+</div>
+
+<h2 id="g-numberslide-vi">🔢 NumberSlide</h2>
+<div class="game-card">
+  <p><span class="badge">Giải đố</span><span class="badge">30 cấp</span></p>
+  <h3>Mục tiêu</h3><p>Trượt ô vào thứ tự 1, 2, 3,… Ô trống ở góc dưới phải.</p>
+  <h3>Điều khiển</h3><ul><li><kbd>Click</kbd>/<kbd>chạm</kbd> ô cạnh ô trống</li><li><kbd>Mũi tên</kbd> trên PC</li></ul>
+  <h3>Tính điểm</h3><p>Điểm = 10000 / số bước. Càng ít bước càng cao.</p>
+</div>
+
+</section>
+
+<!-- ================= JA ================= -->
+<section data-lang="ja" class="hide">
+
+<h2>プラットフォーム機能</h2>
+<div class="grid">
+  <div class="feat"><div class="feat-t">📱 スマホ風ステータスバー</div><div class="feat-d">時計・電波・ネット・バッテリー — スマホ上部と同じ。</div></div>
+  <div class="feat"><div class="feat-t">⛶ 全画面モード</div><div class="feat-d">フッターの「全画面」をタップ。ステータスバー・フッター・広告枠は表示し続けます。</div></div>
+  <div class="feat"><div class="feat-t">🌐 自動言語</div><div class="feat-d">VN→ベトナム語、JP→日本語、他→英語。</div></div>
+  <div class="feat"><div class="feat-t">🔑 Google ログイン (任意)</div><div class="feat-d">ゲスト or Google でクラウド保存＆ランキング参加。</div></div>
+  <div class="feat"><div class="feat-t">💾 端末保存</div><div class="feat-d">IndexedDB にレベル・履歴・進捗を保存。オフライン対応。</div></div>
+  <div class="feat"><div class="feat-t">🏆 オンランク</div><div class="feat-d">各ゲームのトップ20、総合と週間。</div></div>
+  <div class="feat"><div class="feat-t">📲 モバイル対応</div><div class="feat-d">レスポンシブ。WebView ラップでネイティブ化可能。</div></div>
+  <div class="feat"><div class="feat-t">🛡️ プライバシー</div><div class="feat-d">CSP、デフォルトでトラッキング無し。</div></div>
+</div>
+
+<h2>アカウント &amp; ログイン</h2>
+<ol>
+  <li><strong>ゲスト:</strong>「ゲストでプレイ」+名前。スコアは端末のみ。</li>
+  <li><strong>Google サインイン:</strong> プロフィール → アカウント選択。名前・アバター・スコアが端末間で同期。</li>
+  <li><strong>サインアウト:</strong> プロフィール → サインアウト。</li>
+</ol>
+
+<div class="toc">
+  <strong style="font-size:.82rem;align-self:center;color:#9ca3af">ゲームへ:</strong>
+  <a href="#g-ballmerge-ja">🎱 BallMerge</a>
+  <a href="#g-chromamatch-ja">🎨 ChromaMatch</a>
+  <a href="#g-stacktower-ja">🏗️ StackTower</a>
+  <a href="#g-memoryflip-ja">🃏 MemoryFlip</a>
+  <a href="#g-snakerush-ja">🐍 SnakeRush</a>
+  <a href="#g-bubbleblast-ja">🫧 BubbleBlast</a>
+  <a href="#g-arkanoidx-ja">🏓 ArkanoidX</a>
+  <a href="#g-numberslide-ja">🔢 NumberSlide</a>
+</div>
+
+<h2 id="g-ballmerge-ja">🎱 BallMerge</h2>
+<div class="game-card">
+  <p><span class="badge">パズル</span><span class="badge">30レベル</span></p>
+  <h3>目的</h3><p>列に番号ボールを落とす。同じ数字が隣接 → 合体して次の番号。連鎖して★（レベル7）を目指せ。列が上まで埋まるとゲームオーバー。</p>
+  <h3>操作</h3><ul><li><kbd>クリック/タップ</kbd>列を選んで落下</li></ul>
+  <h3>アドベンチャー</h3><p>あふれる前に目標スコアを達成。30レベル。</p>
+</div>
+
+<h2 id="g-chromamatch-ja">🎨 ChromaMatch</h2>
+<div class="game-card">
+  <p><span class="badge">マッチ3</span><span class="badge">30レベル</span></p>
+  <h3>目的</h3><p>隣のタイルをスワップして同色3つ揃え。連鎖で得点倍率アップ。</p>
+  <h3>アドベンチャー</h3><p>時間内に目標スコア達成。30レベル。</p>
+</div>
+
+<h2 id="g-stacktower-ja">🏗️ StackTower</h2>
+<div class="game-card">
+  <p><span class="badge">アーケード</span><span class="badge">30レベル</span></p>
+  <h3>目的</h3><p>タップでブロックを落として塔を築け。重なった部分のみ残る。⭐ PERFECT で幅キープ。</p>
+</div>
+
+<h2 id="g-memoryflip-ja">🃏 MemoryFlip</h2>
+<div class="game-card">
+  <p><span class="badge">記憶</span><span class="badge">30レベル</span></p>
+  <h3>目的</h3><p>2枚ずつめくってペアを揃える。時間内に全ペア成立。</p>
+  <h3>アドベンチャー</h3><p>30レベル: 4×3 → 8×8。高レベルほど早く裏返る。</p>
+</div>
+
+<h2 id="g-snakerush-ja">🐍 SnakeRush</h2>
+<div class="game-card">
+  <p><span class="badge">アーケード</span><span class="badge">30レベル</span></p>
+  <h3>目的</h3><p>🍎を食べて伸びろ。壁・しっぽに当たるな。タイムアタック！</p>
+  <h3>パワーアップ</h3><ul><li>⚡ スロー · ⭐ +50点 · ✂️ しっぽ切断</li></ul>
+</div>
+
+<h2 id="g-bubbleblast-ja">🫧 BubbleBlast</h2>
+<div class="game-card">
+  <p><span class="badge">パズル</span><span class="badge">30レベル</span></p>
+  <h3>目的</h3><p>クラスターにバブル発射。同色3個以上でポップ。全消し → クリア。</p>
+  <h3>特殊（Lv3〜）</h3><ul><li>💣 爆弾 · 🌈 レインボー</li></ul>
+</div>
+
+<h2 id="g-arkanoidx-ja">🏓 ArkanoidX</h2>
+<div class="game-card">
+  <p><span class="badge">アーケード</span><span class="badge">30レベル</span></p>
+  <h3>目的</h3><p>パドルでボールを跳ね返し全ブロック破壊。</p>
+  <h3>パワーアップ</h3><ul><li>🔴 ワイド · 🔵 マルチ · 🟢 スロー · 🟡 レーザー · ❤️ ライフ</li></ul>
+</div>
+
+<h2 id="g-numberslide-ja">🔢 NumberSlide</h2>
+<div class="game-card">
+  <p><span class="badge">パズル</span><span class="badge">30レベル</span></p>
+  <h3>目的</h3><p>1, 2, 3…の順にタイルを並べよ。空きマスは右下。</p>
+  <h3>得点</h3><p>得点 = 10000 / 手数。少ない手数ほど高得点。</p>
+</div>
+
+</section>
+
+<footer>
+  © <span id="yr"></span> <a href="https://allin1site.com">allin1site.com</a> · GenZ Web Game Factory · v2.0
+</footer>
+
+</div>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  const nav = (navigator.language || 'en').toLowerCase();
+  let lang = 'en';
+  if (nav.startsWith('vi')) lang = 'vi';
+  else if (nav.startsWith('ja')) lang = 'ja';
+  function setLang(l) {
+    document.querySelectorAll('section[data-lang]').forEach(s => s.classList.toggle('hide', s.dataset.lang !== l));
+    document.querySelectorAll('#langTabs button').forEach(b => b.classList.toggle('active', b.dataset.l === l));
+    document.documentElement.setAttribute('lang', l);
+  }
+  setLang(lang);
+  document.querySelectorAll('#langTabs button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.l)));
+</script>
+</body>
+</html>

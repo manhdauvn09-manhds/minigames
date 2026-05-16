@@ -1,0 +1,1006 @@
+{
+  "$schemaVersion": "1.0",
+  "generatedAt": "2026-04-26T05:33:41Z",
+  "meta": {
+    "gameName": "Penumbra",
+    "gameNameKebab": "penumbra",
+    "gameNameSlug": "penumbra",
+    "tagline": "Trace the line. Find the light.",
+    "owner": "TBD",
+    "targetLaunchWeeks": 8
+  },
+  "scope": {
+    "tier": "mvp-plus-ai",
+    "outOfScopeForV1": [
+      "Real-time co-op puzzles",
+      "User-generated puzzle creator",
+      "Friend leaderboard / social graph",
+      "Story / narrative mode",
+      "Native mobile app",
+      "Multiple cosmetic theme packs",
+      "Pro subscription tier",
+      "Mood-based puzzle generation",
+      "Puzzle remix / UGC editing",
+      "Audio music score"
+    ]
+  },
+  "puzzle": {
+    "type": "path-drawing",
+    "boardShape": "grid",
+    "boardSize": {
+      "minRows": 4,
+      "maxRows": 9,
+      "minCols": 4,
+      "maxCols": 9
+    },
+    "rules": [
+      "The path is a continuous chain of orthogonally adjacent cells (up/down/left/right; no diagonals).",
+      "The path begins at one lantern and ends at the paired lantern.",
+      "Every bright cell must be on the path.",
+      "The path may not enter any void cell.",
+      "The path may not visit the same cell twice (no self-crossing).",
+      "Each puzzle is guaranteed to have at least one valid solution."
+    ],
+    "playerActions": [
+      "tap",
+      "drag",
+      "undo",
+      "redo",
+      "reset",
+      "hint"
+    ],
+    "winCondition": "A continuous valid path connects both lanterns, includes every bright cell, never enters a void cell, and never crosses itself.",
+    "loseCondition": null,
+    "difficulty": {
+      "scale": [
+        1,
+        10
+      ],
+      "curve": "gradual-with-plateaus",
+      "newMechanicEveryNLevels": 5
+    },
+    "totalLevelsAtLaunch": 60,
+    "starsRubric": {
+      "threeStar": "Solve with the minimum-possible path length (optimal).",
+      "twoStar": "Solve without using any hint (Tier 2 or 3).",
+      "oneStar": "Solve with any valid path."
+    },
+    "cellTypes": [
+      {
+        "name": "lantern",
+        "symbol": "◉",
+        "description": "Path endpoint. Always 2 per puzzle (or 4 for two-pair levels)."
+      },
+      {
+        "name": "bright",
+        "symbol": "◆",
+        "description": "Path must pass through this cell."
+      },
+      {
+        "name": "empty",
+        "symbol": "·",
+        "description": "Path may pass through this cell."
+      },
+      {
+        "name": "void",
+        "symbol": "✕",
+        "description": "Path may not enter this cell."
+      },
+      {
+        "name": "portal",
+        "symbol": "◌",
+        "description": "Linked pair; entering one exits the other."
+      },
+      {
+        "name": "switch",
+        "symbol": "⊕",
+        "description": "Path through this cell toggles a void to bright."
+      }
+    ],
+    "mechanicsByLevelRange": [
+      {
+        "range": "1-5",
+        "introduces": "basic"
+      },
+      {
+        "range": "6-10",
+        "introduces": "void cells"
+      },
+      {
+        "range": "11-20",
+        "introduces": "multi-color lantern pairs"
+      },
+      {
+        "range": "21-30",
+        "introduces": "portals"
+      },
+      {
+        "range": "31-45",
+        "introduces": "switches"
+      },
+      {
+        "range": "46-60",
+        "introduces": "layered boards"
+      }
+    ]
+  },
+  "features": {
+    "core": {
+      "scoringStars": true,
+      "hintSystem": true,
+      "saveProgress": true,
+      "dailyPuzzle": true,
+      "shareEmojiGrid": true,
+      "shareableUrl": true,
+      "noSignupQuickPlay": true,
+      "darkMode": true
+    },
+    "engagement": {
+      "dailyStreak": true,
+      "freezeTokens": true,
+      "achievements": true,
+      "achievementsAtLaunchCount": 12,
+      "seasonalEvents": false,
+      "emailDigest": true,
+      "hintEconomy": true
+    },
+    "social": {
+      "friendLeaderboard": false,
+      "asyncPvP": false,
+      "realtimeCoop": false,
+      "ugcCreator": false,
+      "embedWidget": false,
+      "phantomPath": true
+    },
+    "ai": {
+      "adaptiveDifficulty": true,
+      "aiHintExplainer": true,
+      "moodBasedGeneration": false,
+      "soulutionEleganceScoring": false,
+      "aiCoCreate": false
+    },
+    "monetization": {
+      "donationLink": true,
+      "displayAds": true,
+      "rewardedVideoForHints": true,
+      "proSubscription": false,
+      "cosmeticPacks": false
+    },
+    "accessibility": {
+      "wcagAA": true,
+      "multiLanguage": true,
+      "darkModeSupport": true,
+      "reducedMotion": true,
+      "colorblindMode": true,
+      "keyboardFirst": true
+    }
+  },
+  "uiux": {
+    "vibe": "dark-mysterious",
+    "designTokens": {
+      "colors": {
+        "bg-primary": "#0A0E14",
+        "bg-secondary": "#11161E",
+        "bg-tertiary": "#1A2129",
+        "bg-elevated": "#232C36",
+        "surface-soft": "#1F2730",
+        "surface-hard": "#2A333E",
+        "border-subtle": "#2D3742",
+        "border-strong": "#3F4B58",
+        "fg-primary": "#E8ECEF",
+        "fg-secondary": "#A8B2BD",
+        "fg-muted": "#6B7785",
+        "fg-disabled": "#4A5563",
+        "accent": "#C9A062",
+        "accent-glow": "#E0B97A",
+        "accent-deep": "#8C6E3F",
+        "success": "#6E9F76",
+        "warning": "#C49B4F",
+        "danger": "#B25D5D",
+        "info": "#6E8FB0",
+        "cell-empty": "#1A2129",
+        "cell-bright": "#C9A062",
+        "cell-void": "#060A10",
+        "cell-path": "#C9A062",
+        "cell-hint": "#8FA8C4",
+        "cell-portal": "#9B7FB8"
+      },
+      "typography": {
+        "fontDisplay": "Cormorant Garamond, Noto Serif JP, serif",
+        "fontBody": "Inter, Noto Sans JP, system-ui, sans-serif",
+        "fontMono": "JetBrains Mono, IBM Plex Mono, monospace"
+      },
+      "spacing": [
+        "0.25rem",
+        "0.5rem",
+        "0.75rem",
+        "1rem",
+        "1.5rem",
+        "2rem",
+        "3rem",
+        "4rem"
+      ],
+      "radii": {
+        "sm": "4px",
+        "md": "8px",
+        "lg": "12px",
+        "xl": "16px",
+        "full": "9999px"
+      },
+      "shadows": {
+        "sm": "0 1px 2px rgba(0,0,0,0.4)",
+        "md": "0 4px 12px rgba(0,0,0,0.5)",
+        "lg": "0 12px 32px rgba(0,0,0,0.6)",
+        "glowAccent": "0 0 24px rgba(201,160,98,0.4)",
+        "glowSuccess": "0 0 24px rgba(110,159,118,0.4)",
+        "glowHint": "0 0 32px rgba(143,168,196,0.5)"
+      },
+      "motion": {
+        "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "easingFirm": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "durations": {
+          "instant": "100ms",
+          "quick": "200ms",
+          "normal": "400ms",
+          "slow": "800ms",
+          "cinematic": "1600ms"
+        }
+      }
+    },
+    "lightModeSupported": false,
+    "screens": [
+      {
+        "id": "S01",
+        "name": "Landing",
+        "route": "/",
+        "purpose": "Hero + daily puzzle CTA",
+        "authRequired": false,
+        "components": [
+          "Hero",
+          "DailyPuzzleCard",
+          "HowItWorks",
+          "Footer"
+        ]
+      },
+      {
+        "id": "S02",
+        "name": "Daily Puzzle",
+        "route": "/daily/[date]",
+        "purpose": "Today's puzzle for everyone",
+        "authRequired": false,
+        "components": [
+          "PuzzleBoard",
+          "Timer",
+          "HintBar",
+          "ShareButton"
+        ]
+      },
+      {
+        "id": "S03",
+        "name": "Level Map",
+        "route": "/levels",
+        "purpose": "Browse free-play levels",
+        "authRequired": false,
+        "components": [
+          "LevelGrid",
+          "LevelCard",
+          "FilterBar"
+        ]
+      },
+      {
+        "id": "S04",
+        "name": "Level Play",
+        "route": "/levels/[id]",
+        "purpose": "Play a specific level",
+        "authRequired": false,
+        "components": [
+          "PuzzleBoard",
+          "Timer",
+          "HintBar",
+          "UndoBar"
+        ]
+      },
+      {
+        "id": "S05",
+        "name": "Result Overlay",
+        "route": "(overlay)",
+        "purpose": "Solve celebration + share",
+        "authRequired": false,
+        "components": [
+          "Stars",
+          "ShareGrid",
+          "NextButton"
+        ]
+      },
+      {
+        "id": "S06",
+        "name": "Profile",
+        "route": "/me",
+        "purpose": "Stats + achievements",
+        "authRequired": false,
+        "components": [
+          "StatBlock",
+          "AchievementGrid",
+          "RecentPuzzles"
+        ]
+      },
+      {
+        "id": "S07",
+        "name": "Settings",
+        "route": "/settings",
+        "purpose": "Language + sound + account",
+        "authRequired": false,
+        "components": [
+          "SettingsList"
+        ]
+      },
+      {
+        "id": "S08",
+        "name": "About",
+        "route": "/about",
+        "purpose": "Lore + credits + contact",
+        "authRequired": false,
+        "components": [
+          "StaticContent"
+        ]
+      },
+      {
+        "id": "S09",
+        "name": "Not Found",
+        "route": "*",
+        "purpose": "404",
+        "authRequired": false,
+        "components": [
+          "NotFound"
+        ]
+      },
+      {
+        "id": "S10",
+        "name": "Sign In",
+        "route": "/auth/signin",
+        "purpose": "Magic link entry",
+        "authRequired": false,
+        "components": [
+          "EmailForm"
+        ]
+      },
+      {
+        "id": "S11",
+        "name": "Auth Callback",
+        "route": "/auth/callback",
+        "purpose": "Magic link confirm",
+        "authRequired": false,
+        "components": [
+          "AuthCallback"
+        ]
+      }
+    ],
+    "components": [
+      {
+        "name": "Button",
+        "purpose": "Generic action trigger",
+        "variants": [
+          "primary",
+          "secondary",
+          "ghost",
+          "icon"
+        ],
+        "states": [
+          "default",
+          "hover",
+          "active",
+          "focus",
+          "disabled",
+          "loading"
+        ]
+      },
+      {
+        "name": "PuzzleBoard",
+        "purpose": "Renders the active puzzle and handles input",
+        "variants": [],
+        "states": [
+          "idle",
+          "interactive",
+          "submitting",
+          "solved"
+        ]
+      },
+      {
+        "name": "BoardCell",
+        "purpose": "Smallest interactive unit on the board",
+        "variants": [],
+        "states": [
+          "default",
+          "in-path",
+          "hint-highlighted",
+          "wrong"
+        ]
+      },
+      {
+        "name": "HintButton",
+        "purpose": "Triggers hint usage",
+        "variants": [
+          "tier1",
+          "tier2",
+          "tier3"
+        ],
+        "states": [
+          "available",
+          "disabled-no-balance",
+          "loading"
+        ]
+      },
+      {
+        "name": "AIHintCard",
+        "purpose": "Renders streamed LLM hint response",
+        "variants": [],
+        "states": [
+          "streaming",
+          "complete",
+          "error"
+        ]
+      },
+      {
+        "name": "ShareGrid",
+        "purpose": "Wordle-style emoji result share",
+        "variants": [],
+        "states": [
+          "idle",
+          "copying",
+          "copied"
+        ]
+      },
+      {
+        "name": "Stars",
+        "purpose": "1/2/3-star rating display",
+        "variants": [],
+        "states": [
+          "default",
+          "animating"
+        ]
+      },
+      {
+        "name": "Timer",
+        "purpose": "Counts elapsed seconds during play",
+        "variants": [],
+        "states": [
+          "running",
+          "paused"
+        ]
+      },
+      {
+        "name": "Modal",
+        "purpose": "Focused overlay for confirmations",
+        "variants": [],
+        "states": [
+          "closed",
+          "opening",
+          "open",
+          "closing"
+        ]
+      },
+      {
+        "name": "Toast",
+        "purpose": "Ephemeral status feedback",
+        "variants": [
+          "success",
+          "info",
+          "warning",
+          "error"
+        ],
+        "states": [
+          "entering",
+          "visible",
+          "exiting"
+        ]
+      },
+      {
+        "name": "StreakBadge",
+        "purpose": "Shows current streak in header",
+        "variants": [],
+        "states": [
+          "default",
+          "at-risk",
+          "active-7+"
+        ]
+      },
+      {
+        "name": "LevelCard",
+        "purpose": "Single level entry on level map",
+        "variants": [],
+        "states": [
+          "locked",
+          "available",
+          "completed-1-star",
+          "completed-2-star",
+          "completed-3-star"
+        ]
+      },
+      {
+        "name": "LanguageSwitcher",
+        "purpose": "Switch UI language VI/EN/JP",
+        "variants": [],
+        "states": [
+          "default",
+          "open"
+        ]
+      }
+    ],
+    "userFlows": [
+      {
+        "name": "First-time visitor solves first puzzle",
+        "steps": [
+          "Land at /",
+          "See daily card with 'Begin today'",
+          "Tap Begin",
+          "Land at /daily/[today]",
+          "Drag from a glowing lantern through cells",
+          "Path completes; solve overlay slides up",
+          "Tap Share"
+        ]
+      },
+      {
+        "name": "Daily puzzle solve and share",
+        "steps": [
+          "Open /daily/[today]",
+          "Solve",
+          "Share grid generated client-side",
+          "Web Share API or clipboard copy",
+          "Toast confirms 'Copied'"
+        ]
+      },
+      {
+        "name": "Use AI hint",
+        "steps": [
+          "Player stuck on level after 60s",
+          "Hint bar pulses subtly",
+          "Tap 'Explain'",
+          "Confirm 2-hint cost",
+          "AI streams 60-word hint via SSE",
+          "Player resumes drawing",
+          "Solve earns max 1-star"
+        ]
+      },
+      {
+        "name": "Streak recovery via freeze token",
+        "steps": [
+          "Open app after missing yesterday",
+          "App checks freeze token balance",
+          "If >= 1: token consumed silently",
+          "Toast 'A freeze was used to protect your streak'",
+          "If 0: streak resets with empathetic message"
+        ]
+      },
+      {
+        "name": "Anonymous to account migration",
+        "steps": [
+          "Player has 10 anonymous plays in localStorage",
+          "Card on level map suggests cloud save",
+          "Tap → /auth/signin, enter email",
+          "Magic link sent",
+          "User clicks email link",
+          "Land at /auth/callback",
+          "Profile created and anonymous plays migrated by session_id",
+          "Toast 'You're signed in. Your progress is safe.'"
+        ]
+      }
+    ],
+    "responsive": {
+      "breakpoints": {
+        "sm": "640px",
+        "md": "768px",
+        "lg": "1024px",
+        "xl": "1280px"
+      },
+      "boardScalingRule": "max 90vw on mobile, max 600px on desktop, always centered",
+      "hideFooterOn": [
+        "S02",
+        "S04"
+      ]
+    },
+    "accessibility": {
+      "wcagLevel": "2.1 AA",
+      "keyboardShortcuts": [
+        {
+          "key": "Tab/Shift+Tab",
+          "action": "Navigate top-level controls"
+        },
+        {
+          "key": "Arrow keys",
+          "action": "Move focus within board"
+        },
+        {
+          "key": "Space/Enter",
+          "action": "Place/extend path at focused cell"
+        },
+        {
+          "key": "Backspace/B",
+          "action": "Retract path one cell"
+        },
+        {
+          "key": "H",
+          "action": "Use Tier 1 hint"
+        },
+        {
+          "key": "Shift+H",
+          "action": "Open hint menu"
+        },
+        {
+          "key": "Z",
+          "action": "Undo last move"
+        },
+        {
+          "key": "R",
+          "action": "Reset path"
+        },
+        {
+          "key": "Esc",
+          "action": "Close modal/overlay"
+        },
+        {
+          "key": "?",
+          "action": "Open shortcuts help"
+        }
+      ]
+    }
+  },
+  "tech": {
+    "stackPreset": "nextjs-supabase",
+    "framework": "Next.js 14 (App Router)",
+    "language": "TypeScript",
+    "styling": "Tailwind CSS + Radix UI",
+    "animation": "Framer Motion",
+    "stateManagement": "Zustand",
+    "i18nLib": "next-intl",
+    "iconsLib": "lucide-react",
+    "formsLib": "react-hook-form + zod",
+    "backend": {
+      "platform": "Supabase",
+      "auth": "magic-link",
+      "db": "PostgreSQL",
+      "realtime": false,
+      "storage": "minimal (OG previews only)"
+    },
+    "ai": {
+      "provider": "Anthropic",
+      "models": {
+        "hintExplainer": "claude-sonnet-4",
+        "difficultyClassifier": "claude-haiku-4-5"
+      },
+      "sdk": "@anthropic-ai/sdk"
+    },
+    "rateLimiting": {
+      "provider": "Upstash Redis",
+      "lib": "@upstash/ratelimit"
+    },
+    "deployment": {
+      "primary": "self-hosted-docker",
+      "alternative": "Vercel",
+      "subdomain": "penumbra.allin1site.com",
+      "parentDomain": "allin1site.com",
+      "runtimeMode": "nextjs-standalone-node-behind-nginx",
+      "containerPort": 3000,
+      "tlsTermination": "nginx + Let's Encrypt (matches Sodoku pattern)",
+      "siblingSubapp": "sodoku.allin1site.com",
+      "cron": [
+        {
+          "path": "/api/cron/daily-generate",
+          "schedule": "50 23 * * *",
+          "executor": "APScheduler in Crawler&Admin BE container (calls penumbra:3000/api/cron/daily-generate with CRON_SECRET) — Vercel cron not used on self-host"
+        }
+      ]
+    },
+    "testing": {
+      "unit": "Vitest",
+      "component": "Vitest + React Testing Library",
+      "e2e": "Playwright",
+      "engineCoverageTarget": 0.9
+    },
+    "errorTracking": "Sentry",
+    "analytics": "PostHog (cookieless, IP anonymized)",
+    "schemaNotes": [
+      "plays table: add nullable column `best_path jsonb` to store the winning path for phantom display. Also add `path_score integer` (computed: stars*1000 - duration_ms/1000 - hints_used*200) for ranking. Cron job selects top path_score per puzzle per day and caches in `daily_phantom` table."
+    ],
+    "additionalTables": [
+      {
+        "name": "daily_phantoms",
+        "purpose": "Cache the top-scoring path per puzzle per UTC day for phantom display",
+        "columns": [
+          "puzzle_id uuid references puzzles(id)",
+          "date date",
+          "path jsonb not null  -- [{ row, col }, ...]",
+          "path_score integer not null",
+          "created_at timestamptz default now()",
+          "PRIMARY KEY (puzzle_id, date)"
+        ],
+        "rls": "public read (no auth required)",
+        "populatedBy": "cron job at 00:05 UTC (5 min after daily rollover)"
+      }
+    ],
+    "additionalEndpoints": [
+      {
+        "method": "GET",
+        "path": "/api/phantom/[puzzleId]",
+        "auth": "none",
+        "description": "Returns the top-scoring path for a puzzle on a given date (yesterday for daily puzzles, all-time best for levels). Used to render the phantom overlay on result screen.",
+        "queryParams": {
+          "date": "YYYY-MM-DD (optional, defaults to yesterday UTC)"
+        },
+        "response200": {
+          "path": "[{ row: number, col: number }] | null"
+        },
+        "cacheControl": "public, max-age=3600 (changes once per day)"
+      }
+    ],
+    "analyticsEvents": [
+      "phantom_viewed"
+    ]
+  },
+  "ai": {
+    "hintExplainer": {
+      "model": "claude-sonnet-4",
+      "endpoint": "/api/hint/explain",
+      "transport": "server-sent-events",
+      "promptTemplate": "You are a quiet puzzle coach for the game Penumbra. The player is stuck on a path-drawing puzzle.\n\nGame rules:\n- Draw a continuous orthogonal path between two lanterns.\n- The path must include all bright cells.\n- The path must avoid all void cells.\n- The path may not cross itself.\n\nCurrent board (JSON, row-major):\n{{board_json}}\n\nThe correct solution path (JSON, do NOT reveal directly):\n{{solution_path_json}}\n\nThe player's current path (JSON):\n{{current_path_json}}\n\nThe player's recent moves (JSON):\n{{recent_moves_json}}\n\nYour task:\n1. Identify the wrong assumption or pattern the player is missing.\n2. Describe one concrete observation about the current board state that nudges them toward progress.\n3. Do NOT give the next correct cell directly. Hint at the principle, not the move.\n4. Keep the response under 60 words. Conversational and encouraging tone.\n5. Match the player's quiet, contemplative game vibe — no exclamation marks, no \"you got this!\".\n\nRespond in {{user_locale}} (one of: vi, en, ja).",
+      "responseLocale": "user.locale",
+      "wordLimit": 60,
+      "fallbackToDeterministic": true,
+      "perUserDailyCap": 5,
+      "perAnonSessionDailyCap": 2,
+      "globalRateLimitRps": 10,
+      "estimatedCostPerCallUsd": 0.005
+    },
+    "adaptiveDifficulty": {
+      "method": "elo-style",
+      "recalcEveryNLevels": 5,
+      "skillRange": [
+        1,
+        10
+      ],
+      "preferredDifficultyOffset": [
+        -1,
+        1
+      ],
+      "kFactor": 0.5,
+      "expectedFormula": "1 / (1 + 10^((puzzleDifficulty - skill) / 4))"
+    },
+    "difficultyClassifier": {
+      "model": "claude-haiku-4-5",
+      "purpose": "Classify AI-generated puzzles 1-10 before persisting"
+    }
+  },
+  "monetization": {
+    "model": "indie-commercial",
+    "ads": {
+      "enabled": true,
+      "provider": "google-adsense",
+      "alternative": "ezoic",
+      "interstitialEveryNLevels": 5,
+      "skippableAfterSeconds": 5,
+      "disabledOnFirstNLevels": 10,
+      "rewardedVideoEnabled": true,
+      "rewardedVideoCapPerDay": 5
+    },
+    "donation": {
+      "enabled": true,
+      "platforms": [
+        "buymeacoffee",
+        "patreon"
+      ],
+      "placement": "footer + settings"
+    },
+    "subscription": {
+      "enabled": false,
+      "monthlyPriceUSD": null,
+      "yearlyPriceUSD": null,
+      "perks": [],
+      "deferredTo": "v1.5"
+    },
+    "expectedARPDAU_USD": 0.05,
+    "donationConversionTarget": 0.002,
+    "subscriptionConversionTargetV15": 0.015
+  },
+  "i18n": {
+    "defaultLocale": "vi",
+    "supportedLocales": [
+      "vi",
+      "en",
+      "ja"
+    ],
+    "fallbackChain": {
+      "ja": "en",
+      "vi": "en",
+      "en": "en"
+    },
+    "fileFormat": "JSON",
+    "fileLocations": {
+      "vi": "src/messages/vi.json",
+      "en": "src/messages/en.json",
+      "ja": "src/messages/ja.json"
+    }
+  },
+  "kpis": {
+    "d1RetentionTarget": 0.4,
+    "d7RetentionTarget": 0.15,
+    "d30RetentionTarget": 0.07,
+    "dailyPuzzleCompletionTarget": 0.6,
+    "viralCoefficientTarget": 0.3,
+    "avgSessionLengthMinutes": 6,
+    "arpdauTargetUSD": 0.05,
+    "aiHintUsageTarget": 0.08,
+    "signupConversionTarget": 0.12
+  },
+  "achievements": [
+    {
+      "id": "first_light",
+      "rewardHints": 1,
+      "criteria": {
+        "type": "plays_completed",
+        "value": 1
+      }
+    },
+    {
+      "id": "seven_days",
+      "rewardHints": 3,
+      "criteria": {
+        "type": "streak",
+        "value": 7
+      }
+    },
+    {
+      "id": "thirty_days",
+      "rewardHints": 5,
+      "criteria": {
+        "type": "streak",
+        "value": 30
+      }
+    },
+    {
+      "id": "optimal_path",
+      "rewardHints": 1,
+      "criteria": {
+        "type": "first_try_3star",
+        "value": 1
+      }
+    },
+    {
+      "id": "pathfinder",
+      "rewardHints": 2,
+      "criteria": {
+        "type": "plays_completed",
+        "value": 10
+      }
+    },
+    {
+      "id": "wayfarer",
+      "rewardHints": 3,
+      "criteria": {
+        "type": "plays_completed",
+        "value": 50
+      }
+    },
+    {
+      "id": "silent_solve",
+      "rewardHints": 1,
+      "criteria": {
+        "type": "daily_no_hint",
+        "value": 1
+      }
+    },
+    {
+      "id": "early_bird",
+      "rewardHints": 1,
+      "criteria": {
+        "type": "daily_within_hours",
+        "value": 1
+      }
+    },
+    {
+      "id": "polyglot",
+      "rewardHints": 1,
+      "criteria": {
+        "type": "languages_used",
+        "value": 2
+      }
+    },
+    {
+      "id": "share_one",
+      "rewardHints": 1,
+      "criteria": {
+        "type": "shares",
+        "value": 1
+      }
+    },
+    {
+      "id": "share_ten",
+      "rewardHints": 2,
+      "criteria": {
+        "type": "shares",
+        "value": 10
+      }
+    },
+    {
+      "id": "void_walker",
+      "rewardHints": 2,
+      "criteria": {
+        "type": "level_with_voids",
+        "min_voids": 6
+      }
+    },
+    {
+      "id": "shadow_walker",
+      "rewardHints": 2,
+      "description": "Solve a level whose phantom path is completely different from yours (0% cell overlap)",
+      "criteria": {
+        "type": "phantom_no_overlap",
+        "value": 1
+      }
+    }
+  ],
+  "hintSystem": {
+    "initialBalance": 3,
+    "dailyRefillTo": 3,
+    "maxBalance": 20,
+    "earnSources": {
+      "threeStar": 1,
+      "rewardedVideoCapPerDay": 5,
+      "dailyLogin": 1
+    },
+    "tiers": [
+      {
+        "tier": 1,
+        "name": "highlight",
+        "cost": 0,
+        "starsCap": 3
+      },
+      {
+        "tier": 2,
+        "name": "next-move",
+        "cost": 1,
+        "starsCap": 1
+      },
+      {
+        "tier": 3,
+        "name": "ai-explain",
+        "cost": 2,
+        "starsCap": 1
+      }
+    ]
+  },
+  "dailyPuzzle": {
+    "rolloverTime": "00:00 UTC",
+    "sameForAllUsers": true,
+    "difficultyByDayOfWeek": {
+      "monday": 3,
+      "tuesday": 4,
+      "wednesday": 6,
+      "thursday": 5,
+      "friday": 7,
+      "saturday": 8,
+      "sunday": 6
+    },
+    "shareCodeFormat": "shortcode-base36",
+    "archiveAfterDays": 90
+  },
+  "phantomPath": {
+    "enabled": true,
+    "description": "After a player solves a level, a ghost of the previous day's top-scorer's path fades in for 2 seconds — visible only on the result screen, never during play.",
+    "triggerOn": "solve",
+    "displayDurationMs": 2000,
+    "fadeInMs": 400,
+    "fadeOutMs": 600,
+    "ghostOpacity": 0.25,
+    "ghostColor": "var(--fg-muted)",
+    "sourcePlayer": "yesterday-top-scorer",
+    "fallback": "If no previous solver exists (e.g. new level), phantom is omitted silently — no placeholder or empty animation.",
+    "dataStorage": {
+      "what": "winning path as { row, col }[] array",
+      "where": "plays table — best_path column added to plays (nullable jsonb)",
+      "retention": "keep only the top-scored path per puzzle per UTC day; older snapshots purged nightly by cron"
+    },
+    "privacyNote": "Phantom path is anonymous — no display name, no avatar, no link to a profile. Just the trace.",
+    "shareNote": "The share grid emoji does NOT include the phantom path — it shows only the player's own solve.",
+    "scope": "mvp-plus-ai",
+    "implementedInSkill": 4
+  }
+}

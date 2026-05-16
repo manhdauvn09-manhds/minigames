@@ -1,0 +1,572 @@
+/* ==========================================================================
+   Kaya Caro — app-level overrides
+   --------------------------------------------------------------------------
+   The Kaya Design System kit.css + board.css carry 80% of the styling.
+   This file only adds pieces specific to the Caro app:
+     1. Topbar repositioned inside the left sidebar (not a separate row)
+     2. Sidebar card internals (score digits, level meter, history rows)
+     3. Status chip + level chip row above the board
+     4. Board wrapper: square, centered, max-size capped by viewport
+     5. Actions toolbar spacing under the board
+     6. Responsive collapse below 960px → single column, bottom drawer
+   ========================================================================== */
+
+
+/* ── Layout shell ────────────────────────────────────────────────────────── */
+/* Override kit.css `.app` padding so mobile viewports don't lose 80px of
+   horizontal space on a 375px screen. Keep sidebars sticky on desktop
+   (top:24px) so long history lists can scroll without the header
+   vanishing. */
+.app {
+  grid-template-columns: minmax(260px, 20%) 1fr minmax(260px, 20%);
+  gap: 24px;
+  padding: 24px 32px;
+}
+.app > .side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: sticky;
+  top: 24px;
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+}
+.app > .stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+/* ── Topbar (lives inside left sidebar) ──────────────────────────────────── */
+.topbar {
+  padding: 4px 2px 4px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.home-btn {
+  flex-shrink: 0;
+  text-decoration: none;
+  color: var(--fg-muted);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.home-btn:hover { color: var(--sumi); }
+.home-btn svg { width: 18px; height: 18px; stroke-width: 2; }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+.brand:hover { text-decoration: none; }
+.brand:focus-visible { outline: none; }
+.brand:focus-visible .word { text-decoration: underline; text-decoration-color: var(--accent); }
+
+/* Override kit.css .brand .dot with our fuller stone render so the logo
+   reads as an object, matching preview/logo.html. */
+.brand .dot {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #3a3230 0%, #1f1a17 55%, #0b0907 100%);
+  box-shadow: var(--shadow-stone);
+  position: relative;
+  flex-shrink: 0;
+}
+.brand .dot::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, rgba(255,255,255,0.55), transparent 24%);
+}
+.brand .word {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  color: var(--fg);
+}
+.brand .sub {
+  font-size: 10px; letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-subtle);
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* ── Stat card (W/L/D record) ────────────────────────────────────────────── */
+.stat-card .score {
+  display: flex; gap: 18px; margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 15px; color: var(--fg-muted);
+}
+.stat-card .score b { color: var(--fg); font-weight: 600; margin-right: 2px; }
+.stat-sub {
+  font-size: 13px; color: var(--fg-muted);
+  margin-top: 10px; line-height: var(--lh-normal);
+}
+
+/* ── Level meter ─────────────────────────────────────────────────────────── */
+.level-card .meter {
+  display: flex; gap: 4px; margin-top: 10px;
+  cursor: pointer;
+}
+.level-card .meter > div {
+  flex: 1; height: 6px; border-radius: 2px;
+  background: var(--paper-3);
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.level-card .meter > div.on { background: var(--sumi); }
+.level-card .meter:hover > div:not(.on) { background: var(--paper-3); filter: brightness(0.96); }
+.level-card .meter:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+  border-radius: var(--radius-xs);
+}
+
+/* ── Move history ────────────────────────────────────────────────────────── */
+.history-card { padding: 14px 16px; }
+.history {
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 0 -4px;
+}
+.history-empty {
+  padding: 20px 8px;
+  text-align: center;
+  color: var(--fg-subtle);
+  font-size: 13px;
+  font-style: italic;
+}
+.history-row {
+  display: grid;
+  grid-template-columns: 28px 14px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 4px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background var(--dur-fast);
+}
+.history-row:hover { background: var(--paper-2); }
+.history-row.active { background: var(--accent-ghost); }
+.history-row .n {
+  color: var(--fg-subtle);
+  font-size: 11px;
+  text-align: right;
+}
+.history-row .s {
+  width: 12px; height: 12px; border-radius: 50%;
+  box-shadow: var(--shadow-stone);
+}
+.history-row .s.sb { background: radial-gradient(circle at 36% 30%, #3a3230, #0b0907); }
+.history-row .s.sw { background: radial-gradient(circle at 36% 30%, #FDFAF2, #D9CFB8); }
+.history-row .c { color: var(--fg); letter-spacing: 0.02em; }
+.history-row .t { font-size: 11px; color: var(--fg-subtle); }
+
+/* ── Match log card ──────────────────────────────────────────────────────── */
+.matchlog-card { padding: 14px 16px; }
+.matchlog-card .eyebrow-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.link-btn {
+  background: transparent; border: 0; padding: 0;
+  font: inherit;
+  color: var(--fg-subtle);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.link-btn:hover { color: var(--sumi); }
+.matchlog {
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 0 -4px;
+  display: flex; flex-direction: column;
+}
+.matchlog .log-empty {
+  padding: 18px 8px;
+  text-align: center;
+  color: var(--fg-subtle);
+  font-size: 13px;
+  font-style: italic;
+}
+.match-row {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 4px;
+  border-bottom: 1px dashed var(--border);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.match-row:last-of-type { border-bottom: 0; }
+.match-row .badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 22px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+.match-row .badge.b-w { background: var(--sumi); color: #fff; }
+.match-row .badge.b-l { background: var(--paper-3); color: var(--fg-muted); }
+.match-row .badge.b-d { background: var(--paper-2); color: var(--fg-muted); border: 1px dashed var(--border); }
+.match-row .meta {
+  display: flex; flex-direction: column; gap: 2px;
+  min-width: 0;
+}
+.match-row .meta .who {
+  color: var(--fg);
+  font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: var(--font-sans);
+  font-size: 13px;
+}
+.match-row .meta .when { color: var(--fg-subtle); font-size: 11px; }
+.match-row .stats { color: var(--fg-muted); font-size: 11px; text-align: right; }
+.match-row .stats b { color: var(--fg); font-weight: 600; }
+
+/* ── Settings: level seg + text input ────────────────────────────────────── */
+.seg-level { gap: 2px; }
+.seg-level button {
+  min-width: 32px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+.text-input {
+  flex: 1;
+  min-width: 0;
+  max-width: 220px;
+  background: var(--paper-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 8px 10px;
+  font: 14px var(--font-sans);
+  color: var(--fg);
+  transition: border-color var(--dur-fast), background var(--dur-fast);
+}
+.text-input:focus {
+  outline: none;
+  border-color: var(--sumi);
+  background: var(--paper-1, #fff);
+}
+
+/* ── Status chip row (above board) ───────────────────────────────────────── */
+.status-row {
+  display: flex; align-items: center; gap: 10px;
+  min-height: 28px;
+}
+.chip-turn .chip-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor;
+}
+.chip.turn-you { background: var(--sumi); color: #fff; }
+.chip.turn-bot {
+  background: var(--paper-2); color: var(--fg);
+  border: 1px solid var(--border);
+}
+.chip.turn-bot .chip-dot {
+  background: var(--fg-muted);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.chip-level {
+  background: var(--accent-ghost);
+  color: var(--sumi);
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+@keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+/* ── Board grid lines (override design-system kaya-grid) ─────────────────── */
+/* The wood-texture board nearly hides the original light grid. Bump the
+   stroke darkness + remove the 0.7 opacity so the 15x15 mesh reads at a
+   glance. */
+.board-grid line   { stroke: rgba(38, 26, 14, 0.55); stroke-width: 1.4; opacity: 1; }
+.board-grid circle.hoshi { fill: rgba(38, 26, 14, 0.78); opacity: 1; }
+[data-theme="dark"] .board-grid line   { stroke: rgba(255, 240, 215, 0.45); }
+[data-theme="dark"] .board-grid circle.hoshi { fill: rgba(255, 240, 215, 0.65); }
+
+/* ── Win line: dashed, 5px, no draw-in animation ─────────────────────────── */
+/* Per request: thin dashed pattern instead of the bold solid line. The
+   board SVG uses viewBox-stretched units, so we pin stroke + dashes to
+   px via vector-effect so the visual stays at 5px regardless of board
+   size or aspect-ratio. */
+.win-line line {
+  stroke: var(--sumi);
+  stroke-width: 5px;
+  stroke-linecap: round;
+  stroke-dasharray: 12 9;
+  stroke-dashoffset: 0;
+  animation: none;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 4px var(--sumi-ring));
+}
+
+/* ── Board container ─────────────────────────────────────────────────────── */
+/* The board is always a perfect square; we clamp it to min(60vh, 56vw)
+   so both dimensions fit comfortably on the typical 1366×768 laptop
+   AND a 1080p tall viewport. 520px upper cap keeps the stones tappable
+   on ultra-wide displays without swallowing the sidebars' reading space. */
+.board-wrap {
+  width: min(60vh, 56vw, 520px);
+  aspect-ratio: 1 / 1;
+  position: relative;
+}
+.board {
+  width: 100%; height: 100%;
+  padding: 18px;
+  box-sizing: border-box;
+  position: relative;
+}
+.board-placeholder {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  opacity: 0.55;
+}
+
+/* board.css's .cell:hover .ghost rule fires on every cell including
+   occupied ones, which would draw a ghost on top of the real stone.
+   Suppress it here instead of editing the design-system file. */
+.cell.occupied { cursor: default; }
+.cell.occupied .ghost { opacity: 0 !important; pointer-events: none; }
+
+/* ── Hint pulse ────────────────────────────────────────────────────────── */
+/* A 1.5 s pulsing sumi ring on the suggested cell. The ring lives
+   inside the cell so it inherits the grid-aligned centring; we use
+   ::before (not the .ghost) so it stays visible even when the user's
+   mouse is nowhere near the cell. Removed via JS class toggle. */
+.cell.hint::before {
+  content: "";
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  border: 2px solid var(--sumi);
+  box-shadow: 0 0 0 0 var(--sumi-ring);
+  pointer-events: none;
+  animation: hintPulse 0.9s var(--ease-standard) infinite;
+  z-index: 3;
+}
+@keyframes hintPulse {
+  0%   { opacity: 0.2; box-shadow: 0 0 0 0    var(--sumi-ring); }
+  50%  { opacity: 1;   box-shadow: 0 0 0 8px  var(--sumi-ring); }
+  100% { opacity: 0.2; box-shadow: 0 0 0 14px rgba(0,0,0,0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cell.hint::before { animation: none; opacity: 0.8; }
+}
+
+/* ── Review chip ───────────────────────────────────────────────────────── */
+/* Shown while the user is scrubbed to an old move via history-row click.
+   Uses sumi-ghost + sumi foreground so it stands out from the turn
+   chips without shouting. Clickable to exit review. */
+.chip-review {
+  background: var(--accent-ghost);
+  color: var(--sumi);
+  border: 1px solid var(--border-hi, var(--border));
+  cursor: pointer;
+}
+.chip-review:hover { background: rgba(166, 60, 40, 0.15); }
+.chip-review .chip-dot { background: var(--sumi); animation: pulse 1.6s ease-in-out infinite; }
+
+/* While in review mode the board is visually "paused" -- suppress the
+   hover ghost preview on every cell so the user doesn't see a phantom
+   move they can't actually make. */
+.board.reviewing .cell { cursor: default; }
+.board.reviewing .cell .ghost { opacity: 0 !important; }
+
+/* ── Reduced-motion audit ──────────────────────────────────────────────── */
+/* board.css ships a `winPulse` animation that's hard-coded at 1.8 s
+   instead of using the --dur-* tokens, and the thinking overlay also
+   pulses continuously. For users who opt out of motion we freeze both
+   at a mid-opacity state so the visual semantics remain but nothing
+   oscillates. The .stone.winning placement animation already resolves
+   correctly via --dur-base. */
+@media (prefers-reduced-motion: reduce) {
+  .stone.winning         { animation: placeStone var(--dur-base) linear !important; }
+  .thinking-overlay      { animation: none !important; opacity: 0.45; }
+  .chip-turn .chip-dot,
+  .chip.turn-bot .chip-dot,
+  .chip-review .chip-dot { animation: none !important; }
+}
+
+/* ── Actions toolbar (under board) ───────────────────────────────────────── */
+.actions {
+  display: flex; gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+}
+.actions .btn-icon { margin-left: 4px; }
+
+/* ── Timer ───────────────────────────────────────────────────────────────── */
+.timer-card .eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.timer-card .eyebrow svg { width: 12px; height: 12px; stroke-width: 2; }
+.timer-big {
+  font-family: var(--font-mono);
+  font-size: 36px;
+  font-weight: 500;
+  color: var(--fg);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-top: 4px;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+/* ── Quick card (theme + sound) ──────────────────────────────────────────── */
+.quick-card .row-setting { padding: 10px 0; border-top: 1px solid var(--border); }
+.quick-card .row-setting:first-of-type { border-top: 0; padding-top: 4px; }
+.quick-card .label { font: 500 13px var(--font-sans); color: var(--fg); }
+.quick-card .help { font: 400 11px var(--font-sans); color: var(--fg-muted); margin-top: 2px; }
+
+/* ── Tip card ────────────────────────────────────────────────────────────── */
+.tip-card ul.tips {
+  list-style: none; margin: 0; padding: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg-muted);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.tip-card ul.tips kbd {
+  font-family: var(--font-mono); font-size: 11px;
+  background: var(--paper-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 1px 6px;
+  margin-right: 8px;
+  color: var(--fg);
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+
+/* ── Modal / scrim `hidden` attr support ─────────────────────────────────── */
+.scrim[hidden] { display: none; }
+
+/* ── Verdict card (overrides kit.css slightly) ───────────────────────────── */
+.verdict-card { position: relative; overflow: hidden; }
+.verdict-card .actions { margin-top: 22px; }
+.verdict-card .stat b { color: var(--fg); }
+
+/* Celebration variant -- triggered when the human wins. The base modal
+   stays as is for losses + draws so a defeat doesn't get a victory
+   parade. The eyebrow + heading shift to sumi-tinted, scale up, and the
+   confetti layer becomes visible above the modal background. */
+.verdict-card.celebrate {
+  background: linear-gradient(160deg,
+              var(--paper-1, #fff) 0%,
+              var(--accent-ghost) 60%,
+              rgba(255, 220, 130, 0.20) 100%);
+  border: 1px solid var(--sumi-ring);
+  box-shadow: 0 18px 48px rgba(166, 60, 40, 0.18);
+}
+.verdict-card.celebrate .eyebrow {
+  color: var(--sumi);
+  letter-spacing: 0.32em;
+  font-size: 12px;
+}
+.verdict-card.celebrate .big {
+  font-family: var(--font-serif);
+  font-size: 44px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--sumi);
+  margin-top: 6px;
+  animation: trophyDrop 0.6s var(--ease-spring) both;
+}
+.verdict-card.celebrate .celebrate-sub {
+  margin-top: 8px;
+  color: var(--fg-muted);
+  font-style: italic;
+  font-size: 14px;
+}
+.verdict-card .celebrate-sub[hidden] { display: none; }
+@keyframes trophyDrop {
+  0%   { opacity: 0; transform: translateY(-14px) scale(0.94); }
+  60%  { opacity: 1; transform: translateY(2px)   scale(1.02); }
+  100% { transform: translateY(0)    scale(1); }
+}
+
+/* Confetti layer -- 24 absolutely-positioned diamonds animated to fall
+   + spin. Hidden by default, shown only when .celebrate is on. The
+   diamonds are pure CSS (no images) so the bundle stays tiny. Reduced-
+   motion users get a static gradient sparkle instead. */
+.confetti-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+}
+.verdict-card.celebrate .confetti-layer { opacity: 1; }
+.confetti {
+  position: absolute;
+  top: -24px;
+  width: 9px;
+  height: 14px;
+  border-radius: 2px;
+  opacity: 0.9;
+  animation: confettiFall 2.4s linear forwards;
+}
+@keyframes confettiFall {
+  0%   { transform: translate3d(0, -24px, 0) rotate(0deg);   opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translate3d(var(--cx, 0), 460px, 0) rotate(720deg); opacity: 0.85; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confetti { animation: none; opacity: 0.5; }
+  .verdict-card.celebrate .big { animation: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE COLLAPSE
+   Below 960px the app becomes one column: board first, sidebars stacked
+   below. Cards get tighter padding; the board gets viewport-width-based
+   sizing so it fills the phone screen nicely.
+   Kaya README explicitly spec'd "mobile collapses to a stacked layout
+   with a bottom drawer for controls" — PHASE 7 can upgrade the bottom
+   cards to a true drawer. For now stacking is enough and keeps all
+   features visible + scrollable.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 960px) {
+  .app {
+    grid-template-columns: 1fr;
+    padding: 16px;
+    gap: 16px;
+  }
+  .app > .side {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+  /* Reorder: board stage on top for immediate access. */
+  .side-left  { order: 2; }
+  .stage      { order: 1; }
+  .side-right { order: 3; }
+
+  .board-wrap { width: min(92vw, 520px); }
+
+  /* On narrow screens, stack the brand so the wordmark has its own line. */
+  .brand .word { font-size: 24px; }
+  .brand .dot  { width: 28px; height: 28px; }
+}
+
+@media (max-width: 520px) {
+  .timer-big { font-size: 28px; }
+  .board { padding: 10px; }
+  .actions .btn { padding: 9px 12px; font-size: 13px; }
+}

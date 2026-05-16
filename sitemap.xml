@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://minigames.allin1site.com/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://minigames.allin1site.com/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://minigames.allin1site.com/?lang=vi"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://minigames.allin1site.com/?lang=ja"/>
+  </url>
+  <url><loc>https://minigames.allin1site.com/user-manual.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minigames.allin1site.com/games/ballmerge/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://minigames.allin1site.com/games/chromamatch/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://minigames.allin1site.com/games/stacktower/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://minigames.allin1site.com/games/memoryflip/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://minigames.allin1site.com/games/snakerush/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://minigames.allin1site.com/games/bubbleblast/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://minigames.allin1site.com/games/arkanoidx/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://minigames.allin1site.com/games/numberslide/</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+</urlset>

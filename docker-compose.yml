@@ -1,0 +1,40 @@
+# =====================================================================
+# allin1site Mini Games — independent Docker Compose
+# Place your .env file in the same directory (NEVER commit it).
+# Start:  docker compose up -d --build
+# Logs:   docker compose logs -f
+# Stop:   docker compose down
+# =====================================================================
+services:
+  minigames:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: minigames:2.1.0
+    container_name: minigames
+    restart: unless-stopped
+    ports:
+      # Bind to localhost only — nginx on the host proxies 443 → 3333.
+      # Change to "3333:3333" if you need external direct access (not recommended).
+      - "127.0.0.1:3333:3333"
+    environment:
+      NODE_ENV: production
+      PORT: "3333"
+      DATABASE_URL: ${DATABASE_URL}
+      MYSQL_SSL: ${MYSQL_SSL:-true}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3333/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # If you put nginx/CF in front, only expose to localhost:
+    # ports:
+    #   - "127.0.0.1:3333:3333"

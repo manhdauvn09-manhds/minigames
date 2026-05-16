@@ -1,0 +1,157 @@
+/* Kaya board-specific styles */
+
+.board-wrap {
+  position: relative;
+  filter: drop-shadow(var(--shadow-board));
+}
+
+.board {
+  position: relative;
+  background-image: url("../../assets/board-texture.svg");
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--radius-lg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(40, 25, 10, 0.15);
+}
+
+.board-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.board-grid line { stroke: var(--kaya-grid); stroke-width: 1; opacity: 0.7; }
+.board-grid circle.hoshi { fill: var(--kaya-grid); opacity: 0.85; }
+
+.board-cells {
+  position: absolute;
+  inset: 0;
+  display: grid;
+}
+
+.cell {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cell:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+  border-radius: var(--radius-xs);
+  z-index: 2;
+}
+
+.cell:hover .ghost { opacity: 0.45; transform: scale(1); }
+
+.ghost {
+  width: 78%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity var(--dur-fast), transform var(--dur-fast) var(--ease-spring);
+  pointer-events: none;
+}
+.ghost.ghost-black {
+  background: radial-gradient(circle at 36% 30%, #3a3230, #0b0907);
+}
+.ghost.ghost-white {
+  background: radial-gradient(circle at 36% 30%, #FDFAF2, #D9CFB8);
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.stone {
+  position: absolute;
+  width: 78%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: var(--shadow-stone);
+  animation: placeStone var(--dur-base) var(--ease-spring);
+}
+.stone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, rgba(255,255,255,0.55), transparent 24%);
+}
+.stone.black {
+  background: radial-gradient(circle at 36% 30%, #3a3230, #1f1a17 55%, #0b0907);
+}
+.stone.white {
+  background: radial-gradient(circle at 36% 30%, #FDFAF2, #F5EFE4 55%, #D9CFB8);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+@keyframes placeStone {
+  0%   { transform: scale(1.18); opacity: 0; }
+  60%  { transform: scale(0.96); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* winning stone glow */
+.stone.winning {
+  box-shadow: var(--shadow-stone), 0 0 0 2px var(--sumi), 0 0 16px var(--sumi-ring);
+  animation: placeStone var(--dur-base) var(--ease-spring), winPulse 1.8s ease-in-out infinite;
+}
+@keyframes winPulse {
+  0%,100% { box-shadow: var(--shadow-stone), 0 0 0 2px var(--sumi), 0 0 14px var(--sumi-ring); }
+  50%     { box-shadow: var(--shadow-stone), 0 0 0 2px var(--sumi), 0 0 28px var(--sumi-ring); }
+}
+
+/* bot thinking overlay */
+.thinking-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  background: rgba(20, 14, 8, 0.04);
+  pointer-events: none;
+  animation: thinkingPulse 2.4s ease-in-out infinite;
+}
+@keyframes thinkingPulse {
+  0%,100% { opacity: 0.3; }
+  50%     { opacity: 1; }
+}
+
+/* colorblind variants */
+.cb .stone.black::before {
+  content: "";
+  position: absolute;
+  inset: 40%;
+  background: var(--stone-white);
+  border-radius: 50%;
+}
+.cb .stone.white {
+  background: radial-gradient(circle at 36% 30%, #F0DFC0, #D9C39A);
+}
+.cb .stone.white::before {
+  content: "";
+  position: absolute;
+  inset: 22%;
+  border: 2px solid rgba(60, 40, 20, 0.45);
+  border-radius: 50%;
+}
+
+/* winning line (SVG overlay) */
+.win-line {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.win-line line {
+  stroke: var(--sumi);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: drawLine 0.9s var(--ease-standard) 0.2s forwards;
+  filter: drop-shadow(0 0 6px var(--sumi-ring));
+}
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}

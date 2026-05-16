@@ -1,0 +1,341 @@
+/* ==========================================================================
+   Kaya Design System — Colors & Type
+   ==========================================================================
+   Warm neutrals + single bold accent (sumi red).
+   All color values use oklch where possible for perceptual consistency.
+   ========================================================================== */
+
+/* ---------- Fonts ---------- */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("fonts/Inter-Variable.ttf") format("truetype-variations");
+}
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("fonts/Fraunces-Variable.ttf") format("truetype-variations");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("fonts/JetBrainsMono-Variable.ttf") format("truetype-variations");
+}
+
+/* ==========================================================================
+   1. COLOR TOKENS
+   ========================================================================== */
+
+:root {
+  /* --- Raw warm-neutral ramp (light theme base) --- */
+  --paper-0:  oklch(99.2% 0.006 80);   /* #FBF9F5 — page bg */
+  --paper-1:  oklch(97.2% 0.010 82);   /* #F5F1E8 — card bg */
+  --paper-2:  oklch(94.5% 0.014 82);   /* #ECE5D4 — subtle fill */
+  --paper-3:  oklch(89.0% 0.020 80);   /* #DDD2B8 — border/divider strong */
+
+  /* --- Wood ramp (for the board) --- */
+  --kaya-0:   oklch(88.0% 0.040 75);   /* #E8D6B0 — board highlight */
+  --kaya-1:   oklch(82.0% 0.050 70);   /* #D8BE8C — board base */
+  --kaya-2:   oklch(72.0% 0.055 65);   /* #B89968 — board shadow */
+  --kaya-grid: oklch(55.0% 0.045 55);  /* #7F6441 — grid lines */
+
+  /* --- Warm-ink ramp (foreground) --- */
+  --ink-0:    oklch(20.0% 0.012 55);   /* #2A231C — primary text */
+  --ink-1:    oklch(35.0% 0.010 55);   /* #4E4539 — secondary text */
+  --ink-2:    oklch(52.0% 0.008 55);   /* #7B7267 — muted text */
+  --ink-3:    oklch(70.0% 0.008 55);   /* #ADA699 — disabled / hint */
+
+  /* --- Accent (sumi red — desaturated vermilion) --- */
+  --sumi:     oklch(50.0% 0.145 30);   /* #A63C28 — primary accent */
+  --sumi-hover: oklch(45.0% 0.150 30); /* #94331F */
+  --sumi-press: oklch(40.0% 0.155 30); /* #7F2A18 */
+  --sumi-ghost: oklch(50.0% 0.145 30 / 0.10); /* tinted fills */
+  --sumi-ring:  oklch(50.0% 0.145 30 / 0.40); /* focus rings */
+
+  /* --- Semantic status --- */
+  --win:      oklch(55.0% 0.095 145);  /* muted moss-green */
+  --loss:     var(--sumi);
+  --draw:     var(--ink-2);
+
+  /* --- Stone colors (warm, not pure) --- */
+  --stone-black:       oklch(22.0% 0.008 50);   /* #1A1613 */
+  --stone-black-hi:    oklch(32.0% 0.008 50);   /* top highlight */
+  --stone-white:       oklch(95.0% 0.015 85);   /* #F5EFE4 */
+  --stone-white-hi:    oklch(99.0% 0.010 85);
+  --stone-shadow:      oklch(20.0% 0.008 50 / 0.22);
+
+  /* --- Semantic aliases --- */
+  --bg:            var(--paper-0);
+  --bg-elevated:   var(--paper-1);
+  --bg-sunken:     var(--paper-2);
+  --fg:            var(--ink-0);
+  --fg-muted:      var(--ink-1);
+  --fg-subtle:     var(--ink-2);
+  --fg-disabled:   var(--ink-3);
+  --border:        oklch(89.0% 0.020 80 / 0.8);
+  --border-strong: var(--paper-3);
+  --accent:        var(--sumi);
+  --accent-hover:  var(--sumi-hover);
+  --accent-press:  var(--sumi-press);
+  --accent-ghost:  var(--sumi-ghost);
+  --focus-ring:    var(--sumi-ring);
+  --scrim:         oklch(22.0% 0.012 50 / 0.52);
+}
+
+/* ==========================================================================
+   2. DARK THEME (warm, lamp-lit, not cool-gray)
+   ========================================================================== */
+:root[data-theme="dark"] {
+  --paper-0:  oklch(18.0% 0.012 55);   /* page bg — deep warm brown */
+  --paper-1:  oklch(22.0% 0.014 55);
+  --paper-2:  oklch(26.0% 0.016 55);
+  --paper-3:  oklch(34.0% 0.018 55);
+
+  --kaya-0:   oklch(42.0% 0.040 65);
+  --kaya-1:   oklch(36.0% 0.045 62);
+  --kaya-2:   oklch(28.0% 0.040 60);
+  --kaya-grid: oklch(70.0% 0.025 60);
+
+  --ink-0:    oklch(95.0% 0.010 85);
+  --ink-1:    oklch(82.0% 0.010 80);
+  --ink-2:    oklch(65.0% 0.010 75);
+  --ink-3:    oklch(45.0% 0.010 70);
+
+  --sumi:     oklch(65.0% 0.140 32);
+  --sumi-hover: oklch(70.0% 0.140 32);
+  --sumi-press: oklch(60.0% 0.140 32);
+
+  --stone-shadow: oklch(8.0% 0.008 50 / 0.55);
+
+  --border:        oklch(34.0% 0.018 55 / 0.8);
+  --border-strong: var(--paper-3);
+  --scrim:         oklch(10.0% 0.010 50 / 0.65);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --paper-0:  oklch(18.0% 0.012 55);
+    --paper-1:  oklch(22.0% 0.014 55);
+    --paper-2:  oklch(26.0% 0.016 55);
+    --paper-3:  oklch(34.0% 0.018 55);
+    --kaya-0:   oklch(42.0% 0.040 65);
+    --kaya-1:   oklch(36.0% 0.045 62);
+    --kaya-2:   oklch(28.0% 0.040 60);
+    --kaya-grid: oklch(70.0% 0.025 60);
+    --ink-0:    oklch(95.0% 0.010 85);
+    --ink-1:    oklch(82.0% 0.010 80);
+    --ink-2:    oklch(65.0% 0.010 75);
+    --ink-3:    oklch(45.0% 0.010 70);
+    --sumi:     oklch(65.0% 0.140 32);
+    --stone-shadow: oklch(8.0% 0.008 50 / 0.55);
+    --border: oklch(34.0% 0.018 55 / 0.8);
+    --scrim:  oklch(10.0% 0.010 50 / 0.65);
+  }
+}
+
+/* ==========================================================================
+   3. TYPOGRAPHY
+   ========================================================================== */
+
+:root {
+  /* Font stacks */
+  --font-sans:    "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif:   "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+
+  /* Type scale — 1.25 minor third, base 16px */
+  --text-xs:   12px;
+  --text-sm:   13px;
+  --text-base: 15px;
+  --text-md:   17px;
+  --text-lg:   20px;
+  --text-xl:   24px;
+  --text-2xl:  32px;
+  --text-3xl:  44px;
+  --text-4xl:  64px;
+  --text-5xl:  96px;
+
+  /* Line heights */
+  --lh-tight:  1.12;
+  --lh-snug:   1.25;
+  --lh-normal: 1.5;
+  --lh-loose:  1.7;
+
+  /* Tracking */
+  --tracking-tight:  -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+  --tracking-caps:   0.08em;
+
+  /* Weights */
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semibold: 600;
+  --weight-bold:    700;
+}
+
+/* ---------- Semantic typography classes ---------- */
+
+.t-display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: var(--text-4xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+}
+.t-display-huge {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: var(--text-5xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+}
+
+.t-h1 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-2xl);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+}
+.t-h2 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-xl);
+  line-height: var(--lh-snug);
+  letter-spacing: -0.01em;
+}
+.t-h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-md);
+  line-height: var(--lh-snug);
+}
+
+.t-body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--text-base);
+  line-height: var(--lh-normal);
+  color: var(--fg);
+}
+.t-body-sm {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--text-sm);
+  line-height: var(--lh-normal);
+  color: var(--fg-muted);
+}
+
+.t-label {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-normal);
+  color: var(--fg);
+}
+
+.t-eyebrow {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  line-height: 1;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--fg-subtle);
+}
+
+.t-mono {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--text-base);
+  line-height: var(--lh-snug);
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+.t-mono-lg {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--text-2xl);
+  line-height: 1;
+  font-feature-settings: "tnum" 1, "zero" 1;
+  letter-spacing: -0.01em;
+}
+
+/* ==========================================================================
+   4. SPACING, RADII, SHADOWS, MOTION
+   ========================================================================== */
+
+:root {
+  /* Spacing — 4px grid */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 48px;
+  --space-12: 64px;
+
+  /* Radii */
+  --radius-xs: 2px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 9999px;
+
+  /* Shadows — always warm-brown-tinted, never neutral gray */
+  --shadow-1: 0 1px 2px rgba(40, 30, 20, 0.06);
+  --shadow-2: 0 4px 12px rgba(40, 30, 20, 0.08), 0 1px 3px rgba(40, 30, 20, 0.06);
+  --shadow-3: 0 16px 40px rgba(40, 30, 20, 0.14), 0 4px 12px rgba(40, 30, 20, 0.08);
+  --shadow-board: 0 2px 0 rgba(40, 30, 20, 0.04), 0 8px 24px rgba(40, 30, 20, 0.10);
+  --shadow-stone: 0 1px 2px rgba(20, 14, 8, 0.35), 0 0.5px 0.5px rgba(20, 14, 8, 0.25);
+
+  /* Motion */
+  --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:      cubic-bezier(0, 0, 0.2, 1);
+  --dur-fast:   150ms;
+  --dur-base:   220ms;
+  --dur-slow:   400ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ease-spring: cubic-bezier(0.4, 0, 0.2, 1);
+    --dur-fast:  80ms;
+    --dur-base:  80ms;
+    --dur-slow: 120ms;
+  }
+}
+
+/* ==========================================================================
+   5. BASE RESETS (opt-in)
+   ========================================================================== */
+
+html { color-scheme: light dark; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}

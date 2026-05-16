@@ -1,0 +1,279 @@
+/* Kaya Web UI Kit — shared styles */
+@import url("../../colors_and_type.css");
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  margin: 0;
+}
+
+/* ---------- Layout ---------- */
+.app {
+  display: grid;
+  grid-template-columns: minmax(280px, 22%) 1fr minmax(280px, 22%);
+  gap: 32px;
+  padding: 32px 40px;
+  min-height: 100vh;
+  align-items: start;
+  box-sizing: border-box;
+}
+.app > aside, .app > main {
+  position: sticky;
+  top: 32px;
+}
+.app > main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* ---------- Top chrome ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: 8px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand .dot {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #3a3230, #0b0907);
+  box-shadow: var(--shadow-stone);
+  position: relative;
+}
+.brand .dot::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, rgba(255,255,255,0.55), transparent 22%);
+}
+.brand .word {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+}
+.brand .sub {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--fg-subtle);
+  margin-top: 2px;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--paper-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+  padding: 18px;
+}
+.eyebrow {
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-subtle);
+  margin: 0 0 10px;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  appearance: none;
+  font: 600 14px var(--font-sans);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background var(--dur-fast) var(--ease-standard),
+              color var(--dur-fast), border-color var(--dur-fast);
+}
+.btn-primary { background: var(--sumi); color: #fff; box-shadow: var(--shadow-1); }
+.btn-primary:hover { background: var(--sumi-hover); }
+.btn-primary:active { background: var(--sumi-press); }
+
+.btn-secondary { background: var(--paper-1); color: var(--fg); border-color: var(--border-strong); }
+.btn-secondary:hover { background: var(--paper-2); }
+
+.btn-ghost { background: transparent; color: var(--fg); }
+.btn-ghost:hover { background: var(--paper-2); }
+
+.btn[disabled] { background: var(--paper-1); color: var(--fg-disabled); cursor: not-allowed; border-color: var(--border); }
+.btn-icon {
+  width: 40px; height: 40px; padding: 0; justify-content: center;
+  background: var(--paper-1); color: var(--fg); border-color: var(--border);
+}
+.btn-icon:hover { background: var(--paper-2); }
+.btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.btn-icon svg { width: 18px; height: 18px; }
+
+/* ---------- Segmented ---------- */
+.seg {
+  display: inline-flex;
+  background: var(--paper-2);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.seg button {
+  border: 0;
+  background: transparent;
+  padding: 6px 14px;
+  font: 500 13px var(--font-sans);
+  color: var(--fg-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.seg button.active { background: var(--paper-0); color: var(--fg); box-shadow: var(--shadow-1); }
+.seg button:hover:not(.active) { color: var(--fg); }
+
+/* ---------- Switch ---------- */
+.switch {
+  width: 40px; height: 22px;
+  background: var(--paper-3);
+  border-radius: 999px;
+  position: relative;
+  cursor: pointer;
+  transition: background var(--dur-fast);
+  flex: none;
+}
+.switch::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 18px; height: 18px; background: #fff;
+  border-radius: 50%; box-shadow: var(--shadow-1);
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+.switch.on { background: var(--sumi); }
+.switch.on::after { transform: translateX(18px); }
+
+/* ---------- Chips ---------- */
+.chip {
+  font: 600 12px var(--font-sans);
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid transparent;
+}
+.chip-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.chip-you { background: var(--sumi); color: #fff; }
+.chip-bot { background: var(--paper-2); color: var(--fg); border-color: var(--border); }
+.chip-bot .chip-dot { background: var(--fg-muted); animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+/* ---------- Scrim + Modal ---------- */
+.scrim {
+  position: fixed; inset: 0;
+  background: var(--scrim);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  animation: fadeIn var(--dur-slow) var(--ease-standard);
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  width: min(480px, 92vw);
+  background: var(--paper-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-3);
+  padding: 28px;
+  animation: popIn var(--dur-base) var(--ease-spring);
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal h2 { margin: 4px 0 20px; font: 600 24px var(--font-sans); letter-spacing: -0.01em; }
+.modal .close {
+  position: absolute; right: 16px; top: 16px;
+  background: transparent; border: 0; cursor: pointer; color: var(--fg-muted);
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal .close:hover { background: var(--paper-2); color: var(--fg); }
+.modal-header-wrap { position: relative; }
+
+.row-setting {
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.row-setting:first-of-type { border-top: 0; }
+.row-setting .label { font: 500 14px var(--font-sans); }
+.row-setting .help { font: 400 12px var(--font-sans); color: var(--fg-muted); margin-top: 2px; }
+
+/* ---------- Slider ---------- */
+.slider {
+  flex: 1;
+  min-width: 140px;
+  height: 4px;
+  background: var(--paper-3);
+  border-radius: 2px;
+  position: relative;
+  cursor: pointer;
+  margin-left: 16px;
+}
+.slider .track {
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  background: var(--sumi);
+  border-radius: 2px;
+}
+.slider .thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--shadow-2);
+  border: 1px solid var(--border-strong);
+}
+
+/* ---------- Victory / Loss overlay ---------- */
+.verdict-card {
+  padding: 36px 32px;
+  text-align: center;
+  width: min(420px, 90vw);
+}
+.verdict-card .eyebrow { margin-bottom: 6px; }
+.verdict-card .big {
+  font-family: var(--font-serif);
+  font-size: 56px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+}
+.verdict-card .stat {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--fg-muted);
+}
+.verdict-card .stat b { color: var(--fg); font-weight: 600; }
+.verdict-card .actions { margin-top: 26px; display: flex; gap: 10px; justify-content: center; }

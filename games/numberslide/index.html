@@ -1,0 +1,335 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#1e3c72">
+<meta name="description" content="NumberSlide — Free 15-puzzle classic with 30 levels of growing complexity. Slide tiles into order, fewest moves wins.">
+<meta name="keywords" content="15 puzzle, sliding puzzle, number slide, allin1site games, numberslide">
+<meta name="robots" content="index,follow">
+<meta name="referrer" content="no-referrer-when-downgrade">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://*.gstatic.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https:; connect-src 'self' https:; frame-src https://accounts.google.com; base-uri 'self'; form-action 'self';">
+<meta name="X-Content-Type-Options" content="nosniff">
+<meta name="gp-google-client-id" content="781592547104-970ld4c6lb6l8ev4hhvlg3k0943k8t3j.apps.googleusercontent.com">
+<meta name="gp-api-base" content="">
+<title>NumberSlide — Puzzle Master | allin1site Games</title>
+<link rel="canonical" href="/games/numberslide/">
+<link rel="stylesheet" href="../../game-platform.css?v=11">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"NumberSlide","genre":"Puzzle","applicationCategory":"GameApplication","operatingSystem":"Web Browser","description":"Sliding tile puzzle — 30 progressive levels.","publisher":{"@type":"Organization","name":"allin1site.com"}}
+</script>
+<style>
+* {margin:0;padding:0;box-sizing:border-box;}
+body {
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--gp-stage-bg, linear-gradient(135deg,#234888 0%,#3366b0 50%,#234888 100%));
+  color:var(--gp-text-primary, #f8fafc);
+  min-height:100vh; display:flex; flex-direction:column; align-items:center;
+  color:white; padding:10px 6px; overflow-x:hidden;
+}
+h1{font-size:1.6em;color:#74b9ff;text-shadow:0 0 16px #74b9ff;margin-bottom:1px;}
+.subtitle{font-size:.76em;opacity:.7;margin-bottom:7px;}
+.hud{display:flex;gap:18px;margin-bottom:6px;align-items:center;}
+.hud-item{text-align:center;}
+.hud-label{font-size:.6em;text-transform:uppercase;opacity:.7;}
+.hud-value{font-size:1.3em;font-weight:800;color:#74b9ff;}
+.hud-btns{display:flex;gap:6px;margin-left:auto;}
+.hud-btn{padding:5px 11px;border-radius:7px;border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.14);color:#eee;font-size:.78em;font-weight:600;cursor:pointer;transition:background .18s;}
+.hud-btn:hover{background:rgba(255,255,255,.2);}
+.game-wrap{padding:12px;background:rgba(0,0,0,.20);border-radius:14px;border:2px solid rgba(116,185,255,.35);}
+.grid{display:grid;gap:6px;}
+.tile{
+  display:flex;align-items:center;justify-content:center;
+  border-radius:10px;font-weight:800;cursor:pointer;
+  transition:transform .12s,box-shadow .12s;
+  user-select:none;-webkit-tap-highlight-color:transparent;
+  overflow:hidden;
+}
+.tile:not(.empty):hover{transform:scale(1.03);}
+.tile:not(.empty):active{transform:scale(.96);}
+.tile.empty{background:rgba(0,0,0,.18);cursor:default;box-shadow:none;border:2px dashed rgba(255,255,255,.14);}
+.tile.correct{box-shadow:0 0 12px rgba(0,255,136,.4);}
+.tile.moving{animation:tileMove .12s ease-out;}
+@keyframes tileMove{from{transform:scale(1.08)}to{transform:scale(1)}}
+.game-outer{position:relative;}
+.new-btn{margin-top:8px;padding:9px 22px;font-size:.88em;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.28);color:white;border-radius:9px;cursor:pointer;transition:transform .1s;display:none;}
+.new-btn:hover{transform:scale(1.03);}
+.timer-wrap{width:280px;margin-bottom:6px;}
+.timer-bar{height:7px;background:rgba(255,255,255,.16);border-radius:4px;overflow:hidden;}
+.timer-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#74b9ff,#2980b9);transition:width .9s linear,background .4s;}
+.timer-fill.warn{background:linear-gradient(90deg,#ff7675,#ff9f43);}
+.timer-label{font-size:.7em;opacity:.75;text-align:right;margin-top:2px;}
+</style>
+</head>
+<body>
+<h1>🔢 NumberSlide</h1>
+<p class="subtitle">Slide tiles into order — fewest moves wins!</p>
+<div class="hud" id="hudRow" style="display:none">
+  <div class="hud-item"><div class="hud-label">Moves</div><div class="hud-value" id="hMoves">0</div></div>
+  <div class="hud-item"><div class="hud-label">Best</div><div class="hud-value" id="hBest">—</div></div>
+  <div class="hud-item"><div class="hud-label">Time</div><div class="hud-value" id="hTime">0:00</div></div>
+  <div class="hud-btns">
+    <button class="hud-btn" id="newPuzzleBtn">🔀</button>
+    <button class="hud-btn" onclick="GamePlatform.showHome()">🏠</button>
+  </div>
+</div>
+<div class="timer-wrap" id="timerLimitWrap" style="display:none">
+  <div class="timer-bar"><div class="timer-fill" id="tLimitBar" style="width:100%"></div></div>
+  <div class="timer-label" id="tLimitLabel"></div>
+</div>
+<div class="game-outer" id="gameOuter" style="display:none">
+  <div class="game-wrap">
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+<button class="new-btn" id="newBtnBottom" onclick="newGame()">🔀 New Puzzle</button>
+
+<script src="../../game-platform.js?v=11"></script>
+<script>
+// 30 progressive levels — board grows 3×3 → 5×5, harder shuffles, timed at higher levels
+const PLEVELS = (() => {
+  const arr = [];
+  for (let i = 0; i < 30; i++) {
+    // Exponential difficulty: grid grows fast, shuffles explode, time tightens
+    let rows, cols;
+    if      (i < 3)  { rows = 3; cols = 3; }
+    else if (i < 6)  { rows = 4; cols = 3; }
+    else if (i < 10) { rows = 4; cols = 4; }
+    else if (i < 16) { rows = 5; cols = 4; }
+    else if (i < 22) { rows = 5; cols = 5; }
+    else             { rows = 6; cols = 5; }
+    const shuffles = Math.min(Math.round(1000 * Math.pow(1.25, i)), 50000); // 10x base + cap raised
+    const timeLimit = i >= 1 ? Math.max(15, Math.round(90 * Math.pow(0.88, i))) : 0; // timed from L2, half time
+    const label = `${cols}×${rows}` + (timeLimit ? ' ⏱' : '');
+    arr.push({ rows, cols, shuffles, timeLimit, label });
+  }
+  return arr;
+})();
+
+let ROWS_N=3, COLS_N=3, SHUFFLES=300, TIME_LIMIT=0;
+let tiles=[], blank={r:0,c:0}, moves=0, startTime=0, timerInt, limitInt, solved=false;
+let currentMode='normal', currentLevel=0, gameRunning=false;
+
+GamePlatform.init({
+  id:'numberslide',
+  name:'🔢 NumberSlide',
+  icon:'🔢',
+  description:{en:'Slide tiles into numerical order using as few moves as possible!',vi:'Trượt ô số theo thứ tự với ít bước nhất có thể!',ja:'タイルをスライドして数字順に並べよう！最少手数を目指せ！'},
+  levels: PLEVELS,
+  howto:{
+    en:`<h3>🔢 NumberSlide</h3><ul>
+<li><b>Click / tap</b> any tile next to the empty space to slide it</li>
+<li>Arrange tiles <b>1, 2, 3… in order</b> left-to-right, top-to-bottom</li>
+<li>Empty space is at bottom-right when solved</li>
+<li>Try to solve in as <b>few moves as possible</b> — beat your best!</li>
+<li><b>Arrow keys</b> also work on desktop</li>
+<li><b>Adventure:</b> bigger grids and time limits at higher levels!</li></ul>`,
+    vi:`<h3>🔢 NumberSlide</h3><ul>
+<li><b>Click / chạm</b> vào ô cạnh ô trống để trượt</li>
+<li>Xếp các ô theo thứ tự <b>1, 2, 3…</b> trái→phải, trên→dưới</li>
+<li>Ô trống ở góc dưới phải khi giải xong</li>
+<li>Cố gắng giải bằng <b>ít bước nhất</b>!</li>
+<li><b>Adventure:</b> lưới lớn hơn và giới hạn thời gian ở cấp cao!</li></ul>`,
+    ja:`<h3>🔢 NumberSlide</h3><ul>
+<li>空きマスの隣のタイルを<b>クリック / タップ</b></li>
+<li>タイルを<b>1, 2, 3…の順</b>に並べよう</li>
+<li>完成すると空きマスは右下</li>
+<li>できるだけ<b>少ない手数</b>で解こう！</li>
+<li><b>アドベンチャー:</b> 高レベルほど大きなグリッドとタイムリミット！</li></ul>`
+  },
+  onBeforeHome() {
+    setTimeout(() => {
+      const overlay = document.querySelector(".gp-overlay");
+      if (!overlay) return;
+      const gridSize = localStorage.getItem('gp_grid_numberslide') || '3';
+      const html = `<div style="margin:16px 0;text-align:center;"><label style="display:inline-block;color:#ccc;font-size:0.9em;">Grid: <strong id="gv1">${gridSize}</strong>×<strong id="gv2">${gridSize}</strong></label><br><input type="range" min="3" max="6" value="${gridSize}" style="width:200px;margin-top:8px;" id="gslider"></div>`;
+      const screen = overlay.querySelector(".gp-screen");
+      if (screen) screen.insertAdjacentHTML("afterbegin", html);
+      const slider = document.getElementById('gslider');
+      if (slider) slider.onchange = (e) => {
+        localStorage.setItem('gp_grid_numberslide', e.target.value);
+        document.getElementById('gv1').textContent = e.target.value;
+        document.getElementById('gv2').textContent = e.target.value;
+      };
+    }, 50);
+  },
+  onStart({mode, level, levelConfig}) {
+    currentMode=mode; currentLevel=level;
+    const customGrid = parseInt(localStorage.getItem('gp_grid_numberslide') || '3');
+    if (customGrid !== 3) levelConfig = {rows: customGrid, cols: customGrid, shuffles: levelConfig.shuffles, timeLimit: levelConfig.timeLimit};
+    startGame(levelConfig);
+  },
+  onGetState() { return {mode:currentMode, level:currentLevel}; },
+  onRestoreState(snap, ctx2) { startGame(ctx2.levelConfig); }
+});
+
+function startGame(lc) {
+  lc=lc||{};
+  ROWS_N    = lc.rows      || 3;
+  COLS_N    = lc.cols      || 3;
+  SHUFFLES  = lc.shuffles  || 300;
+  TIME_LIMIT= lc.timeLimit || 0;
+
+  ['hudRow','gameOuter'].forEach(id=>document.getElementById(id).style.display=id==='hudRow'?'flex':'block');
+  document.getElementById('newBtnBottom').style.display='block';
+  gameRunning=true;
+  newGame();
+}
+
+function newGame(){
+  if(timerInt) clearInterval(timerInt);
+  if(limitInt) clearInterval(limitInt);
+  document.getElementById('timerLimitWrap').style.display='none';
+
+  const total=ROWS_N*COLS_N;
+  tiles=[];
+  for(let r=0;r<ROWS_N;r++) for(let c=0;c<COLS_N;c++){
+    const val=(r*COLS_N+c+1)%total;
+    tiles.push({val,r,c});
+  }
+  blank={r:ROWS_N-1,c:COLS_N-1};
+  shufflePuzzle(SHUFFLES);
+  moves=0; solved=false; startTime=Date.now();
+  timerInt=setInterval(updateTimer,500);
+
+  if(TIME_LIMIT>0){
+    document.getElementById('timerLimitWrap').style.display='block';
+    updateLimitBar(TIME_LIMIT);
+    if(limitInt) clearInterval(limitInt);
+    let remaining=TIME_LIMIT;
+    limitInt=setInterval(()=>{
+      remaining--;
+      updateLimitBar(remaining);
+      if(remaining<=0){clearInterval(limitInt);clearInterval(timerInt);if(!solved)endGame(false,'⏰ Time\'s Up!');}
+    },1000);
+  }
+
+  render(); syncHUD();
+}
+
+function updateLimitBar(remaining){
+  const pct=Math.max(0,remaining/TIME_LIMIT*100);
+  document.getElementById('tLimitBar').style.width=pct+'%';
+  document.getElementById('tLimitBar').className='timer-fill'+(pct<25?' warn':'');
+  document.getElementById('tLimitLabel').textContent=`${remaining}s remaining`;
+}
+
+function shufflePuzzle(steps){
+  let lastDir=null;
+  for(let i=0;i<steps;i++){
+    const mvs=validMoves().filter(m=>!(lastDir&&m.r===blank.r+lastDir.r&&m.c===blank.c+lastDir.c));
+    const mv=mvs.length>0?mvs[Math.floor(Math.random()*mvs.length)]:validMoves()[0];
+    if(!mv) continue;
+    const dr=blank.r-mv.r, dc=blank.c-mv.c;
+    doMove(mv.r,mv.c,false);
+    lastDir={r:dr,c:dc};
+  }
+}
+
+function validMoves(){
+  const {r,c}=blank;
+  return [{r:r-1,c},{r:r+1,c},{r,c:c-1},{r,c:c+1}].filter(m=>m.r>=0&&m.r<ROWS_N&&m.c>=0&&m.c<COLS_N);
+}
+
+function doMove(tr,tc,count=true){
+  const tile=tiles.find(t=>t.r===tr&&t.c===tc);
+  if(!tile) return false;
+  const {r:br,c:bc}=blank;
+  if(Math.abs(tr-br)+Math.abs(tc-bc)!==1) return false;
+  tile.r=br; tile.c=bc; blank={r:tr,c:tc};
+  if(count){moves++;syncHUD();}
+  return true;
+}
+
+function checkSolved(){
+  const total=ROWS_N*COLS_N;
+  return tiles.every(t=>{const expected=(t.r*COLS_N+t.c+1)%total;return t.val===expected;});
+}
+
+function render(){
+  const size=Math.min(82,Math.floor((300-(COLS_N-1)*6)/COLS_N));
+  const gridEl=document.getElementById('grid');
+  gridEl.style.cssText=`grid-template-columns:repeat(${COLS_N},${size}px);grid-template-rows:repeat(${ROWS_N},${size}px);`;
+  gridEl.innerHTML='';
+  const cell=Array.from({length:ROWS_N},()=>new Array(COLS_N).fill(null));
+  tiles.forEach(t=>cell[t.r][t.c]=t);
+  for(let r=0;r<ROWS_N;r++) for(let c=0;c<COLS_N;c++){
+    const div=document.createElement('div');
+    div.className='tile';
+    div.style.cssText=`width:${size}px;height:${size}px;font-size:${size*.28}px;`;
+    const t=cell[r][c];
+    if(!t||t.val===0){div.classList.add('empty');}
+    else{
+      const total=ROWS_N*COLS_N;
+      const expected=(r*COLS_N+c+1)%total;
+      const isCorrect=t.val===expected;
+      if(isCorrect) div.classList.add('correct');
+      const hue=(t.val/((ROWS_N*COLS_N)-1))*60+200;
+      div.style.background=`hsl(${hue},65%,${isCorrect?40:30}%)`;
+      div.style.boxShadow=isCorrect?`0 0 10px hsl(${hue},80%,60%)40`:'';
+      div.style.border=`2px solid hsl(${hue},50%,50%)`;
+      div.style.color='white';div.style.textShadow='0 1px 3px rgba(0,0,0,0.5)';
+      div.textContent=t.val;
+      div.addEventListener('click',()=>handleTileClick(r,c));
+    }
+    gridEl.appendChild(div);
+  }
+}
+
+function handleTileClick(r,c){
+  if(solved)return;
+  if(doMove(r,c,true)){
+    render();
+    if(checkSolved()){
+      solved=true;
+      clearInterval(timerInt);if(limitInt)clearInterval(limitInt);
+      const elapsed=Math.floor((Date.now()-startTime)/1000);
+      const isNew=saveBest(elapsed);
+      setTimeout(()=>endGame(true,isNew?'🎉 New Personal Best!':'Keep going for fewer moves!'),300);
+    }
+  }
+}
+
+function saveBest(elapsed){
+  const key=`ns_best_${ROWS_N}x${COLS_N}`;
+  const prevMoves=+localStorage.getItem(key+'_m')||Infinity;
+  const isNew=moves<prevMoves;
+  if(isNew){localStorage.setItem(key+'_m',moves);localStorage.setItem(key+'_t',elapsed);}
+  return isNew;
+}
+
+function endGame(win, extra){
+  gameRunning=false;solved=true;
+  const elapsed=Math.floor((Date.now()-startTime)/1000);
+  // Score = inversely proportional to moves: fewer moves = higher score
+  const baseScore = Math.max(1, Math.round(10000 / Math.max(moves,1)));
+  const timeBonus = TIME_LIMIT>0 && win ? Math.round((TIME_LIMIT - elapsed)*5) : 0;
+  const totalScore = win ? baseScore + timeBonus : Math.round(baseScore*0.3);
+  GamePlatform.recordResult({score: totalScore, extra: win ? `${moves} moves in ${fmtTime(elapsed)}${extra?' — '+extra:''}` : extra||'Did not finish'});
+}
+
+function fmtTime(s){return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;}
+function updateTimer(){if(solved)return;const s=Math.floor((Date.now()-startTime)/1000);document.getElementById('hTime').textContent=fmtTime(s);}
+function syncHUD(){
+  document.getElementById('hMoves').textContent=moves;
+  const key=`ns_best_${ROWS_N}x${COLS_N}`;
+  const bm=+localStorage.getItem(key+'_m');
+  document.getElementById('hBest').textContent=bm?bm+'mv':'—';
+}
+
+document.getElementById('newPuzzleBtn').addEventListener('click',newGame);
+
+document.addEventListener('keydown',e=>{
+  const {r:br,c:bc}=blank;
+  const map={ArrowUp:{r:br+1,c:bc},ArrowDown:{r:br-1,c:bc},ArrowLeft:{r:br,c:bc+1},ArrowRight:{r:br,c:bc-1}};
+  const mv=map[e.key];
+  if(!mv) return;
+  e.preventDefault();
+  if(doMove(mv.r,mv.c,true)){
+    render();
+    if(checkSolved()){solved=true;clearInterval(timerInt);if(limitInt)clearInterval(limitInt);const el=Math.floor((Date.now()-startTime)/1000);const isNew=saveBest(el);setTimeout(()=>endGame(true,isNew?'🎉 New Personal Best!':''),300);}
+  }
+});
+</script>
+</body>
+</html>

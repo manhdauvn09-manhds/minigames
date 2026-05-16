@@ -1,0 +1,35 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css"><style>
+body{margin:0;padding:18px;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.board{
+  width:360px;height:230px;
+  border-radius:var(--radius-lg);
+  background-image:url('../assets/board-texture.svg');
+  background-size:cover;
+  position:relative;
+  box-shadow:var(--shadow-board);
+  overflow:hidden;
+}
+.grid{position:absolute;inset:16px;background-image:
+  linear-gradient(to right, rgba(127,100,65,0.6) 1px, transparent 1px),
+  linear-gradient(to bottom, rgba(127,100,65,0.6) 1px, transparent 1px);
+  background-size: calc(100%/8) calc(100%/5);
+}
+.stone{position:absolute;width:28px;height:28px;border-radius:50%;box-shadow:var(--shadow-stone)}
+.b{background:radial-gradient(circle at 36% 30%,#3a3230,#0b0907)}
+.w{background:radial-gradient(circle at 36% 30%,#FDFAF2,#D9CFB8)}
+.b::after,.w::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 36% 30%,rgba(255,255,255,0.5) 0%,rgba(255,255,255,0) 25%)}
+.hoshi{position:absolute;width:5px;height:5px;background:#7F6441;border-radius:50%;transform:translate(-50%,-50%)}
+</style></head><body>
+<div class="board">
+  <div class="grid"></div>
+  <div class="hoshi" style="left:25%;top:25%"></div>
+  <div class="hoshi" style="left:75%;top:25%"></div>
+  <div class="hoshi" style="left:50%;top:50%"></div>
+  <div class="hoshi" style="left:25%;top:75%"></div>
+  <div class="hoshi" style="left:75%;top:75%"></div>
+  <div class="stone b" style="left:42%;top:34%"></div>
+  <div class="stone w" style="left:55%;top:38%"></div>
+  <div class="stone b" style="left:47%;top:48%"></div>
+  <div class="stone w" style="left:60%;top:54%"></div>
+</div>
+</body></html>

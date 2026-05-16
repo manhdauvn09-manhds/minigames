@@ -1,0 +1,25 @@
+# npm
+node_modules/
+
+# Vite build output (Phase 6 ships dist/ to the nginx container).
+dist/
+dist-ssr/
+
+# tsc -b project-reference cache
+*.tsbuildinfo
+
+# tsc emits .d.ts + .js for any included config when run without
+# --noEmit (the Vite config is referenced by tsconfig.node.json).
+vite.config.d.ts
+vite.config.js
+vitest.config.d.ts
+vitest.config.js
+
+# Local Vitest coverage / cache
+coverage/
+.vitest/
+
+# Editor scratch
+.vscode/
+.idea/
+.DS_Store

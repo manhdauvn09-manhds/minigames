@@ -1,0 +1,299 @@
+[
+  {
+    "id": "20260427_beatjump",
+    "title": "BeatJump",
+    "type": "generated",
+    "genre": [
+      "rhythm",
+      "platformer",
+      "action"
+    ],
+    "core_loop_verbs": [
+      "tap",
+      "jump",
+      "dodge",
+      "combo"
+    ],
+    "mechanics": [
+      "timing-based jumping",
+      "combo meter",
+      "difficulty curve"
+    ],
+    "input": [
+      "tap",
+      "spacebar"
+    ],
+    "session_length_sec": 120,
+    "camera": "vertical-scrolling",
+    "theme_keywords": [
+      "neon",
+      "arcade",
+      "fast-paced"
+    ]
+  },
+  {
+    "id": "20260427_fastletters",
+    "title": "FastLetters",
+    "type": "generated",
+    "genre": [
+      "puzzle",
+      "word-game",
+      "timed"
+    ],
+    "core_loop_verbs": [
+      "type",
+      "submit",
+      "create"
+    ],
+    "mechanics": [
+      "word validation",
+      "letter matching",
+      "combo scoring"
+    ],
+    "input": [
+      "keyboard"
+    ],
+    "session_length_sec": 60,
+    "camera": "ui-only",
+    "theme_keywords": [
+      "neon",
+      "fast-paced"
+    ]
+  },
+  {
+    "id": "20260427_spacehopper",
+    "title": "SpaceHopper",
+    "type": "generated",
+    "genre": [
+      "action",
+      "platformer"
+    ],
+    "core_loop_verbs": [
+      "tap",
+      "jump",
+      "climb"
+    ],
+    "mechanics": [
+      "gravity",
+      "platform collision",
+      "endless progression"
+    ],
+    "input": [
+      "tap",
+      "spacebar"
+    ],
+    "session_length_sec": 120,
+    "camera": "vertical-scrolling",
+    "theme_keywords": [
+      "neon",
+      "space",
+      "arcade"
+    ]
+  },
+  {
+    "id": "20260427_stuntdash",
+    "title": "StuntDash",
+    "type": "generated",
+    "genre": [
+      "action",
+      "physics",
+      "driving"
+    ],
+    "core_loop_verbs": [
+      "tap",
+      "flip",
+      "dodge"
+    ],
+    "mechanics": [
+      "rotation physics",
+      "obstacle avoidance",
+      "trick scoring"
+    ],
+    "input": [
+      "tap",
+      "spacebar"
+    ],
+    "session_length_sec": 120,
+    "camera": "side-view",
+    "theme_keywords": [
+      "motocross",
+      "physics",
+      "stunt"
+    ]
+  },
+  {
+    "id": "20260427_tapfactory",
+    "title": "TapFactory",
+    "type": "generated",
+    "genre": [
+      "idle",
+      "clicker",
+      "strategy"
+    ],
+    "core_loop_verbs": [
+      "tap",
+      "buy",
+      "upgrade"
+    ],
+    "mechanics": [
+      "idle income",
+      "upgrade progression",
+      "exponential growth"
+    ],
+    "input": [
+      "tap/click"
+    ],
+    "session_length_sec": 60,
+    "camera": "ui-only",
+    "theme_keywords": [
+      "gold",
+      "money",
+      "incremental"
+    ]
+  },
+  {
+    "id": "20260427_blobmerge",
+    "title": "BlobMerge",
+    "type": "generated",
+    "genre": [
+      "puzzle",
+      "merge",
+      "strategy"
+    ],
+    "core_loop_verbs": [
+      "drag",
+      "merge",
+      "level-up"
+    ],
+    "mechanics": [
+      "drag-merge mechanics",
+      "level progression",
+      "combo scoring"
+    ],
+    "input": [
+      "drag"
+    ],
+    "session_length_sec": 300,
+    "camera": "ui-only",
+    "theme_keywords": [
+      "colorful",
+      "satisfying"
+    ]
+  },
+  {
+    "id": "20260427_gemblast",
+    "title": "GemBlast",
+    "type": "generated",
+    "genre": [
+      "puzzle",
+      "match3"
+    ],
+    "core_loop_verbs": [
+      "swap",
+      "match",
+      "clear"
+    ],
+    "mechanics": [
+      "match-3 mechanic",
+      "gravity",
+      "combo chains"
+    ],
+    "input": [
+      "tap/click"
+    ],
+    "session_length_sec": 300,
+    "camera": "ui-only",
+    "theme_keywords": [
+      "gems",
+      "colorful"
+    ]
+  },
+  {
+    "id": "20260427_spellduel",
+    "title": "SpellDuel",
+    "type": "generated",
+    "genre": [
+      "strategy",
+      "card-game",
+      "roguelike"
+    ],
+    "core_loop_verbs": [
+      "cast",
+      "duel",
+      "build"
+    ],
+    "mechanics": [
+      "card selection",
+      "turn-based combat",
+      "deck building"
+    ],
+    "input": [
+      "tap/click"
+    ],
+    "session_length_sec": 300,
+    "camera": "ui-only",
+    "theme_keywords": [
+      "magic",
+      "strategy",
+      "cards"
+    ]
+  },
+  {
+    "id": "20260427_wavedefender",
+    "title": "WaveDefender",
+    "type": "generated",
+    "genre": [
+      "strategy",
+      "action",
+      "tower-defense"
+    ],
+    "core_loop_verbs": [
+      "place",
+      "defend",
+      "survive"
+    ],
+    "mechanics": [
+      "tower placement",
+      "wave system",
+      "resource management"
+    ],
+    "input": [
+      "tap/click"
+    ],
+    "session_length_sec": 300,
+    "camera": "topdown",
+    "theme_keywords": [
+      "strategy",
+      "defense"
+    ]
+  },
+  {
+    "id": "20260427_clicksync",
+    "title": "ClickSync",
+    "type": "generated",
+    "genre": [
+      "rhythm",
+      "action",
+      "timing"
+    ],
+    "core_loop_verbs": [
+      "click",
+      "sync",
+      "perfect"
+    ],
+    "mechanics": [
+      "rhythm mechanics",
+      "timing accuracy",
+      "combo streaks"
+    ],
+    "input": [
+      "tap/click"
+    ],
+    "session_length_sec": 150,
+    "camera": "ui-only",
+    "theme_keywords": [
+      "rhythm",
+      "beat"
+    ]
+  }
+]

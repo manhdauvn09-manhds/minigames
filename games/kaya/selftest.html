@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kaya — AI self-test</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="/Kaya Design System/assets/favicon.svg">
+  <link rel="stylesheet" href="/Kaya Design System/ui_kits/web/kit.css">
+  <style>
+    body { padding: 40px 28px; max-width: 760px; margin: 0 auto; }
+    h1 { font-family: var(--font-serif); font-weight: 500; font-size: 32px;
+         letter-spacing: -0.02em; margin: 0 0 8px;
+         font-variation-settings: "opsz" 144, "SOFT" 30; }
+    p.lead { color: var(--fg-muted); margin: 0 0 22px; line-height: 1.5; }
+    .card { padding: 20px 24px; margin-bottom: 18px; }
+    .eyebrow { margin-bottom: 12px; }
+    pre { font-family: var(--font-mono); font-size: 13px;
+          background: var(--paper-2); padding: 14px 16px;
+          border-radius: var(--radius-sm); overflow: auto;
+          border: 1px solid var(--border); color: var(--fg);
+          white-space: pre-wrap; word-break: break-all;
+          min-height: 260px; margin: 0; }
+    .row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .row label { display: inline-flex; align-items: center; gap: 6px; color: var(--fg-muted); font-size: 13px; }
+    .row input[type=number] { width: 60px; padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm); font: 500 14px var(--font-mono); background: var(--paper-1); color: var(--fg); }
+    .metric { font-family: var(--font-mono); font-size: 24px; font-weight: 500; }
+    .pass { color: var(--win); font-weight: 700; }
+    .fail { color: var(--sumi); font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>AI self-test</h1>
+  <p class="lead">
+    Level 5 plays Level 1 for N games. The spec requires Level 5 to win
+    at least 9 out of 10. Each game is played with a fresh board; the
+    opener alternates so any first-move bias cancels out.
+  </p>
+
+  <section class="card">
+    <div class="eyebrow">Controls</div>
+    <div class="row">
+      <label>Games <input id="nGames" type="number" min="1" max="50" value="10"></label>
+      <label>Size <input id="bSize" type="number" min="5" max="19" value="15"></label>
+      <button class="btn btn-primary" id="btnRun">Run</button>
+      <button class="btn btn-secondary" id="btnClear">Clear</button>
+    </div>
+    <div class="row" style="margin-bottom:0">
+      <div><span class="eyebrow">L5 wins</span> <div class="metric" id="winL5">—</div></div>
+      <div><span class="eyebrow">L1 wins</span> <div class="metric" id="winL1">—</div></div>
+      <div><span class="eyebrow">Draws</span>   <div class="metric" id="winDr">—</div></div>
+      <div><span class="eyebrow">Verdict</span> <div class="metric" id="verdict">—</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="eyebrow">Log</div>
+    <pre id="log">Ready. Click "Run" to start.</pre>
+  </section>
+
+  <script type="module" src="/src/selftest.js"></script>
+</body>
+</html>

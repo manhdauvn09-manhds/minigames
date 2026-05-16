@@ -1,0 +1,31 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css"><style>
+body{margin:0;padding:0;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:var(--font-sans)}
+.modal{
+  width:440px;background:var(--paper-0);border:1px solid var(--border);border-radius:var(--radius-md);
+  box-shadow:var(--shadow-3);padding:24px;
+}
+.eyebrow{font:600 11px var(--font-sans);letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-subtle)}
+h2{margin:4px 0 18px;font:600 22px var(--font-sans);letter-spacing:-0.01em;color:var(--fg)}
+.row{padding:12px 0;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.row:first-of-type{border-top:0}
+.row .l{font:500 14px var(--font-sans)}
+.row .h{font:400 12px var(--font-sans);color:var(--fg-muted);margin-top:2px}
+.seg{display:inline-flex;background:var(--paper-2);padding:3px;border-radius:var(--radius-sm);border:1px solid var(--border)}
+.seg button{border:0;background:transparent;padding:5px 12px;font:500 12px var(--font-sans);color:var(--fg-muted);border-radius:4px;cursor:pointer}
+.seg button.active{background:var(--paper-0);color:var(--fg);box-shadow:var(--shadow-1)}
+.slider{flex:1;margin-left:20px;height:4px;background:var(--paper-3);border-radius:2px;position:relative}
+.slider .track{position:absolute;left:0;top:0;height:100%;width:60%;background:var(--sumi);border-radius:2px}
+.slider .thumb{position:absolute;left:60%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:var(--shadow-2);border:1px solid var(--border-strong)}
+.switch{width:36px;height:20px;background:var(--sumi);border-radius:999px;position:relative}
+.switch::after{content:"";position:absolute;top:2px;left:18px;width:16px;height:16px;background:#fff;border-radius:50%;box-shadow:var(--shadow-1)}
+</style></head><body>
+<div class="modal">
+  <div class="eyebrow">Settings</div>
+  <h2>Adjust your game</h2>
+  <div class="row"><div><div class="l">Difficulty</div><div class="h">Level 3 · Measured</div></div><div class="slider"><div class="track"></div><div class="thumb"></div></div></div>
+  <div class="row"><div class="l">Who goes first</div><div class="seg"><button class="active">You</button><button>Bot</button><button>Random</button></div></div>
+  <div class="row"><div class="l">Board size</div><div class="seg"><button class="active">15×15</button><button>19×19</button></div></div>
+  <div class="row"><div class="l">Sound</div><div class="switch"></div></div>
+  <div class="row"><div class="l">Theme</div><div class="seg"><button class="active">Light</button><button>Dark</button><button>Auto</button></div></div>
+</div>
+</body></html>

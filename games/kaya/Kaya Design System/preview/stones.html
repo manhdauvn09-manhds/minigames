@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css"><style>
+body{margin:0;padding:28px;background:var(--bg);display:flex;gap:30px;align-items:center;justify-content:center}
+.col{display:flex;flex-direction:column;align-items:center;gap:10px}
+.stone{width:76px;height:76px;border-radius:50%}
+.black{
+  background: radial-gradient(circle at 36% 32%, #3a3230 0%, #1f1a17 55%, #0b0907 100%);
+  box-shadow: var(--shadow-stone);
+}
+.black::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 36% 30%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 22%)}
+.white{
+  background: radial-gradient(circle at 36% 32%, #FDFAF2 0%, #F5EFE4 55%, #D9CFB8 100%);
+  box-shadow: var(--shadow-stone);
+}
+.white::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 36% 30%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 30%)}
+.sh{position:relative}
+.cb-black{background: radial-gradient(circle at 36% 32%, #3a3230 0%, #1f1a17 55%, #0b0907 100%);box-shadow: var(--shadow-stone);position:relative}
+.cb-black::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%, #f5efe4 0 6px, transparent 7px)}
+.cb-white{background: radial-gradient(circle at 36% 32%, #F0DFC0 0%, #D9C39A 100%);box-shadow: var(--shadow-stone);position:relative;border:1px solid rgba(0,0,0,0.15)}
+.cb-white::after{content:"";position:absolute;inset:8px;border-radius:50%;border:2px solid rgba(60,40,20,0.4)}
+.name{font:500 11px var(--font-mono);color:var(--fg)}
+.hex{font:400 10px var(--font-mono);color:var(--fg-subtle)}
+</style></head><body>
+<div class="col"><div class="sh stone black"></div><div class="name">black</div><div class="hex">#1A1613</div></div>
+<div class="col"><div class="sh stone white"></div><div class="name">white</div><div class="hex">#F5EFE4</div></div>
+<div class="col"><div class="sh stone cb-black"></div><div class="name">cb · black</div><div class="hex">center dot</div></div>
+<div class="col"><div class="sh stone cb-white"></div><div class="name">cb · white</div><div class="hex">ring</div></div>
+</body></html>

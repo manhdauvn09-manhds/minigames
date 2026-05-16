@@ -1,0 +1,287 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0d1b2a">
+<meta name="description" content="MemoryFlip — Free card-matching memory game. 30 progressive levels, combo multipliers, online leaderboard.">
+<meta name="keywords" content="memory game, card match, concentration, allin1site games, memoryflip">
+<meta name="robots" content="index,follow">
+<meta name="referrer" content="no-referrer-when-downgrade">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://*.gstatic.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https:; connect-src 'self' https:; frame-src https://accounts.google.com; base-uri 'self'; form-action 'self';">
+<meta name="X-Content-Type-Options" content="nosniff">
+<meta name="gp-google-client-id" content="781592547104-970ld4c6lb6l8ev4hhvlg3k0943k8t3j.apps.googleusercontent.com">
+<meta name="gp-api-base" content="">
+<title>MemoryFlip — Card Matching Puzzle | allin1site Games</title>
+<link rel="canonical" href="/games/memoryflip/">
+<link rel="stylesheet" href="../../game-platform.css?v=11">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"MemoryFlip","genre":"Memory","applicationCategory":"GameApplication","operatingSystem":"Web Browser","description":"Card-matching memory game — 30 progressive levels, combo multipliers.","publisher":{"@type":"Organization","name":"allin1site.com"}}
+</script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--gp-stage-bg, linear-gradient(135deg, #1e2248 0%, #243060 50%, #1e3870 100%));
+  color: var(--gp-text-primary, #f8fafc);
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  color: white; padding: 10px 8px; overflow-x: hidden;
+}
+h1 { font-size:1.65em; color:#A29BFE; text-shadow:0 0 18px #A29BFE; margin-bottom:1px; }
+.subtitle { font-size:.78em; opacity:.7; margin-bottom:8px; }
+.hud { display:flex; gap:16px; margin-bottom:5px; align-items:center; }
+.hud-item { text-align:center; }
+.hud-label { font-size:.62em; text-transform:uppercase; opacity:.7; }
+.hud-value { font-size:1.3em; font-weight:800; color:#A29BFE; }
+.hud-btns { display:flex; gap:6px; margin-left:auto; }
+.hud-btn { min-width: 44px; height: 44px; padding: 0; border-radius:7px; border:1px solid rgba(255,255,255,.32); background:rgba(255,255,255,.14); color:#eee; font-size:.78em; font-weight:600; cursor:pointer; transition:background .18s; }
+.hud-btn:hover { background:rgba(255,255,255,.2); }
+.timer-wrap { width:280px; margin-bottom:7px; }
+.timer-bar { height:8px; background:rgba(255,255,255,.16); border-radius:4px; overflow:hidden; }
+.timer-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#A29BFE,#6c5ce7); transition:width .9s linear, background .4s; }
+.timer-fill.warn { background:linear-gradient(90deg,#ff7675,#fd79a8); }
+.level-badge { text-align:right; font-size:.72em; opacity:.75; margin-top:2px; }
+.combo-strip { height:22px; display:flex; align-items:center; justify-content:center; margin-bottom:5px; font-size:.9em; font-weight:700; }
+.combo-strip.combo1 { color:#A29BFE; }
+.combo-strip.combo2 { color:#FFD32A; text-shadow:0 0 12px #FFD32A; }
+.combo-strip.combo3 { color:#ff6b6b; text-shadow:0 0 14px #ff6b6b; animation:comboPulse .4s ease infinite alternate; }
+@keyframes comboPulse { from{transform:scale(1)} to{transform:scale(1.08)} }
+.board-wrap { position:relative; background:rgba(0,0,0,.22); border-radius:14px; border:2px solid rgba(255,255,255,.18); padding:10px; }
+.board { display:grid; gap:6px; }
+.card-outer { perspective:600px; cursor:pointer; }
+.card-inner { position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); }
+.card-outer.flipped .card-inner { transform:rotateY(180deg); }
+.card-face, .card-back { position:absolute; inset:0; border-radius:10px; display:flex; align-items:center; justify-content:center; backface-visibility:hidden; border:2px solid rgba(255,255,255,.12); }
+.card-back { background:linear-gradient(135deg,#364070,#242e52); }
+.card-back::after { content:'?'; font-size:1.2em; font-weight:900; color:rgba(255,255,255,.28); }
+.card-face { transform:rotateY(180deg); font-size:1.7em; }
+.card-outer.matched .card-face { border-color:rgba(0,255,136,.5); animation:matchPop .35s ease-out; }
+.card-outer.wrong .card-inner { animation:shake .4s ease; }
+@keyframes matchPop { 0%{transform:rotateY(180deg) scale(1)} 50%{transform:rotateY(180deg) scale(1.15)} 100%{transform:rotateY(180deg) scale(1)} }
+@keyframes shake { 0%,100%{transform:rotateY(180deg) translateX(0)} 20%{transform:rotateY(180deg) translateX(-5px)} 40%{transform:rotateY(180deg) translateX(5px)} 60%{transform:rotateY(180deg) translateX(-4px)} 80%{transform:rotateY(180deg) translateX(4px)} }
+.level-msg { position:fixed; top:30%; left:50%; transform:translate(-50%,-50%); font-size:2em; font-weight:900; pointer-events:none; color:#FFD32A; text-shadow:0 0 24px #FFD32A; opacity:0; z-index:100; }
+.level-msg.pop { animation:lvlPop .8s ease-out forwards; }
+@keyframes lvlPop { 0%{opacity:1;transform:translate(-50%,-50%) scale(.7)} 30%{opacity:1;transform:translate(-50%,-50%) scale(1.1)} 70%{opacity:1;transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(-50%,-120%) scale(1.2)} }
+</style>
+</head>
+<body>
+<h1>🃏 MemoryFlip</h1>
+<p class="subtitle">Find all pairs before time runs out!</p>
+<div class="hud" id="hudRow" style="display:none">
+  <div class="hud-item"><div class="hud-label">Score</div><div class="hud-value" id="hScore">0</div></div>
+  <div class="hud-item"><div class="hud-label">Best</div><div class="hud-value" id="hBest">0</div></div>
+  <div class="hud-item"><div class="hud-label">Pairs</div><div class="hud-value" id="hPairs">0</div></div>
+  <div class="hud-btns">
+    <button class="hud-btn" id="pauseBtn">⏸</button>
+    <button class="hud-btn" onclick="GamePlatform.showHome()">🏠</button>
+  </div>
+</div>
+<div class="timer-wrap" id="timerWrap" style="display:none">
+  <div class="timer-bar"><div class="timer-fill" id="tBar" style="width:100%"></div></div>
+  <div class="level-badge" id="lvlLabel"></div>
+</div>
+<div class="combo-strip" id="comboStrip" style="display:none"></div>
+<div class="board-wrap" id="boardWrap" style="display:none">
+  <div class="board" id="board"></div>
+</div>
+<div class="level-msg" id="lvlMsg"></div>
+
+<script src="../../game-platform.js?v=11"></script>
+<script>
+// 30 progressive levels — board grows: 4×3 → 8×6, time tightens, flip-back faster
+const PLEVELS = (() => {
+  // Exponential difficulty: grid grows fast, time shrinks exponentially
+  const sizes = [
+    [4,3],[4,4],[5,4],[6,4],[6,5],[6,6],         // L0-5: ramp fast
+    [7,5],[7,6],[8,5],[8,6],[8,6],[8,7],         // L6-11: big boards
+    [8,7],[8,8],[8,8],[10,6],[10,6],[10,7],      // L12-17: huge boards
+    [10,7],[10,8],[10,8],[10,8],[10,8],[10,8],   // L18-23: massive
+    [10,8],[10,8],[10,8],[10,8],[10,8],[10,8]    // L24-29: maximum
+  ];
+  return sizes.map(([cols, rows], i) => ({
+    cols, rows,
+    time: Math.max(8, Math.round(40 * Math.pow(0.85, i))),    // 10x tighter: half base, faster decay
+    flipBack: Math.max(120, Math.round(600 * Math.pow(0.85, i))), // ~10x tighter peek window
+  }));
+})();
+
+const ALL_EMOJIS=['🐶','🐱','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🦄','🐙','🦋','🐢','🦀','🌸','🍕','🎸','🚀','🎯','🏆','⚡','🌈','🎮','💎','🔮','🎪','🎭','🍩','🎈','🌟','🍔','🚗','🛸','🦖','🍿','🎁','🎄'];
+
+let cards, flipped, matched, score, timeLeft, ticker, busy, combo;
+let COLS_N, ROWS_N, TIME_LIMIT, FLIP_BACK;
+let gameRunning=false, paused=false, currentMode='normal', currentLevel=0;
+
+GamePlatform.init({
+  id:'memoryflip',
+  name:'🃏 MemoryFlip',
+  icon:'🃏',
+  description:{en:'Flip cards to find matching pairs. Build combos by matching pairs in a row!',vi:'Lật bài tìm cặp giống nhau. Ghép đôi liên tiếp để nhân điểm combo!',ja:'カードをめくってペアを探そう！連続マッチでコンボ倍率アップ！'},
+  levels: PLEVELS,
+  howto:{
+    en:`<h3>🃏 MemoryFlip</h3><ul>
+<li><b>Click/tap</b> a card to flip it over</li>
+<li>Flip a second card — if they <b>match</b>, they disappear!</li>
+<li>If they don't match, they <b>flip back</b> (faster at higher levels!)</li>
+<li><b>Combos:</b> match pairs in a row for big multipliers</li>
+<li><b>Adventure:</b> clear all pairs before time runs out!</li></ul>`,
+    vi:`<h3>🃏 MemoryFlip</h3><ul>
+<li><b>Click/chạm</b> để lật bài lên</li>
+<li>Lật bài thứ 2 — nếu <b>giống nhau</b> chúng biến mất!</li>
+<li>Không khớp → lật lại (cấp cao = lật lại nhanh hơn!)</li>
+<li><b>Combo:</b> ghép đôi liên tiếp để nhân điểm lớn</li>
+<li><b>Adventure:</b> hoàn thành trước khi hết giờ!</li></ul>`,
+    ja:`<h3>🃏 MemoryFlip</h3><ul>
+<li>カードを<b>クリック/タップ</b>してめくる</li>
+<li>2枚目が<b>同じ絵</b>ならペア成立！消える</li>
+<li>違ったら裏返る（高レベルほど早く返る！）</li>
+<li><b>コンボ:</b> 連続ペアで得点倍率アップ</li>
+<li><b>アドベンチャー:</b> 時間内に全ペアを揃えよう！</li></ul>`
+  },
+  onBeforeHome() {
+    setTimeout(() => {
+      const overlay = document.querySelector(".gp-overlay");
+      if (!overlay) return;
+      const gridSize = localStorage.getItem('gp_grid_memoryflip') || '4';
+      const html = `<div style="margin:16px 0;text-align:center;"><label style="display:inline-block;color:#ccc;font-size:0.9em;">Grid: <strong id="gv1">${gridSize}</strong>×<strong id="gv2">${gridSize}</strong></label><br><input type="range" min="3" max="6" value="${gridSize}" style="width:200px;margin-top:8px;" id="gslider"></div>`;
+      const screen = overlay.querySelector(".gp-screen");
+      if (screen) screen.insertAdjacentHTML("afterbegin", html);
+      const slider = document.getElementById('gslider');
+      if (slider) slider.onchange = (e) => {
+        localStorage.setItem('gp_grid_memoryflip', e.target.value);
+        document.getElementById('gv1').textContent = e.target.value;
+        document.getElementById('gv2').textContent = e.target.value;
+      };
+    }, 50);
+  },
+  onStart({mode, level, levelConfig}) {
+    currentMode=mode; currentLevel=level;
+    const customGrid = parseInt(localStorage.getItem('gp_grid_memoryflip') || '4');
+    if (customGrid !== 4) levelConfig = {rows: customGrid, cols: customGrid, time: levelConfig.time, flipBack: levelConfig.flipBack};
+    startGame(levelConfig);
+  },
+  onGetState() { return {mode:currentMode, level:currentLevel}; },
+  onRestoreState(snap, ctx2) { startGame(ctx2.levelConfig); }
+});
+
+function startGame(lc) {
+  lc=lc||{};
+  COLS_N    = lc.cols   || 4;
+  ROWS_N    = lc.rows   || 4;
+  TIME_LIMIT= lc.time   || 60;
+  FLIP_BACK = lc.flipBack|| 1200;
+
+  const pairs=(COLS_N*ROWS_N)/2;
+  const emojis=ALL_EMOJIS.slice(0,pairs);
+  const deck=[...emojis,...emojis];
+  shuffle(deck);
+  cards=deck.map((e,i)=>({id:i,emoji:e,flipped:false,matched:false}));
+  flipped=[]; matched=[]; combo=0; timeLeft=TIME_LIMIT; busy=false;
+  score=+localStorage.getItem('mf_score')||0;
+  gameRunning=true; paused=false;
+
+  ['hudRow','timerWrap','comboStrip','boardWrap'].forEach(id=>document.getElementById(id).style.display=id==='hudRow'?'flex':'block');
+  document.getElementById('pauseBtn').textContent='⏸';
+  document.getElementById('lvlLabel').textContent=`Level ${currentLevel+1} — ${COLS_N}×${ROWS_N} — ${TIME_LIMIT}s`;
+
+  const board=document.getElementById('board');
+  const cellSize=Math.min(52,Math.floor((300-(COLS_N-1)*6)/COLS_N));
+  board.style.gridTemplateColumns=`repeat(${COLS_N},${cellSize}px)`;
+  board.innerHTML='';
+  cards.forEach((c,i)=>{
+    const outer=document.createElement('div');
+    outer.className='card-outer';
+    outer.style.cssText=`width:${cellSize}px;height:${cellSize}px;`;
+    outer.innerHTML=`<div class="card-inner"><div class="card-back"></div><div class="card-face" style="background:${cardBG(c.emoji)};font-size:${Math.max(1,cellSize*0.036)}em">${c.emoji}</div></div>`;
+    outer.addEventListener('click',()=>onCard(i,outer));
+    board.appendChild(outer);
+    c.el=outer;
+  });
+
+  updateTimerBar(); syncHUD();
+  if (ticker) clearInterval(ticker);
+  ticker=setInterval(tick,1000);
+}
+
+function cardBG(emoji){const idx=ALL_EMOJIS.indexOf(emoji);const hue=(idx*37)%360;return `hsla(${hue},60%,20%,0.8)`;}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
+
+function tick(){
+  if(!gameRunning||paused)return;
+  timeLeft--;updateTimerBar();
+  if(timeLeft<=0){clearInterval(ticker);endGame(false);}
+}
+
+function updateTimerBar(){
+  const pct=Math.max(0,timeLeft/TIME_LIMIT*100);
+  const bar=document.getElementById('tBar');
+  bar.style.width=pct+'%';
+  bar.className='timer-fill'+(pct<25?' warn':'');
+}
+
+function onCard(i,el){
+  if(busy||flipped.length>=2||paused||!gameRunning)return;
+  const c=cards[i];
+  if(c.flipped||c.matched)return;
+  c.flipped=true;el.classList.add('flipped');
+  flipped.push(i);
+  if(flipped.length===2){busy=true;setTimeout(checkMatch,FLIP_BACK>700?700:FLIP_BACK);}
+}
+
+function checkMatch(){
+  const [a,b]=flipped;
+  const ca=cards[a],cb=cards[b];
+  if(ca.emoji===cb.emoji){
+    ca.matched=cb.matched=true;
+    ca.el.classList.add('matched');cb.el.classList.add('matched');
+    matched.push(a,b); combo++;
+    const pts=100*combo+timeLeft;
+    score+=pts;
+    const hs=+localStorage.getItem('mf_hs')||0;
+    if(score>hs)localStorage.setItem('mf_hs',score);
+    showCombo(combo,pts);syncHUD();
+    if(matched.length===cards.length){clearInterval(ticker);setTimeout(()=>endGame(true),600);}
+  } else {
+    combo=0;
+    [ca,cb].forEach(c=>{
+      c.flipped=false;c.el.classList.add('wrong');
+      setTimeout(()=>{c.el.classList.remove('flipped','wrong');},FLIP_BACK);
+    });
+    updateCombo();
+  }
+  flipped=[];busy=false;
+}
+
+function showCombo(c,pts){
+  const el=document.getElementById('comboStrip');
+  if(c>=3){el.className='combo-strip combo3';el.textContent=`🔥 ${c}x Combo! +${pts}pts`;}
+  else if(c>=2){el.className='combo-strip combo2';el.textContent=`⚡ ${c}x Combo! +${pts}pts`;}
+  else{el.className='combo-strip combo1';el.textContent=`✓ Match! +${pts}pts`;}
+}
+function updateCombo(){document.getElementById('hPairs').textContent=matched.length/2+' / '+(cards.length/2);}
+function syncHUD(){
+  document.getElementById('hScore').textContent=score;
+  document.getElementById('hBest').textContent=+localStorage.getItem('mf_hs')||0;
+  updateCombo();
+}
+
+function endGame(cleared){
+  gameRunning=false;
+  clearInterval(ticker);
+  GamePlatform.recordResult({score, extra:cleared?`All ${cards.length/2} pairs found! 🎉`:`Found ${matched.length/2}/${cards.length/2} pairs`});
+}
+
+// Pause
+document.getElementById('pauseBtn').addEventListener('click',()=>{
+  if(!gameRunning)return;
+  paused=!paused;
+  document.getElementById('pauseBtn').textContent=paused?'▶':'⏸';
+  if(paused){
+    GamePlatform.pause({mode:currentMode,level:currentLevel});
+    ['hudRow','timerWrap','comboStrip','boardWrap'].forEach(id=>document.getElementById(id).style.display='none');
+    gameRunning=false;
+  }
+});
+</script>
+</body>
+</html>

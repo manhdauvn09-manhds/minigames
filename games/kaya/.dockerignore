@@ -1,0 +1,8 @@
+# Keep the build context tight: the prompt + any test scripts don't
+# belong inside the container image.
+PROMPT_CAROGAME.md
+test/
+*.log
+.git/
+.gitignore
+node_modules/

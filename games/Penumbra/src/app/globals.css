@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-primary: #0A0E14;
+    --bg-secondary: #11161E;
+    --bg-tertiary: #1A2129;
+    --bg-elevated: #232C36;
+    --surface-soft: #1F2730;
+    --surface-hard: #2A333E;
+    --border-subtle: #2D3742;
+    --border-strong: #3F4B58;
+    --fg-primary: #E8ECEF;
+    --fg-secondary: #A8B2BD;
+    --fg-muted: #6B7785;
+    --fg-disabled: #4A5563;
+    --accent: #C9A062;
+    --accent-glow: #E0B97A;
+    --accent-deep: #8C6E3F;
+    --success: #6E9F76;
+    --warning: #C49B4F;
+    --danger: #B25D5D;
+    --info: #6E8FB0;
+    --cell-empty: #1A2129;
+    --cell-bright: #C9A062;
+    --cell-void: #060A10;
+    --cell-path: #C9A062;
+    --cell-hint: #8FA8C4;
+    --cell-portal: #9B7FB8;
+
+    /* Font variables — assigned by next/font in layout.tsx */
+    --font-display: var(--font-display-loaded);
+    --font-body: var(--font-body-loaded);
+    --font-mono: var(--font-mono-loaded);
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--fg-primary);
+    font-family: var(--font-body), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Respect reduced-motion preference globally */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Focus visibility */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}

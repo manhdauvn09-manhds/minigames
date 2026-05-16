@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0d1b2a">
+<meta name="description" content="BubbleBlast — Free hex bubble shooter with 30 progressive levels. Aim, shoot, match 3+, pop combos. Plays on phone, tablet & desktop.">
+<meta name="keywords" content="bubble shooter, hex bubble, match 3, free puzzle game, allin1site games, bubblblast">
+<meta name="robots" content="index,follow">
+<meta name="referrer" content="no-referrer-when-downgrade">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://*.gstatic.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https:; connect-src 'self' https: ; frame-src https://accounts.google.com; base-uri 'self'; form-action 'self';">
+<meta name="X-Content-Type-Options" content="nosniff">
+
+<!-- GamePlatform config (Vercel will substitute or you can hardcode) -->
+<meta name="gp-google-client-id" content="781592547104-970ld4c6lb6l8ev4hhvlg3k0943k8t3j.apps.googleusercontent.com">
+<meta name="gp-api-base" content="">
+
+<title>BubbleBlast — Hex Shooter | allin1site Games</title>
+<link rel="canonical" href="/games/20260430_bubblblast/">
+<link rel="stylesheet" href="../../game-platform.css?v=11">
+
+<!-- JSON-LD: SEO structured data -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"BubbleBlast","genre":"Puzzle","applicationCategory":"GameApplication","operatingSystem":"Web Browser","description":"Hex bubble shooter — 30 progressive levels, special bombs and rainbows, online leaderboard.","publisher":{"@type":"Organization","name":"allin1site.com"}}
+</script>
+
+<style>
+  /* Game-specific styles inside the shared shell stage */
+  .bb-title    { font-size: 1.4rem; color: #4ecdc4; text-shadow: 0 0 10px rgba(78,205,196,.5); margin: 4px 0 1px; }
+  .bb-subtitle { font-size: .72rem; opacity: .7; margin-bottom: 6px; text-align: center; }
+  .bb-hud      { display: flex; gap: 12px; margin-bottom: 5px; align-items: center; flex-wrap: wrap; justify-content: center; }
+  .bb-item     { text-align: center; min-width: 50px; }
+  .bb-label    { font-size: .58rem; text-transform: uppercase; opacity: .7; }
+  .bb-value    { font-size: 1.1rem; font-weight: 800; color: #4ecdc4; }
+  .bb-btns     { display: flex; gap: 6px; }
+  .bb-btn      { padding: 5px 10px; border-radius: 7px; border: 1px solid rgba(255,255,255,.32); background: rgba(255,255,255,.14); color: #eee; font-size: .76rem; font-weight: 600; cursor: pointer; }
+  .bb-btn:hover { background: rgba(255,255,255,.2); }
+  .bb-lvlbar   { width: min(280px, 90%); margin-bottom: 5px; }
+  .bb-lbar     { display: flex; align-items: center; gap: 6px; font-size: .68rem; opacity: .75; }
+  .bb-lbar-fill{ flex: 1; height: 4px; background: rgba(255,255,255,.16); border-radius: 3px; overflow: hidden; }
+  .bb-lbar-inner{ height:100%; background:#4ecdc4; border-radius:3px; transition: width .3s; }
+  .bb-preview  { display: flex; gap: 8px; margin-bottom: 4px; align-items: center; font-size: .75rem; opacity: .9; }
+  .bb-pball    { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,.3); display: flex; align-items: center; justify-content: center; font-size: .85rem; }
+  .bb-wrap     { position: relative; border-radius: 10px; overflow: hidden; border: 2px solid rgba(78,205,196,.35); cursor: crosshair; touch-action: none; max-width: 100%; max-height: 100%; }
+  .bb-wrap canvas { display: block; max-width: 100%; max-height: 100%; height: auto; }
+</style>
+</head>
+<body>
+<script src="../../game-platform.js?v=11"></script>
+<script>
+/* ============================================================
+   BubbleBlast — 30 progressive levels
+   Each platform level configures a complete game session
+   (numColors, initRows, shots-per-internal-level, internal maxLevel, specials).
+   Difficulty rises smoothly: more colors → more rows → fewer shots → harder pacing.
+   ============================================================ */
+function buildLevels() {
+  const levels = [];
+  for (let i = 0; i < 30; i++) {
+    // Exponential difficulty: 3x+ harder each level
+    const numColors  = Math.min(3 + Math.floor(i / 3), 6);     // colors ramp faster: 3→6 by L9
+    const initRows   = Math.min(4 + Math.floor(i * 0.8), 13);  // rows fill up much faster
+    const shots      = Math.max(Math.round(15 * Math.pow(0.92, i)), 5);  // 10x tighter: half shots, floor 5
+    const maxLevel   = Math.min(6 + i, 24);                    // more internal sub-levels
+    const specials   = i >= 4;                                  // unlock later (L5)
+    const specialRate= Math.min(0.03 + i * 0.002, 0.08);       // fewer specials
+    const dropChance = Math.max(0.08 * Math.pow(0.9, i), 0.01); // board much tighter
+    levels.push({ numColors, initRows, shots, maxLevel, specials, specialRate, dropChance });
+  }
+  return levels;
+}
+
+const PLEVELS = buildLevels();
+
+// ── Geometry ────────────────────────────────────────────────────────────
+const DIAM = 38, R = DIAM/2, ROW_H = Math.round(DIAM*0.866);
+const CE = 9, CO = 8, ROWS = 14;
+const CW = CE*DIAM + 4, CH = 580, SHOOTER_Y = CH - 50;
+const DANGER_Y = (ROWS/2) * ROW_H + R*2;
+const COLORS = ['#FF6B6B','#FF9F43','#4ecdc4','#A29BFE','#2ECC71','#F368E0'];
+const SPECIAL_BOMB = '💣', SPECIAL_RAINBOW = '🌈';
+
+// ── Game state ──────────────────────────────────────────────────────────
+let canvas, ctx;
+let grid, bullet, currColor, nextColor, score, best, level, shots;
+let aimX = CW/2, aimY = 100;
+let pops = [], drops = [], gameOver = false, levelClearing = false;
+let NUM_COLORS = 3, MAX_LEVEL = 6, USE_SPECIALS = false, INIT_SHOTS = 30, SPECIAL_RATE = 0.06, DROP_CHANCE = 0.10;
+let gameRunning = false, paused = false, currentMode = 'normal', currentLevel = 0;
+let ui = {};
+
+// ── Boot via GamePlatform ───────────────────────────────────────────────
+GamePlatform.init({
+  id: 'bubbleblast',
+  name: '🫧 BubbleBlast',
+  icon: '🫧',
+  description: {en:'Aim, shoot, match 3+. 30 levels of bubble-popping mayhem!',vi:'Ngắm, bắn, ghép 3+. 30 cấp độ nổ bóng điên cuồng!',ja:'狙って撃って3個以上マッチ！30レベルのバブル破裂パニック！'},
+  levels: PLEVELS,
+  howto: {
+    en: `<h3>🫧 BubbleBlast</h3><ul>
+<li><b>Move mouse / drag</b> to aim the shooter</li>
+<li><b>Click / tap</b> to fire — bubble reflects off walls</li>
+<li>Match <b>3 or more</b> same-color bubbles to pop them</li>
+<li>Bubbles cut off from the ceiling <b>fall — bonus points!</b></li>
+<li>Specials: <b>💣 Bomb</b> pops all neighbors • <b>🌈 Rainbow</b> matches any color</li>
+<li>Clear the board = <b>Level Complete!</b></li>
+<li><b>Adventure mode:</b> 30 levels — more colors, more rows, fewer shots each level</li>
+<li>Sign in with Google to compete on the <b>online leaderboard</b></li></ul>`,
+    vi: `<h3>🫧 BubbleBlast</h3><ul>
+<li><b>Di chuyển chuột / kéo</b> để ngắm</li>
+<li><b>Click / chạm</b> để bắn — bóng phản xạ khỏi tường</li>
+<li>Khớp <b>3 hay nhiều hơn</b> bóng cùng màu để nổ</li>
+<li>Bóng không gắn trần <b>rơi xuống = điểm thưởng!</b></li>
+<li>Đặc biệt: <b>💣 Bom</b> nổ vùng • <b>🌈 Cầu vồng</b> khớp mọi màu</li>
+<li>Dọn sạch màn = <b>Qua màn!</b></li>
+<li><b>Phiêu Lưu:</b> 30 cấp độ — càng cao càng nhiều màu, nhiều hàng, ít đạn</li>
+<li>Đăng nhập Google để so điểm trên <b>bảng xếp hạng online</b></li></ul>`,
+    ja: `<h3>🫧 BubbleBlast</h3><ul>
+<li><b>マウス移動 / ドラッグ</b>で照準</li>
+<li><b>クリック / タップ</b>で発射 — 壁で反射</li>
+<li>同色<b>3個以上</b>でポップ</li>
+<li>天井から切り離されたバブルは<b>落下 → ボーナス！</b></li>
+<li>特殊: <b>💣 爆弾</b>周囲を消去 • <b>🌈 レインボー</b>どの色とも合致</li>
+<li>全消し = <b>レベルクリア！</b></li>
+<li><b>アドベンチャー:</b> 30レベル — 色・行が増え、ショットが減る</li>
+<li>Google ログインで<b>オンラインランキング</b>に参加</li></ul>`
+  },
+  onStart({mode, level, levelConfig}) {
+    currentMode = mode; currentLevel = level;
+    startGame(levelConfig);
+  },
+  onGetState() { return { mode: currentMode, level: currentLevel }; },
+  onRestoreState(snap, ctx2) { startGame(ctx2.levelConfig); }
+});
+
+// ── Mount UI ────────────────────────────────────────────────────────────
+function mountUI() {
+  if (ui.root) return;
+  const stage = GamePlatform.getStageInner();
+  const root = document.createElement('div');
+  root.style.cssText = 'display:flex;flex-direction:column;align-items:center;width:100%;flex:1;min-height:0;padding:6px 4px;';
+  root.innerHTML = `
+    <h1 class="bb-title">🫧 BubbleBlast</h1>
+    <p class="bb-subtitle">Aim · Shoot · Match 3+</p>
+    <div class="bb-hud">
+      <div class="bb-item"><div class="bb-label">Score</div><div class="bb-value" id="bbScore">0</div></div>
+      <div class="bb-item"><div class="bb-label">Best</div> <div class="bb-value" id="bbBest">0</div></div>
+      <div class="bb-item"><div class="bb-label">Shots</div><div class="bb-value" id="bbShots">∞</div></div>
+      <div class="bb-btns">
+        <button class="bb-btn" id="bbPause">⏸</button>
+        <button class="bb-btn" id="bbHome">🏠</button>
+      </div>
+    </div>
+    <div class="bb-lvlbar">
+      <div class="bb-lbar"><span id="bbLvlTxt">Level 1</span>
+        <div class="bb-lbar-fill"><div class="bb-lbar-inner" id="bbLvlBar" style="width:8%"></div></div>
+        <span id="bbLvlMax">12</span></div>
+    </div>
+    <div class="bb-preview">
+      Now: <span class="bb-pball" id="bbPrevNow"></span>
+      Next: <span class="bb-pball" id="bbPrevNext" style="opacity:.6;width:18px;height:18px;"></span>
+    </div>
+    <div class="gp-fit">
+      <div class="bb-wrap" id="bbWrap"><canvas id="bbCanvas"></canvas></div>
+    </div>
+  `;
+  stage.appendChild(root);
+  ui.root = root;
+  ui.score = root.querySelector('#bbScore');
+  ui.best  = root.querySelector('#bbBest');
+  ui.shots = root.querySelector('#bbShots');
+  ui.lvlTxt= root.querySelector('#bbLvlTxt');
+  ui.lvlBar= root.querySelector('#bbLvlBar');
+  ui.lvlMax= root.querySelector('#bbLvlMax');
+  ui.now   = root.querySelector('#bbPrevNow');
+  ui.next  = root.querySelector('#bbPrevNext');
+  ui.wrap  = root.querySelector('#bbWrap');
+  ui.pause = root.querySelector('#bbPause');
+  ui.home  = root.querySelector('#bbHome');
+
+  canvas = root.querySelector('#bbCanvas');
+  ctx = canvas.getContext('2d');
+  canvas.width = CW; canvas.height = CH;
+
+  ui.pause.addEventListener('click', onPause);
+  ui.home.addEventListener('click', () => { gameRunning = false; GamePlatform.showHome(); });
+
+  // Aim controls
+  const wrap = ui.wrap;
+  function rectXY(ex, ey) {
+    const r = canvas.getBoundingClientRect();
+    return { x: (ex - r.left) * (CW / r.width), y: (ey - r.top) * (CH / r.height) };
+  }
+  function setAim(ex, ey) { const p = rectXY(ex, ey); aimX = p.x; aimY = p.y; }
+  wrap.addEventListener('mousemove', e => setAim(e.clientX, e.clientY));
+  wrap.addEventListener('click',     e => { setAim(e.clientX, e.clientY); shoot(); });
+  wrap.addEventListener('touchmove', e => { e.preventDefault(); setAim(e.touches[0].clientX, e.touches[0].clientY); }, { passive:false });
+  wrap.addEventListener('touchend',  e => { e.preventDefault(); setAim(e.changedTouches[0].clientX, e.changedTouches[0].clientY); shoot(); }, { passive:false });
+}
+
+function onPause() {
+  if (!gameRunning) return;
+  paused = !paused;
+  ui.pause.textContent = paused ? '▶' : '⏸';
+  if (paused) {
+    GamePlatform.pause({ mode: currentMode, level: currentLevel });
+    if (ui.root) ui.root.style.display = 'none';
+    gameRunning = false;
+  }
+}
+
+// ── Game session ────────────────────────────────────────────────────────
+function startGame(lc) {
+  mountUI();
+  ui.root.style.display = 'flex';
+  lc = lc || {};
+  NUM_COLORS   = lc.numColors    || 3;
+  MAX_LEVEL    = lc.maxLevel     || 6;
+  USE_SPECIALS = !!lc.specials;
+  INIT_SHOTS   = lc.shots        || 30;
+  SPECIAL_RATE = lc.specialRate  || 0.06;
+  DROP_CHANCE  = lc.dropChance   || 0.10;
+
+  level = 1; score = 0; best = +localStorage.getItem('bb_hs') || 0;
+  gameRunning = true; paused = false;
+  loadLevel();
+  ui.lvlMax.textContent = MAX_LEVEL;
+  ui.pause.textContent = '⏸';
+  syncHUD(); aimX = CW/2; aimY = 100;
+  requestAnimationFrame(loop);
+}
+
+function loadLevel() {
+  grid = genLevel(level);
+  currColor = randColor();
+  nextColor = randColor();
+  shots = INIT_SHOTS + level * 2;
+  bullet = null; pops = []; drops = [];
+  gameOver = false; levelClearing = false;
+  updatePreview(); syncHUD();
+}
+
+function bXY(r, c) { return { x: r % 2 === 0 ? c*DIAM + R + 2 : c*DIAM + DIAM + 2, y: r*ROW_H + R + 2 }; }
+function maxC(r) { return r % 2 === 0 ? CE : CO; }
+function validCell(r, c) { return r >= 0 && r < ROWS && c >= 0 && c < maxC(r); }
+function neighbors(r, c) {
+  const even = r % 2 === 0;
+  return even
+    ? [[r-1,c-1],[r-1,c],[r,c-1],[r,c+1],[r+1,c-1],[r+1,c]]
+    : [[r-1,c],[r-1,c+1],[r,c-1],[r,c+1],[r+1,c],[r+1,c+1]];
+}
+function randColor() { return COLORS[Math.floor(Math.random() * NUM_COLORS)]; }
+function randSpecialOrColor() {
+  if (!USE_SPECIALS) return randColor();
+  const r = Math.random();
+  if (r < SPECIAL_RATE)              return SPECIAL_BOMB;
+  if (r < SPECIAL_RATE * 2 && level > 2) return SPECIAL_RAINBOW;
+  return randColor();
+}
+
+function genLevel(lvl) {
+  const baseRows = (PLEVELS[currentLevel] || {}).initRows || 4;
+  const rows = Math.min(baseRows + Math.floor(lvl/2), 12);
+  const g = Array.from({length: ROWS}, (_, r) => new Array(maxC(r)).fill(null));
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < maxC(r); c++) {
+      if (Math.random() > DROP_CHANCE) {
+        const isSpc = USE_SPECIALS && Math.random() < SPECIAL_RATE;
+        if (isSpc) g[r][c] = { v: Math.random() < .5 ? SPECIAL_BOMB : SPECIAL_RAINBOW };
+        else       g[r][c] = { v: COLORS[Math.floor(Math.random() * NUM_COLORS)] };
+      }
+    }
+  }
+  return g;
+}
+
+function updatePreview() {
+  if (currColor === SPECIAL_BOMB || currColor === SPECIAL_RAINBOW) {
+    ui.now.textContent = currColor; ui.now.style.background = '#333';
+  } else {
+    ui.now.textContent = ''; ui.now.style.background = currColor;
+  }
+  if (nextColor === SPECIAL_BOMB || nextColor === SPECIAL_RAINBOW) {
+    ui.next.textContent = nextColor; ui.next.style.background = '#333';
+  } else {
+    ui.next.textContent = ''; ui.next.style.background = nextColor;
+  }
+}
+
+function shoot() {
+  if (bullet || gameOver || levelClearing || paused) return;
+  const angle = Math.atan2(aimY - SHOOTER_Y, aimX - CW/2);
+  const clipped = Math.max(-Math.PI + 0.05, Math.min(-0.05, angle));
+  const spd = 10;
+  bullet = { x: CW/2, y: SHOOTER_Y, dx: Math.cos(clipped)*spd, dy: Math.sin(clipped)*spd, color: currColor };
+  currColor = nextColor; nextColor = randSpecialOrColor(); shots--;
+  updatePreview(); syncHUD();
+}
+
+function updateBullet() {
+  if (!bullet) return;
+  bullet.x += bullet.dx; bullet.y += bullet.dy;
+  if (bullet.x - R < 2)      { bullet.x = R + 2;        bullet.dx *= -1; }
+  if (bullet.x + R > CW - 2) { bullet.x = CW - R - 2;   bullet.dx *= -1; }
+  if (bullet.y - R < 2) { attachBullet(); return; }
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < maxC(r); c++) {
+    if (!grid[r][c]) continue;
+    const p = bXY(r, c);
+    if (Math.hypot(bullet.x - p.x, bullet.y - p.y) < DIAM * 0.9) { attachBullet(); return; }
+  }
+  if (bullet.y > CH + 20) bullet = null;
+}
+
+function attachBullet() {
+  const { x, y } = bullet;
+  let best2 = null, bestD = Infinity;
+  const searchR = Math.max(0, Math.min(ROWS - 1, Math.round((y - R - 2) / ROW_H)));
+  for (let r = Math.max(0, searchR - 2); r < Math.min(ROWS, searchR + 3); r++) {
+    for (let c = 0; c < maxC(r); c++) {
+      if (grid[r][c]) continue;
+      const p = bXY(r, c);
+      const d = Math.hypot(x - p.x, y - p.y);
+      if (d < bestD) { bestD = d; best2 = { r, c }; }
+    }
+  }
+  if (!best2) { bullet = null; return; }
+  const { r, c } = best2;
+  grid[r][c] = { v: bullet.color };
+  bullet = null;
+  if (grid[r][c].v === SPECIAL_BOMB) bombAt(r, c);
+  else if (grid[r][c].v === SPECIAL_RAINBOW) {
+    const adjColors = {};
+    neighbors(r, c).forEach(([nr, nc]) => {
+      if (validCell(nr, nc) && grid[nr][nc] && COLORS.includes(grid[nr][nc].v))
+        adjColors[grid[nr][nc].v] = (adjColors[grid[nr][nc].v] || 0) + 1;
+    });
+    const dominant = Object.entries(adjColors).sort((a, b) => b[1] - a[1])[0];
+    if (dominant) { grid[r][c] = { v: dominant[0] }; popGroup(r, c); }
+    else grid[r][c] = null;
+  } else popGroup(r, c);
+  checkDanger(); checkWin();
+}
+
+function popGroup(r, c) {
+  const color = grid[r][c]?.v;
+  if (!color || !COLORS.includes(color)) return;
+  const group = floodFill(r, c, color);
+  if (group.length >= 3) {
+    const mult = group.length >= 8 ? 3 : group.length >= 5 ? 2 : 1;
+    const pts = group.length * 10 * mult * level;
+    score += pts; if (score > best) { best = score; localStorage.setItem('bb_hs', best); }
+    group.forEach(([gr, gc]) => { pops.push({ ...bXY(gr, gc), color, alpha: 1 }); grid[gr][gc] = null; });
+    dropOrphans(); syncHUD();
+  }
+}
+function bombAt(r, c) {
+  grid[r][c] = null;
+  neighbors(r, c).forEach(([nr, nc]) => {
+    if (validCell(nr, nc) && grid[nr][nc]) {
+      pops.push({ ...bXY(nr, nc), color: grid[nr][nc].v, alpha: 1 });
+      grid[nr][nc] = null;
+    }
+  });
+  score += 20 * level; if (score > best) { best = score; localStorage.setItem('bb_hs', best); }
+  dropOrphans(); syncHUD();
+}
+function floodFill(r, c, color) {
+  const visited = new Set(), queue = [[r, c]], result = [];
+  while (queue.length) {
+    const [cr, cc] = queue.pop();
+    const k = cr + ',' + cc;
+    if (visited.has(k)) continue;
+    visited.add(k); result.push([cr, cc]);
+    neighbors(cr, cc).forEach(([nr, nc]) => {
+      if (validCell(nr, nc) && !visited.has(nr + ',' + nc) && grid[nr][nc]?.v === color)
+        queue.push([nr, nc]);
+    });
+  }
+  return result;
+}
+function ceilingConnected() {
+  const conn = new Set(), q = [];
+  for (let c = 0; c < maxC(0); c++) if (grid[0][c]) q.push([0, c]);
+  while (q.length) {
+    const [r, c] = q.pop();
+    const k = r + ',' + c;
+    if (conn.has(k)) continue;
+    conn.add(k);
+    neighbors(r, c).forEach(([nr, nc]) => {
+      if (validCell(nr, nc) && !conn.has(nr + ',' + nc) && grid[nr][nc]) q.push([nr, nc]);
+    });
+  }
+  return conn;
+}
+function dropOrphans() {
+  const conn = ceilingConnected();
+  for (let r = 1; r < ROWS; r++) for (let c = 0; c < maxC(r); c++) {
+    if (grid[r][c] && !conn.has(r + ',' + c)) {
+      drops.push({ ...bXY(r, c), color: grid[r][c].v, vy: 0 });
+      grid[r][c] = null; score += 5 * level;
+      if (score > best) { best = score; localStorage.setItem('bb_hs', best); }
+    }
+  }
+  syncHUD();
+}
+function isEmpty() { for (let r = 0; r < ROWS; r++) for (let c = 0; c < maxC(r); c++) if (grid[r][c]) return false; return true; }
+function checkDanger() {
+  const dr = ROWS / 2 | 0;
+  for (let c = 0; c < maxC(dr); c++) {
+    if (grid[dr][c]) { gameOver = true; setTimeout(() => endGame(false), 400); return; }
+  }
+  if (shots <= 0 && !bullet && !isEmpty()) setTimeout(() => endGame(false), 400);
+}
+function checkWin() { if (isEmpty()) levelComplete(); }
+function levelComplete() {
+  if (levelClearing) return;
+  levelClearing = true;
+  score += 2000 + shots * 50;
+  if (score > best) { best = score; localStorage.setItem('bb_hs', best); }
+  syncHUD();
+  if (level >= MAX_LEVEL) setTimeout(() => endGame(true), 600);
+  else setTimeout(() => { level++; loadLevel(); }, 700);
+}
+function endGame(win) {
+  gameRunning = false;
+  if (ui.root) ui.root.style.display = 'none';
+  GamePlatform.recordResult({
+    score,
+    extra: win ? `All ${MAX_LEVEL} sub-levels cleared!` : `Reached sub-level ${level}`
+  });
+}
+
+function syncHUD() {
+  ui.score.textContent = score;
+  ui.best.textContent  = best;
+  ui.shots.textContent = shots;
+  ui.lvlTxt.textContent = `Level ${level}`;
+  ui.lvlBar.style.width = (level / MAX_LEVEL * 100) + '%';
+}
+
+// ── Drawing ─────────────────────────────────────────────────────────────
+function drawBubble(x, y, v, alpha = 1, scale = 1) {
+  ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x, y); ctx.scale(scale, scale);
+  if (v === SPECIAL_BOMB || v === SPECIAL_RAINBOW) {
+    ctx.fillStyle = '#1a1a2e';
+    ctx.beginPath(); ctx.arc(0, 0, R - 2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = `${DIAM*.55}px sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(v, 0, 1);
+  } else {
+    const g = ctx.createRadialGradient(-R*.3, -R*.35, R*.05, 0, 0, R);
+    g.addColorStop(0, lighten(v, .35)); g.addColorStop(1, v);
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(0, 0, R - 2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.25)';
+    ctx.beginPath(); ctx.ellipse(-R*.25, -R*.3, R*.4, R*.25, -0.4, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+}
+function lighten(hex, amt) {
+  const r = parseInt(hex.slice(1, 3), 16),
+        g = parseInt(hex.slice(3, 5), 16),
+        b = parseInt(hex.slice(5, 7), 16);
+  return `rgb(${Math.min(255, r + 255*amt)},${Math.min(255, g + 255*amt)},${Math.min(255, b + 255*amt)})`;
+}
+function drawAimLine() {
+  if (!aimX || gameOver) return;
+  const angle = Math.atan2(aimY - SHOOTER_Y, aimX - CW/2);
+  const clipped = Math.max(-Math.PI + 0.05, Math.min(-0.05, angle));
+  ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 1.5; ctx.setLineDash([6,8]);
+  let x = CW/2, y = SHOOTER_Y, dx = Math.cos(clipped), dy = Math.sin(clipped);
+  ctx.beginPath(); ctx.moveTo(x, y);
+  for (let i = 0; i < 8; i++) {
+    const steps = Math.ceil(CH / 8);
+    for (let s = 0; s < steps; s++) {
+      x += dx*3; y += dy*3;
+      if (x - R < 2)      { x = R + 2;       dx *= -1; }
+      if (x + R > CW - 2) { x = CW - R - 2;  dx *= -1; }
+      if (y < R + 2 || y > CH - R - 2) break;
+    }
+    ctx.lineTo(x, y);
+    if (y <= R + 2) break;
+  }
+  ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+}
+
+function loop() {
+  if (!gameRunning) { requestAnimationFrame(loop); return; }
+  ctx.clearRect(0, 0, CW, CH);
+  ctx.fillStyle = '#0d1b2a'; ctx.fillRect(0, 0, CW, CH);
+  ctx.strokeStyle = 'rgba(255,100,100,0.15)'; ctx.lineWidth = 1; ctx.setLineDash([4, 6]);
+  ctx.beginPath(); ctx.moveTo(0, DANGER_Y); ctx.lineTo(CW, DANGER_Y); ctx.stroke(); ctx.setLineDash([]);
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < maxC(r); c++) {
+    if (!grid[r][c]) continue;
+    const p = bXY(r, c); drawBubble(p.x, p.y, grid[r][c].v);
+  }
+  if (!paused) drawAimLine();
+  drawBubble(CW/2, SHOOTER_Y, currColor);
+  if (bullet) drawBubble(bullet.x, bullet.y, bullet.color);
+  pops.forEach(p => {
+    ctx.save(); ctx.globalAlpha = p.alpha; ctx.strokeStyle = p.color; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(p.x, p.y, R*(1 - p.alpha)*2 + R*.5, 0, Math.PI * 2);
+    ctx.stroke(); ctx.restore(); p.alpha -= 0.06;
+  });
+  pops = pops.filter(p => p.alpha > 0);
+  drops.forEach(d => { d.vy += 0.7; d.y += d.vy; drawBubble(d.x, d.y, d.color, Math.max(0, 1 - d.y / CH)); });
+  drops = drops.filter(d => d.y < CH + 50);
+  if (!paused) updateBullet();
+  if (paused) {
+    ctx.fillStyle = 'rgba(0,0,0,.7)'; ctx.fillRect(0, 0, CW, CH);
+    ctx.fillStyle = '#4ecdc4'; ctx.font = 'bold 24px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('⏸ PAUSED', CW/2, CH/2);
+  }
+  requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>

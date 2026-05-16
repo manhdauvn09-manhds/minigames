@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    // noUncheckedIndexedAccess intentionally OFF for Phase 2 — the
+    // engine's bitmask + Uint16Array hot paths do many indexed reads
+    // that TS can prove safe at runtime but can't narrow at compile
+    // time without `arr[i]!` everywhere. Re-enable in Phase 6 once
+    // the surface stabilises and the noise is acceptable.
+    "noUncheckedIndexedAccess": false,
+
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

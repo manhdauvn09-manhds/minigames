@@ -1,0 +1,28 @@
+# Local dev / build artefacts — Docker rebuilds these in-image.
+node_modules
+.next
+
+# Skill #1 reference docs (archived) — not needed at runtime.
+_skill
+
+# Spec is the design contract; runtime only needs src/lib/config.ts.
+game-spec.json
+
+# Source control + editor cruft.
+.git
+.gitignore
+.vscode
+.idea
+
+# Local env (must be supplied by docker-compose / deploy).
+.env
+.env.local
+.env*.local
+
+# Tooling configs only used during local dev (Dockerfile reads them
+# back via npm ci/run anyway, so we still need package.json + tsconfig).
+playwright.config.ts
+vitest.config.ts
+.eslintrc.json
+.prettierrc
+tests

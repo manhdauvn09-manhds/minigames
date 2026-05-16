@@ -1,0 +1,296 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0d1b2a">
+  <meta name="description" content="ChromaMatch — Free match-3 puzzle. 30 progressive levels, cascading combos, online leaderboard.">
+  <meta name="keywords" content="match 3, chroma match, color tile puzzle, allin1site games, chromamatch">
+  <meta name="robots" content="index,follow">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://*.gstatic.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https:; connect-src 'self' https:; frame-src https://accounts.google.com; base-uri 'self'; form-action 'self';">
+  <meta name="X-Content-Type-Options" content="nosniff">
+  <meta name="gp-google-client-id" content="781592547104-970ld4c6lb6l8ev4hhvlg3k0943k8t3j.apps.googleusercontent.com">
+  <meta name="gp-api-base" content="">
+  <title>ChromaMatch — Match-3 Puzzle | allin1site Games</title>
+  <link rel="canonical" href="/games/chromamatch/">
+  <link rel="stylesheet" href="../../game-platform.css?v=11">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"VideoGame","name":"ChromaMatch","genre":"Puzzle","applicationCategory":"GameApplication","operatingSystem":"Web Browser","description":"Match-3 tile puzzle — 30 progressive levels, cascading combos.","publisher":{"@type":"Organization","name":"allin1site.com"}}
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gp-stage-bg, linear-gradient(135deg, #1e2845 0%, #243a5c 50%, #1e4868 100%));
+      color: var(--gp-text-primary, #f8fafc);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-start;
+      color: white; padding: 12px 8px; overflow-x: hidden;
+    }
+    h1 { font-size: 1.7em; color: #00ff88; text-shadow: 0 0 18px #00ff88; margin-bottom: 2px; }
+    .subtitle { font-size: 0.8em; opacity: 0.7; margin-bottom: 8px; }
+
+    .hud { display: flex; gap: 16px; margin-bottom: 6px; align-items: center; }
+    .hud-item { text-align: center; min-width: 54px; }
+    .hud-label { font-size: 0.65em; text-transform: uppercase; opacity: 0.7; }
+    .hud-value { font-size: 1.3em; font-weight: 700; color: #00ff88; }
+    .hud-btns { display: flex; gap: 6px; margin-left: auto; }
+    .hud-btn { min-width: 44px; height: 44px; padding: 0; border-radius:7px; border:1px solid rgba(255,255,255,.32); background:rgba(255,255,255,.14); color:#eee; font-size:.78em; font-weight:600; cursor:pointer; transition:background .18s; }
+    .hud-btn:hover { background: rgba(255,255,255,.2); }
+
+    .timer-wrap { width: 280px; margin-bottom: 8px; }
+    .timer-bar { height: 7px; background: rgba(255,255,255,0.16); border-radius: 4px; overflow: hidden; }
+    .timer-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #00ff88, #4ecdc4); transition: width 1s linear, background 0.4s; }
+    .timer-fill.danger { background: linear-gradient(90deg, #ff6b6b, #ff9f43); }
+    .timer-label { font-size: 0.7em; opacity: 0.75; text-align: right; margin-top: 2px; }
+
+    .board-wrap { position: relative; background: rgba(0,0,0,0.22); border: 2px solid rgba(255,255,255,0.18); border-radius: 14px; padding: 9px; touch-action: none; }
+    .board { display: grid; gap: 4px; }
+    .tile {
+      width: 42px; height: 42px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.35em; cursor: pointer;
+      transition: transform 0.12s, opacity 0.15s, box-shadow 0.12s;
+      border: 2px solid rgba(255,255,255,0.18);
+      user-select: none; -webkit-tap-highlight-color: transparent;
+    }
+    .tile:hover { transform: scale(1.1); }
+    .tile.selected { transform: scale(1.15); box-shadow: 0 0 0 3px #fff, 0 0 14px rgba(255,255,255,0.5); z-index: 3; position: relative; }
+    .tile.gone { opacity: 0; transform: scale(0); pointer-events: none; }
+
+    #combo-msg { position: fixed; top: 22%; left: 50%; transform: translate(-50%,-50%); font-size: 1.8em; font-weight: 900; pointer-events: none; text-shadow: 0 0 20px currentColor; opacity: 0; z-index: 200; }
+    .combo-pop { animation: comboAnim 0.7s ease-out forwards; }
+    @keyframes comboAnim { 0%{opacity:1;transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(-50%,-130%) scale(1.6)} }
+  </style>
+</head>
+<body>
+  <h1>🎨 ChromaMatch</h1>
+  <p class="subtitle">Swap tiles — match 3+ colors — chain combos!</p>
+
+  <div class="hud" id="hudRow" style="display:none">
+    <div class="hud-item"><div class="hud-label">Score</div><div class="hud-value" id="score">0</div></div>
+    <div class="hud-item"><div class="hud-label">Target</div><div class="hud-value" id="target">—</div></div>
+    <div class="hud-item"><div class="hud-label">Time</div><div class="hud-value" id="timeNum">90</div></div>
+    <div class="hud-btns">
+      <button class="hud-btn" id="pauseBtn">⏸</button>
+      <button class="hud-btn" onclick="GamePlatform.showHome()">🏠</button>
+    </div>
+  </div>
+
+  <div class="timer-wrap" id="timerWrap" style="display:none">
+    <div class="timer-bar"><div class="timer-fill" id="tBar" style="width:100%"></div></div>
+    <div class="timer-label" id="tLabel">90s remaining</div>
+  </div>
+
+  <div class="board-wrap" id="boardWrap" style="display:none">
+    <div class="board" id="board"></div>
+  </div>
+
+  <div id="combo-msg"></div>
+
+  <script src="../../game-platform.js?v=11"></script>
+  <script>
+    const ALL_EMOJIS = ['🔴','🔵','🟢','🟡','🟣','🟠'];
+    const BG = ['rgba(255,100,100,0.28)','rgba(78,140,220,0.28)','rgba(50,200,100,0.28)','rgba(240,200,50,0.28)','rgba(160,80,200,0.28)','rgba(240,140,40,0.28)'];
+
+    // 30 progressive levels
+    const LEVELS = (() => {
+      const arr = [];
+      for (let i = 0; i < 30; i++) {
+        // Exponential difficulty: 3x+ harder each level
+        const rows = Math.min(6 + Math.floor(i/4), 10);
+        const cols = Math.min(6 + Math.floor(i/4), 10);
+        const colors = Math.min(3 + Math.floor(i/4), 7);             // more colors faster
+        const time = Math.max(25, Math.round(90 * Math.pow(0.93, i))); // exponential time shrink
+        const scoreTarget = Math.round(15000 * Math.pow(1.30, i));   // 10x base · 30% growth per level
+        arr.push({ rows, cols, colors, time, scoreTarget });
+      }
+      return arr;
+    })();
+
+    let ROWS, COLS, NUM_COLORS, TIME_LIMIT, SCORE_TARGET;
+    let grid, sel, score, timeLeft, ticker, busy, alive;
+    let gameRunning=false, paused=false, currentMode='normal', currentLevel=0;
+
+    GamePlatform.init({
+      id: 'chromamatch',
+      name: '🎨 ChromaMatch',
+      icon: '🎨',
+      description: {en:'Swap adjacent tiles to match 3+ of the same color. Chain cascades for huge scores!',vi:'Hoán đổi ô liền kề để ghép 3+ cùng màu. Combo liên hoàn để ghi điểm khủng!',ja:'隣り合うタイルを入れ替えて同色3個以上マッチ！連鎖コンボで大量得点！'},
+      levels: LEVELS,
+      howto: {
+        en: `<h3>🎨 ChromaMatch</h3><ul>
+<li><b>Tap/click</b> a tile to select it (glows white)</li>
+<li>Tap an <b>adjacent tile</b> to swap them</li>
+<li>Match <b>3 or more</b> same-color tiles to clear them</li>
+<li>Cleared tiles fall; new ones drop from the top</li>
+<li><b>Chain reactions</b> double your score each cascade!</li>
+<li><b>Adventure:</b> hit the target score before time runs out!</li></ul>`,
+        vi: `<h3>🎨 ChromaMatch</h3><ul>
+<li><b>Chạm</b> ô để chọn (sáng lên)</li>
+<li>Chạm ô <b>kế bên</b> để hoán đổi</li>
+<li>Ghép <b>3+ ô cùng màu</b> để xóa</li>
+<li>Ô xóa rơi xuống, ô mới xuất hiện từ trên</li>
+<li>Phản ứng dây chuyền <b>nhân đôi điểm</b>!</li>
+<li><b>Adventure:</b> đạt điểm mục tiêu trước khi hết giờ!</li></ul>`,
+        ja: `<h3>🎨 ChromaMatch</h3><ul>
+<li>タイルを<b>タップ</b>して選択</li>
+<li><b>隣のタイル</b>をタップしてスワップ</li>
+<li><b>同色3個以上</b>を揃えて消す</li>
+<li>消えたタイルは落下、新しいタイルが降る</li>
+<li>連鎖で得点が<b>2倍ずつ</b>増える！</li>
+<li><b>アドベンチャー:</b> 時間内に目標スコアを達成！</li></ul>`
+      },
+      onStart({mode, level, levelConfig}) {
+        currentMode = mode; currentLevel = level;
+        startGame(levelConfig);
+      },
+      onGetState() { return {mode:currentMode, level:currentLevel}; },
+      onRestoreState(snap, ctx2) { startGame(ctx2.levelConfig); }
+    });
+
+    function startGame(lc) {
+      lc = lc || {};
+      ROWS = lc.rows || 6; COLS = lc.cols || 6;
+      NUM_COLORS = lc.colors || 4; TIME_LIMIT = lc.time || 90;
+      SCORE_TARGET = lc.scoreTarget || 0;
+
+      grid = mkGrid(); scrubMatches();
+      sel=null; score=0; timeLeft=TIME_LIMIT; busy=false; alive=true;
+      gameRunning=true; paused=false;
+
+      document.getElementById('hudRow').style.display   = 'flex';
+      document.getElementById('timerWrap').style.display= 'block';
+      document.getElementById('boardWrap').style.display= 'block';
+      document.getElementById('target').textContent = SCORE_TARGET || '—';
+      document.getElementById('pauseBtn').textContent = '⏸';
+
+      const board = document.getElementById('board');
+      const cell = Math.min(52, Math.floor((Math.min(window.innerWidth-20, 600)-(COLS-1)*4)/COLS));
+      board.style.display = 'grid';
+      board.style.gap = '4px';
+      board.style.gridTemplateColumns = `repeat(${COLS},${cell}px)`;
+      document.querySelectorAll('.tile').forEach(t => t.style.width = t.style.height = cell+'px');
+
+      syncHUD(); render();
+      if (ticker) clearInterval(ticker);
+      ticker = setInterval(tick, 1000);
+    }
+
+    function mkGrid() {
+      return Array.from({length:ROWS}, () =>
+        Array.from({length:COLS}, () => Math.floor(Math.random()*NUM_COLORS))
+      );
+    }
+    function scrubMatches() {
+      for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+        let t=0;
+        while (initialMatch(r,c)&&t++<20) grid[r][c]=Math.floor(Math.random()*NUM_COLORS);
+      }
+    }
+    function initialMatch(r,c) {
+      const v=grid[r][c];
+      if (c>=2&&grid[r][c-1]===v&&grid[r][c-2]===v) return true;
+      if (r>=2&&grid[r-1][c]===v&&grid[r-2][c]===v) return true;
+      return false;
+    }
+    function tick() {
+      if (!alive||paused) return;
+      timeLeft--;
+      syncHUD();
+      if (timeLeft<=0) endGame();
+    }
+    function syncHUD() {
+      const hs = +localStorage.getItem('cm_hs')||0;
+      document.getElementById('score').textContent = score.toLocaleString();
+      document.getElementById('timeNum').textContent = Math.max(0,timeLeft);
+      const pct = Math.max(0, timeLeft/TIME_LIMIT*100);
+      const bar = document.getElementById('tBar');
+      bar.style.width = pct+'%';
+      bar.className = 'timer-fill'+(pct<25?' danger':'');
+      document.getElementById('tLabel').textContent = Math.max(0,timeLeft)+'s remaining';
+    }
+    function render() {
+      const boardEl = document.getElementById('board');
+      boardEl.innerHTML = '';
+      const cell = Math.min(52, Math.floor((Math.min(window.innerWidth-20, 600)-(COLS-1)*4)/COLS));
+      boardEl.style.display = 'grid';
+      boardEl.style.gap = '4px';
+      boardEl.style.gridTemplateColumns = `repeat(${COLS},${cell}px)`;
+      for (let r=0;r<ROWS;r++) {
+        for (let c=0;c<COLS;c++) {
+          const v=grid[r][c];
+          const div=document.createElement('div');
+          div.className='tile'+(v<0?' gone':'');
+          div.style.cssText=`width:${cell}px;height:${cell}px;background:${v>=0?BG[v]:'transparent'};font-size:${Math.max(1,cell*0.033)}em;`;
+          div.textContent = v>=0?ALL_EMOJIS[v]:'';
+          if (sel&&sel[0]===r&&sel[1]===c) div.classList.add('selected');
+          div.addEventListener('click',()=>onTile(r,c));
+          boardEl.appendChild(div);
+        }
+      }
+    }
+    function onTile(r,c) {
+      if (busy||!alive||paused) return;
+      if (!sel){sel=[r,c];render();return;}
+      const [sr,sc]=sel;
+      if (sr===r&&sc===c){sel=null;render();return;}
+      if (Math.abs(sr-r)+Math.abs(sc-c)!==1){sel=[r,c];render();return;}
+      sel=null; doSwap(sr,sc,r,c);
+    }
+    async function doSwap(r1,c1,r2,c2) {
+      busy=true;
+      [grid[r1][c1],grid[r2][c2]]=[grid[r2][c2],grid[r1][c1]];
+      render(); await wait(100);
+      if (!findMatches().length){[grid[r1][c1],grid[r2][c2]]=[grid[r2][c2],grid[r1][c1]];render();busy=false;return;}
+      await cascade(0); busy=false;
+    }
+    async function cascade(depth) {
+      const hits=findMatches(); if(!hits.length)return;
+      const mult=depth>0?Math.pow(2,depth):1;
+      const pts=Math.floor(([0,100,100,100,300,600][Math.min(hits.length,5)]||600)*mult);
+      score+=pts;
+      const hs=+localStorage.getItem('cm_hs')||0;
+      if(score>hs) localStorage.setItem('cm_hs',score);
+      syncHUD();
+      if(depth>0) showCombo(`${depth+1}x Cascade! +${pts}`);
+      if(SCORE_TARGET&&currentMode==='adventure'&&score>=SCORE_TARGET){hits.forEach(([r,c])=>{grid[r][c]=-1;});render();await wait(200);endGame();return;}
+      hits.forEach(([r,c])=>{grid[r][c]=-1;});render();
+      await wait(200); gravity(); render(); await wait(130); refill(); render(); await wait(110);
+      await cascade(depth+1);
+    }
+    function findMatches() {
+      const m=new Set();
+      for (let r=0;r<ROWS;r++){let run=1;for(let c=1;c<=COLS;c++){if(c<COLS&&grid[r][c]>=0&&grid[r][c]===grid[r][c-1])run++;else{if(run>=3)for(let i=c-run;i<c;i++)m.add(`${r},${i}`);run=1;}}}
+      for (let c=0;c<COLS;c++){let run=1;for(let r=1;r<=ROWS;r++){if(r<ROWS&&grid[r][c]>=0&&grid[r][c]===grid[r-1][c])run++;else{if(run>=3)for(let i=r-run;i<r;i++)m.add(`${i},${c}`);run=1;}}}
+      return [...m].map(k=>k.split(',').map(Number));
+    }
+    function gravity(){for(let c=0;c<COLS;c++){let w=ROWS-1;for(let r=ROWS-1;r>=0;r--){if(grid[r][c]>=0){grid[w][c]=grid[r][c];if(w!==r)grid[r][c]=-1;w--;}}while(w>=0)grid[w--][c]=-1;}}
+    function refill(){for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(grid[r][c]<0)grid[r][c]=Math.floor(Math.random()*NUM_COLORS);}
+    function showCombo(txt){const el=document.getElementById('combo-msg');el.textContent=txt;el.style.color='#FFD32A';el.className='';void el.offsetWidth;el.className='combo-pop';}
+    function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+    function endGame(){
+      alive=false; gameRunning=false;
+      clearInterval(ticker);
+      const hs=+localStorage.getItem('cm_hs')||0;
+      if(score>hs) localStorage.setItem('cm_hs',score);
+      const cleared = SCORE_TARGET && score>=SCORE_TARGET;
+      GamePlatform.recordResult({score, extra: cleared?`Target ${SCORE_TARGET} reached! 🎉`:(SCORE_TARGET?`Target was ${SCORE_TARGET}`:`Time: ${TIME_LIMIT}s`)});
+    }
+
+    // Pause
+    document.getElementById('pauseBtn').addEventListener('click',()=>{
+      if(!gameRunning)return;
+      paused=!paused;
+      document.getElementById('pauseBtn').textContent=paused?'▶':'⏸';
+      if(paused){
+        GamePlatform.pause({mode:currentMode,level:currentLevel});
+        ['hudRow','timerWrap','boardWrap'].forEach(id=>document.getElementById(id).style.display='none');
+        gameRunning=false;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kaya — Caro</title>
+  <meta name="description" content="Kaya — browser Caro / Gomoku against five difficulty levels of bot.">
+  <link rel="canonical" href="https://kaya.allin1site.com/">
+  <link rel="icon" type="image/svg+xml" href="Kaya Design System/assets/favicon.svg">
+
+  <!-- Kaya Design System tokens + UI kit. kit.css @imports colors_and_type.css
+       automatically, so this one link pulls fonts, colors, typography,
+       spacing, shadows, motion + card/button/modal/scrim primitives. -->
+  <link rel="stylesheet" href="Kaya Design System/ui_kits/web/kit.css">
+  <link rel="stylesheet" href="Kaya Design System/ui_kits/web/board.css">
+
+  <!-- App-specific overrides: responsive mobile drawer, topbar layout,
+       chip/history/status styles not covered by the shared kit. -->
+  <link rel="stylesheet" href="src/styles/app.css">
+
+  <!-- Theme-aware override: respect hub's gp_theme localStorage on load -->
+  <script>
+    (() => {
+      try {
+        const saved = localStorage.getItem('gp_theme');
+        const t = saved === 'dark' ? 'dark' : saved === 'light' ? 'light' :
+                  (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch {}
+    })();
+  </script>
+
+  <!-- Lucide icons (stroke-based, loaded from CDN per Kaya README). -->
+  <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script type="module" src="src/main.js"></script>
+</head>
+
+<body>
+<!-- ══════════════════════════════════════════════════════════════════
+     3-column grid: left sidebar (score/level/history), centre (board),
+     right sidebar (timer/status/controls). Below 960px the layout
+     collapses to a single column with a bottom drawer for controls.
+     ══════════════════════════════════════════════════════════════════ -->
+<div class="app">
+
+  <!-- ────────── LEFT SIDEBAR ────────── -->
+  <aside class="side side-left">
+    <!-- Brand / topbar lives in the left sidebar so the board centres
+         on the full viewport. Matches the Kaya preview mockups. -->
+    <div class="topbar">
+      <a class="brand" href="/" aria-label="Kaya home">
+        <span class="dot" aria-hidden="true"></span>
+        <span>
+          <div class="word">Kaya</div>
+          <div class="sub">Five in a row</div>
+        </span>
+      </a>
+      <a class="btn-icon home-btn" href="https://allin1site.com"
+         aria-label="Back to allin1site.com" title="Back to allin1site.com">
+        <i data-lucide="home"></i>
+      </a>
+    </div>
+
+    <!-- Record card: W/L/D persisted per level in localStorage. -->
+    <section class="card stat-card" aria-label="Record">
+      <div class="eyebrow">Record · Level <span id="recLevel">3</span></div>
+      <div class="score">
+        <div><b>W</b> <span id="recW">0</span></div>
+        <div><b>L</b> <span id="recL">0</span></div>
+        <div><b>D</b> <span id="recD">0</span></div>
+      </div>
+      <div class="stat-sub" id="recRate">No games yet</div>
+    </section>
+
+    <!-- Level meter. Clicking any bar sets the difficulty (wired in
+         PHASE 5). The accent colour fill shows how many bars are "on". -->
+    <section class="card level-card" aria-label="Difficulty">
+      <div class="eyebrow">Level <span id="lvlN">3</span> of 5</div>
+      <div class="meter" id="lvlMeter" role="slider" aria-valuemin="1" aria-valuemax="5" aria-valuenow="3" tabindex="0">
+        <div class="on" data-level="1"></div>
+        <div class="on" data-level="2"></div>
+        <div class="on" data-level="3"></div>
+        <div        data-level="4"></div>
+        <div        data-level="5"></div>
+      </div>
+      <div class="stat-sub" id="lvlDesc">Measured. Blocks common threats.</div>
+    </section>
+
+    <!-- Move history — populated in PHASE 4 when the game engine lands.
+         Wrapper scrolls at ~280px; rows use monospace H-file + rank
+         notation (e.g. "H8"). -->
+    <section class="card history-card" aria-label="Move history">
+      <div class="eyebrow">Move history</div>
+      <div class="history" id="history">
+        <div class="history-empty">Play a move to begin.</div>
+      </div>
+    </section>
+
+    <!-- Match log: completed games (date, name, level, result). Capped at
+         50 most-recent entries in localStorage; oldest dropped on overflow. -->
+    <section class="card matchlog-card" aria-label="Match log">
+      <div class="eyebrow eyebrow-row">
+        <span>Match log</span>
+        <button class="link-btn" id="btnClearLog" type="button"
+                title="Clear match log">Clear</button>
+      </div>
+      <div class="matchlog" id="matchLog">
+        <div class="log-empty">No matches yet.</div>
+      </div>
+    </section>
+  </aside>
+
+  <!-- ────────── CENTRE: BOARD ────────── -->
+  <main class="stage">
+    <!-- Status row: whose turn + current level chip.
+         .status-chip swaps between `turn-you` / `turn-bot` classes. -->
+    <div class="status-row">
+      <span class="chip chip-turn turn-you" id="statusChip">
+        <span class="chip-dot"></span><span id="statusLabel">Your move</span>
+      </span>
+      <span class="chip chip-level" id="levelChip">LEVEL 3</span>
+    </div>
+
+    <!-- Board wrapper. Actual <svg> grid + <div class="board-cells">
+         rendered in PHASE 3. The aspect-square + max-size below keeps
+         the board perfectly square no matter the viewport. -->
+    <div class="board-wrap" id="boardWrap">
+      <div class="board" id="board" role="grid" aria-label="Caro board">
+        <!-- PHASE 3 populates .board-grid (SVG) + .board-cells. -->
+        <div class="board-placeholder">
+          Board renders in phase 3.
+        </div>
+      </div>
+    </div>
+
+    <!-- Primary action row under the board. New game / undo / hint. -->
+    <div class="actions" role="toolbar" aria-label="Game controls">
+      <button class="btn btn-primary" id="btnNewGame" type="button"
+              title="Start a new game" aria-label="New game">
+        <i data-lucide="refresh-cw"></i> New game
+      </button>
+      <button class="btn btn-secondary" id="btnUndo" type="button"
+              title="Undo last turn" aria-label="Undo" disabled>
+        <i data-lucide="rotate-ccw"></i> Undo
+      </button>
+      <button class="btn btn-ghost" id="btnHint" type="button"
+              title="Show a hint (level 1–2 only)" aria-label="Hint" disabled>
+        <i data-lucide="lightbulb"></i> Hint
+      </button>
+      <button class="btn-icon" id="btnSettings" type="button"
+              title="Settings" aria-label="Settings">
+        <i data-lucide="settings"></i>
+      </button>
+    </div>
+  </main>
+
+  <!-- ────────── RIGHT SIDEBAR ────────── -->
+  <aside class="side side-right">
+    <!-- Timer -- elapsed since game start. Monospace tabular numerals. -->
+    <section class="card timer-card" aria-label="Timer">
+      <div class="eyebrow"><i data-lucide="clock"></i> Timer</div>
+      <div class="timer-big" id="timer">00:00</div>
+    </section>
+
+    <!-- Quick theme + sound. Full settings modal opened by ⚙︎. -->
+    <section class="card quick-card" aria-label="Quick settings">
+      <div class="eyebrow">Quick</div>
+      <div class="row-setting">
+        <div>
+          <div class="label">Theme</div>
+          <div class="help">Light · Dark · Auto</div>
+        </div>
+        <div class="seg" id="themeSeg" role="radiogroup" aria-label="Theme">
+          <button data-theme="light" class="active" role="radio" aria-checked="true">Light</button>
+          <button data-theme="dark"            role="radio" aria-checked="false">Dark</button>
+          <button data-theme="auto"            role="radio" aria-checked="false">Auto</button>
+        </div>
+      </div>
+      <div class="row-setting">
+        <div>
+          <div class="label">Sound</div>
+          <div class="help">Stone, win, lose</div>
+        </div>
+        <div class="switch on" id="soundSwitch" role="switch" aria-checked="true" tabindex="0"></div>
+      </div>
+    </section>
+
+    <!-- Tip card (hint / keyboard shortcuts) -- copy stays terse. -->
+    <section class="card tip-card" aria-label="Tips">
+      <div class="eyebrow">Tips</div>
+      <ul class="tips">
+        <li><kbd>N</kbd> new game</li>
+        <li><kbd>U</kbd> undo</li>
+        <li><kbd>?</kbd> hint</li>
+        <li><kbd>,</kbd> settings</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     Settings modal — hidden by default, opened by ⚙︎. Wired in PHASE 7.
+     ══════════════════════════════════════════════════════════════════ -->
+<div class="scrim" id="settingsScrim" hidden role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <div class="modal modal-header-wrap">
+    <button class="close" id="settingsClose" type="button" aria-label="Close">
+      <i data-lucide="x"></i>
+    </button>
+    <div class="eyebrow">Settings</div>
+    <h2 id="settingsTitle">Adjust your game</h2>
+
+    <div class="row-setting">
+      <div>
+        <div class="label">Your name</div>
+        <div class="help">Used in the match log + win screen.</div>
+      </div>
+      <input class="text-input" id="playerName" type="text" maxlength="24"
+             placeholder="Anonymous" autocomplete="nickname">
+    </div>
+
+    <div class="row-setting">
+      <div>
+        <div class="label">Difficulty</div>
+        <div class="help" id="diffHelp">Level 3 · Measured</div>
+      </div>
+      <div class="seg seg-level" id="diffSeg" role="radiogroup" aria-label="Difficulty">
+        <button data-level="1" role="radio" aria-checked="false">1</button>
+        <button data-level="2" role="radio" aria-checked="false">2</button>
+        <button class="active" data-level="3" role="radio" aria-checked="true">3</button>
+        <button data-level="4" role="radio" aria-checked="false">4</button>
+        <button data-level="5" role="radio" aria-checked="false">5</button>
+      </div>
+    </div>
+
+    <div class="row-setting">
+      <div class="label">Who goes first</div>
+      <div class="seg" id="firstSeg" role="radiogroup" aria-label="Who goes first">
+        <button class="active" data-first="you" role="radio" aria-checked="true">You</button>
+        <button              data-first="bot" role="radio" aria-checked="false">Bot</button>
+        <button              data-first="rand" role="radio" aria-checked="false">Random</button>
+      </div>
+    </div>
+
+    <div class="row-setting">
+      <div class="label">Board size</div>
+      <div class="seg" id="sizeSeg" role="radiogroup" aria-label="Board size">
+        <button class="active" data-size="15" role="radio" aria-checked="true">15×15</button>
+        <button              data-size="19" role="radio" aria-checked="false">19×19</button>
+      </div>
+    </div>
+
+    <div class="row-setting">
+      <div class="label">Colorblind stones</div>
+      <div class="switch" id="cbSwitch" role="switch" aria-checked="false" tabindex="0"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     Verdict overlay (win / lose / draw). On win, .verdict-card grows a
+     `.celebrate` class which adds the confetti layer + amped-up
+     typography. Lose/draw stay calm. PHASE 4+ wiring in main.js.
+     ══════════════════════════════════════════════════════════════════ -->
+<div class="scrim" id="verdictScrim" hidden role="dialog" aria-modal="true" aria-labelledby="verdictTitle">
+  <div class="modal verdict-card modal-header-wrap" id="verdictCard">
+    <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+    <button class="close" id="verdictClose" type="button" aria-label="Close">
+      <i data-lucide="x"></i>
+    </button>
+    <div class="eyebrow" id="verdictEyebrow">Outcome</div>
+    <div class="big" id="verdictTitle">You won.</div>
+    <div class="celebrate-sub" id="verdictSub" hidden>You took down Kaya. Bask in it.</div>
+    <div class="stat">
+      <span><b id="verdictMoves">—</b> moves</span>
+      <span><b id="verdictTime">—</b> time</span>
+      <span><b id="verdictLevel">—</b> level</span>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="verdictPlayAgain" type="button">
+        <i data-lucide="refresh-cw"></i> Play again
+      </button>
+      <button class="btn btn-secondary" id="verdictReview" type="button">Review</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
