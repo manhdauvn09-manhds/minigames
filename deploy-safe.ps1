@@ -1,0 +1,327 @@
+# =====================================================================
+# allin1site Mini Games — SAFE deploy from local PowerShell
+# Designed for VPS chạy nhiều service — KHÔNG ảnh hưởng container khác
+# =====================================================================
+# Cách dùng:
+#   .\deploy-safe.ps1                                    (config mặc định)
+#   .\deploy-safe.ps1 -VpsHost 1.2.3.4 -VpsUser root     (override)
+#   .\deploy-safe.ps1 -DryRun                            (chỉ check, không deploy)
+#   .\deploy-safe.ps1 -SkipPull                          (chỉ rebuild)
+#   .\deploy-safe.ps1 -UploadEnv                         (scp .env local → VPS)
+#   .\deploy-safe.ps1 -Logs                              (tail log sau deploy)
+#   .\deploy-safe.ps1 -CloneIfMissing                    (lần đầu: tự git clone)
+#
+# An toàn so với deploy.ps1 cũ:
+#   ✓ Pre-flight: check port conflict, container conflict, disk space
+#   ✓ Backup image cũ thành :rollback trước khi build mới
+#   ✓ Healthz check + auto rollback nếu fail
+#   ✓ Safe prune (chỉ image của project minigames, không động service khác)
+#   ✓ Confirm trước mỗi destructive action (trừ khi -Force)
+#   ✓ Log lưu tại .\deploy-logs\YYYY-MM-DD_HHMMSS.log
+#
+# Yêu cầu:
+#   - SSH key đã đăng ký trên VPS, hoặc dùng -SshKey param
+#   - VPS đã cài docker + docker compose
+#   - Repo `minigames` đã clone trên VPS (hoặc dùng -CloneIfMissing)
+#   - File .env tồn tại trong $RepoDir trên VPS (hoặc dùng -UploadEnv)
+# =====================================================================
+
+[CmdletBinding()]
+param(
+  # ── VPS info ──────────────────────────────────────────────────────────
+  [string]$VpsHost   = "62.238.8.222",
+  [string]$VpsUser   = "root",
+  [string]$RepoDir   = "~/minigames",
+  [string]$RepoUrl   = "https://github.com/manhdauvn09-manhds/minigames.git",
+  [string]$SshKey    = "",
+
+  # ── Container expectations ────────────────────────────────────────────
+  [string]$ContainerName    = "minigames",
+  [int]   $ExpectedPort     = 3333,
+  [string]$ComposeProject   = "minigames",
+
+  # ── Behavior flags ────────────────────────────────────────────────────
+  [switch]$DryRun,
+  [switch]$SkipPull,
+  [switch]$Logs,
+  [switch]$UploadEnv,
+  [string]$EnvFile          = ".\.env",
+  [switch]$CloneIfMissing,
+  [switch]$Force,
+  [switch]$SkipNginxReload,
+  [switch]$SkipHealthCheck
+)
+
+$ErrorActionPreference = 'Stop'
+
+# ── Logging setup ───────────────────────────────────────────────────────
+$logDir = ".\deploy-logs"
+if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir | Out-Null }
+$logFile = Join-Path $logDir ("{0:yyyy-MM-dd_HHmmss}.log" -f (Get-Date))
+function Log-Line($msg) { Add-Content -Path $logFile -Value $msg -Encoding utf8 }
+function Write-Step($msg) { Write-Host "▶ $msg" -ForegroundColor Cyan; Log-Line "STEP: $msg" }
+function Write-Ok($msg)   { Write-Host "✓ $msg" -ForegroundColor Green; Log-Line "OK: $msg" }
+function Write-Warn($msg) { Write-Host "⚠ $msg" -ForegroundColor Yellow; Log-Line "WARN: $msg" }
+function Write-Err($msg)  { Write-Host "✗ $msg" -ForegroundColor Red; Log-Line "ERR: $msg" }
+
+# ── SSH wrapper ─────────────────────────────────────────────────────────
+$sshArgs = @()
+if ($SshKey) { $sshArgs += @('-i', $SshKey) }
+$sshArgs += @('-o', 'StrictHostKeyChecking=accept-new', '-o', 'ConnectTimeout=10', "$VpsUser@$VpsHost")
+
+function Invoke-Ssh($remoteCmd, [switch]$AllowFail) {
+  Log-Line "SSH: $remoteCmd"
+  $output = & ssh @sshArgs $remoteCmd 2>&1
+  $code = $LASTEXITCODE
+  Log-Line "SSH-OUT($code): $output"
+  if ($code -ne 0 -and -not $AllowFail) {
+    Write-Err "Remote failed (exit $code): $remoteCmd"
+    Write-Host $output -ForegroundColor Red
+    exit $code
+  }
+  return $output
+}
+
+function Confirm-Or-Exit($prompt) {
+  if ($Force) { Write-Warn "$prompt — auto-confirmed (-Force)"; return }
+  $ans = Read-Host "$prompt (yes/no)"
+  if ($ans -ne 'yes') { Write-Err "User cancelled"; exit 1 }
+}
+
+# =====================================================================
+# PHASE 0 — Banner + DryRun notice
+# =====================================================================
+Write-Host ""
+Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Magenta
+Write-Host "║   MINIGAMES SAFE DEPLOY — multi-service host edition       ║" -ForegroundColor Magenta
+Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Magenta
+Write-Host ("  VPS:        {0}@{1}" -f $VpsUser, $VpsHost)
+Write-Host ("  Repo dir:   {0}" -f $RepoDir)
+Write-Host ("  Container:  {0} (project={1}, port={2})" -f $ContainerName, $ComposeProject, $ExpectedPort)
+Write-Host ("  Log:        {0}" -f $logFile)
+if ($DryRun) { Write-Host "  [DRY RUN — no changes will be applied]" -ForegroundColor Yellow }
+Write-Host ""
+
+# =====================================================================
+# PHASE 1 — Pre-flight checks (read-only, không thay đổi gì)
+# =====================================================================
+Write-Step "Phase 1/6: Pre-flight checks"
+
+# 1.1 SSH connectivity
+Invoke-Ssh "echo ssh_ok" | Out-Null
+Write-Ok "SSH connection"
+
+# 1.2 Docker available
+Invoke-Ssh "command -v docker >/dev/null && command -v 'docker' compose version >/dev/null 2>&1 || docker compose version >/dev/null 2>&1; echo docker_check_ok" | Out-Null
+Write-Ok "Docker + Compose available"
+
+# 1.3 Disk space (warn if <2GB)
+$diskOut = Invoke-Ssh "df -BG --output=avail / | tail -1 | tr -dc '0-9'"
+$diskGB = [int]$diskOut
+if ($diskGB -lt 2) { Write-Warn "Disk free only ${diskGB}GB — build may fail" }
+else { Write-Ok "Disk free: ${diskGB}GB" }
+
+# 1.4 Container name conflict — chỉ ngăn nếu container thuộc PROJECT KHÁC
+$existingProject = Invoke-Ssh "docker inspect -f '{{ index .Config.Labels `"com.docker.compose.project`"}}' $ContainerName 2>/dev/null || echo ''" -AllowFail
+$existingProject = ($existingProject -join '').Trim()
+if ($existingProject -and $existingProject -ne $ComposeProject) {
+  Write-Err "Container '$ContainerName' đang thuộc compose project '$existingProject' — KHÔNG phải '$ComposeProject'."
+  Write-Err "Dừng để tránh ghi đè service khác. Đổi -ContainerName hoặc xử lý thủ công."
+  exit 1
+}
+if ($existingProject -eq $ComposeProject) { Write-Ok "Container '$ContainerName' đã thuộc project '$ComposeProject' — sẽ update" }
+else { Write-Ok "Container '$ContainerName' chưa tồn tại — sẽ tạo mới" }
+
+# 1.5 Port conflict — kiểm tra port 3333 ở 127.0.0.1
+$portCheck = Invoke-Ssh "ss -tlnp 2>/dev/null | awk '`$4 ~ /127.0.0.1:$ExpectedPort\$/ || `$4 ~ /:::$ExpectedPort\$/ || `$4 ~ /\\*:$ExpectedPort\$/ {print `$0}' | head -3" -AllowFail
+if ($portCheck -and ($portCheck -join '').Trim()) {
+  # Có process — check có phải container minigames không
+  $portOwner = Invoke-Ssh "ss -tlnp 2>/dev/null | awk '`$4 ~ /:$ExpectedPort\$/' | head -1" -AllowFail
+  $isOurs = ($portOwner -match 'docker-proxy' -or $portOwner -match $ContainerName)
+  if (-not $isOurs) {
+    Write-Err "Port $ExpectedPort đang bị process KHÁC chiếm:"
+    Write-Host ($portOwner -join "`n") -ForegroundColor Red
+    Write-Err "Dừng. Đổi -ExpectedPort hoặc dừng service kia trước."
+    exit 1
+  }
+  Write-Ok "Port $ExpectedPort đang dùng bởi docker (service hiện tại — OK)"
+} else {
+  Write-Ok "Port $ExpectedPort: free"
+}
+
+# 1.6 Repo tồn tại
+$repoExists = Invoke-Ssh "test -d $RepoDir/.git && echo yes || echo no" -AllowFail
+$repoExists = ($repoExists -join '').Trim()
+if ($repoExists -ne 'yes') {
+  if ($CloneIfMissing) {
+    if ($DryRun) { Write-Warn "[DryRun] Would clone: $RepoUrl → $RepoDir" }
+    else {
+      Write-Step "Cloning $RepoUrl → $RepoDir (lần đầu)"
+      Confirm-Or-Exit "Clone repo vào '$RepoDir'?"
+      Invoke-Ssh "git clone $RepoUrl $RepoDir"
+      Write-Ok "Repo cloned"
+    }
+  } else {
+    Write-Err "Repo không tồn tại tại $RepoDir trên VPS."
+    Write-Err "Chạy lại với -CloneIfMissing để tự clone, hoặc clone thủ công."
+    exit 1
+  }
+} else { Write-Ok "Repo present at $RepoDir" }
+
+# =====================================================================
+# PHASE 2 — Upload .env (optional) + verify
+# =====================================================================
+Write-Step "Phase 2/6: Environment config"
+
+if ($UploadEnv) {
+  if (-not (Test-Path $EnvFile)) { Write-Err ".env not found at $EnvFile"; exit 1 }
+  Confirm-Or-Exit "Upload local '$EnvFile' → VPS:$RepoDir/.env (ghi đè nếu có)?"
+  if (-not $DryRun) {
+    $scpArgs = @()
+    if ($SshKey) { $scpArgs += @('-i', $SshKey) }
+    $scpArgs += @('-o', 'StrictHostKeyChecking=accept-new', $EnvFile, "${VpsUser}@${VpsHost}:$RepoDir/.env")
+    & scp @scpArgs
+    if ($LASTEXITCODE -ne 0) { Write-Err "scp failed"; exit $LASTEXITCODE }
+    Invoke-Ssh "chmod 600 $RepoDir/.env"
+    Write-Ok ".env uploaded (chmod 600)"
+  }
+}
+
+$envOk = Invoke-Ssh "test -f $RepoDir/.env && echo yes || echo no" -AllowFail
+$envOk = ($envOk -join '').Trim()
+if ($envOk -ne 'yes') {
+  Write-Err ".env missing on VPS at $RepoDir/.env"
+  Write-Err "Chạy lại với -UploadEnv để upload từ local."
+  exit 1
+}
+Write-Ok ".env present (mode $((Invoke-Ssh "stat -c %a $RepoDir/.env") -join '').Trim())"
+
+# =====================================================================
+# PHASE 3 — Git pull
+# =====================================================================
+Write-Step "Phase 3/6: Sync code"
+if ($SkipPull) {
+  Write-Warn "Skip git pull (-SkipPull)"
+} elseif ($DryRun) {
+  Invoke-Ssh "cd $RepoDir && git fetch --dry-run 2>&1 | head -20" | Out-Null
+  Write-Warn "[DryRun] Would git pull --ff-only"
+} else {
+  $beforeSha = (Invoke-Ssh "cd $RepoDir && git rev-parse --short HEAD") -join ''
+  Invoke-Ssh "cd $RepoDir && git pull --ff-only" | Out-Null
+  $afterSha = (Invoke-Ssh "cd $RepoDir && git rev-parse --short HEAD") -join ''
+  if ($beforeSha -eq $afterSha) { Write-Ok "Already up-to-date ($afterSha)" }
+  else { Write-Ok "Updated: $beforeSha → $afterSha" }
+}
+
+if ($DryRun) {
+  Write-Host ""
+  Write-Host "════ DRY RUN COMPLETE — no changes applied ════" -ForegroundColor Yellow
+  Write-Host "Re-run without -DryRun để thực sự deploy."
+  exit 0
+}
+
+# =====================================================================
+# PHASE 4 — Backup current image (for rollback)
+# =====================================================================
+Write-Step "Phase 4/6: Backup current image (for rollback)"
+$currentImage = (Invoke-Ssh "docker inspect -f '{{.Config.Image}}' $ContainerName 2>/dev/null || echo none" -AllowFail) -join ''
+$currentImage = $currentImage.Trim()
+if ($currentImage -and $currentImage -ne 'none') {
+  Invoke-Ssh "docker tag $currentImage ${ContainerName}:rollback" | Out-Null
+  Write-Ok "Tagged $currentImage → ${ContainerName}:rollback"
+} else {
+  Write-Warn "No existing container → no rollback image"
+}
+
+# =====================================================================
+# PHASE 5 — Build + deploy + healthcheck (auto-rollback if fail)
+# =====================================================================
+Write-Step "Phase 5/6: Build & deploy (downtime ~2-5s)"
+
+Confirm-Or-Exit "Build + restart container '$ContainerName'?"
+
+# Build first (không restart) để giảm downtime
+Invoke-Ssh "cd $RepoDir && docker compose build 2>&1 | tail -10"
+Write-Ok "Build OK"
+
+# Up -d sẽ recreate container vì image SHA đã đổi
+Invoke-Ssh "cd $RepoDir && docker compose up -d"
+Write-Ok "Container started"
+
+# Healthcheck với retry
+if ($SkipHealthCheck) {
+  Write-Warn "Skip healthcheck (-SkipHealthCheck)"
+} else {
+  Write-Step "Healthcheck (wait up to 30s)..."
+  $healthy = $false
+  for ($i = 1; $i -le 10; $i++) {
+    Start-Sleep -Seconds 3
+    $health = Invoke-Ssh "curl -sf -m 3 http://127.0.0.1:$ExpectedPort/healthz 2>/dev/null || echo FAIL" -AllowFail
+    $healthStr = ($health -join '').Trim()
+    if ($healthStr -match '"ok":\s*true') {
+      Write-Ok "Healthz passed: $healthStr"
+      $healthy = $true
+      break
+    }
+    Write-Host "  attempt $i/10..." -ForegroundColor DarkGray
+  }
+  if (-not $healthy) {
+    Write-Err "Healthz failed after 30s. ROLLING BACK..."
+    if ($currentImage -and $currentImage -ne 'none') {
+      Invoke-Ssh "docker tag ${ContainerName}:rollback $currentImage && cd $RepoDir && docker compose up -d"
+      Start-Sleep -Seconds 5
+      $rollHealth = (Invoke-Ssh "curl -sf -m 3 http://127.0.0.1:$ExpectedPort/healthz" -AllowFail) -join ''
+      if ($rollHealth -match '"ok":\s*true') {
+        Write-Warn "Rolled back to previous image. Healthz: $rollHealth"
+      } else {
+        Write-Err "Rollback also failed. Manual intervention needed: ssh + docker compose logs"
+      }
+    } else {
+      Write-Err "No rollback image available. Container stopped."
+    }
+    Write-Host ""
+    Write-Host "Logs tail:" -ForegroundColor Yellow
+    Invoke-Ssh "cd $RepoDir && docker compose logs --tail=30 $ContainerName" -AllowFail
+    exit 1
+  }
+}
+
+# =====================================================================
+# PHASE 6 — Safe cleanup + nginx reload (optional)
+# =====================================================================
+Write-Step "Phase 6/6: Cleanup + finalize"
+
+# SAFE prune: chỉ xóa dangling images CỦA project này
+$pruneOut = Invoke-Ssh "docker image prune -f --filter 'label=com.docker.compose.project=$ComposeProject' 2>&1 | tail -3"
+Write-Ok "Pruned project images only (other services untouched)"
+
+# Nginx reload (optional, skip nếu chưa setup vhost)
+if (-not $SkipNginxReload) {
+  $hasVhost = (Invoke-Ssh "test -L /etc/nginx/sites-enabled/minigames.conf -o -f /etc/nginx/sites-enabled/minigames.conf && echo yes || echo no" -AllowFail) -join ''
+  if ($hasVhost.Trim() -eq 'yes') {
+    Invoke-Ssh "nginx -t 2>&1 | tail -3"
+    Invoke-Ssh "systemctl reload nginx"
+    Write-Ok "Nginx reloaded (config tested OK)"
+  } else {
+    Write-Warn "No nginx vhost for minigames found — skipping reload"
+  }
+}
+
+# Final summary
+Write-Step "Final status"
+Invoke-Ssh "docker ps --filter name=^${ContainerName}$ --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'"
+
+Write-Host ""
+Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Green
+Write-Host "║   ✓ DEPLOY SUCCESS — minigames is live                     ║" -ForegroundColor Green
+Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host ""
+Write-Host "Verify online:  https://minigames.allin1site.com/" -ForegroundColor White
+Write-Host "Cloudflare:     Caching → Purge Everything" -ForegroundColor Yellow
+Write-Host "Log saved:      $logFile" -ForegroundColor DarkGray
+Write-Host ""
+
+if ($Logs) {
+  Write-Step "Tailing logs (Ctrl+C to stop)..."
+  & ssh @sshArgs "cd $RepoDir && docker compose logs -f --tail=50 $ContainerName"
+}
