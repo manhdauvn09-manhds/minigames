@@ -34,7 +34,7 @@ Hàng ngày tự động:
 
 | \*\*Games domain\*\* | https://minigames.allin1site.com/{ten-game}/ |
 
-| \*\*Server\*\* | 62.238.8.222 (Linux, Docker) |
+| \*\*Server\*\* | 62.238.28.106 (Linux, Docker) |
 
 | \*\*Design system\*\* | Kaya (warm neutrals + sumi red accent) |
 
@@ -1738,7 +1738,7 @@ STEP 6: Build (Docker compose)
 
 &#x20;        ↓
 
-STEP 7: Deploy → 62.238.8.222 (Python \_deploy\_helper.py)
+STEP 7: Deploy → 62.238.28.106 (Python \_deploy\_helper.py)
 
 &#x20;        ↓
 
@@ -1776,7 +1776,7 @@ Message: "daily-genZ-games: YYYY-MM-DD – generated 10 games + shared styles"
 
 Server Configuration
 
-Host: 62.238.8.222
+Host: 62.238.28.106
 
 Repo dir: /opt/allin1site/
 
@@ -2048,13 +2048,13 @@ docker compose build
 
 docker images | grep allin1site
 
-🚀 STEP 6: DEPLOY TO 62.238.8.222
+🚀 STEP 6: DEPLOY TO 62.238.28.106
 
 6.1 Setup credentials
 
 cat > \~/.allin1\_creds << EOF
 
-HOST=62.238.8.222
+HOST=62.238.28.106
 
 USER=root
 
@@ -2156,7 +2156,7 @@ git commit -m "daily-genZ-games: YYYY-MM-DD – 10 games + Kaya styles deployed
 
 
 
-Deploy Status: ✅ LIVE on 62.238.8.222
+Deploy Status: ✅ LIVE on 62.238.28.106
 
 
 

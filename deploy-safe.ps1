@@ -29,7 +29,7 @@
 [CmdletBinding()]
 param(
   # VPS info
-  [string]$VpsHost   = "62.238.8.222",
+  [string]$VpsHost   = "62.238.28.106",
   [string]$VpsUser   = "root",
   [string]$RepoDir   = "~/minigames",
   [string]$RepoUrl   = "https://github.com/manhdauvn09-manhds/minigames.git",
