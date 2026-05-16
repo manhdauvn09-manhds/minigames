@@ -95,10 +95,12 @@ Write-Host ""
 Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Magenta
 Write-Host "║   MINIGAMES SAFE DEPLOY — multi-service host edition       ║" -ForegroundColor Magenta
 Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Magenta
-Write-Host ("  VPS:        {0}@{1}" -f $VpsUser, $VpsHost)
-Write-Host ("  Repo dir:   {0}" -f $RepoDir)
-Write-Host ("  Container:  {0} (project={1}, port={2})" -f $ContainerName, $ComposeProject, $ExpectedPort)
-Write-Host ("  Log:        {0}" -f $logFile)
+Write-Host "  VPS:        ${VpsUser}@${VpsHost}"
+Write-Host "  Repo dir:   ${RepoDir}"
+Write-Host "  Container:  ${ContainerName}"
+Write-Host "  Project:    ${ComposeProject}"
+Write-Host "  Port:       ${ExpectedPort}"
+Write-Host "  Log:        ${logFile}"
 if ($DryRun) { Write-Host "  [DRY RUN — no changes will be applied]" -ForegroundColor Yellow }
 Write-Host ""
 
@@ -112,7 +114,7 @@ Invoke-Ssh "echo ssh_ok" | Out-Null
 Write-Ok "SSH connection"
 
 # 1.2 Docker available
-Invoke-Ssh "command -v docker >/dev/null && command -v 'docker' compose version >/dev/null 2>&1 || docker compose version >/dev/null 2>&1; echo docker_check_ok" | Out-Null
+Invoke-Ssh 'command -v docker >/dev/null 2>&1; docker compose version >/dev/null 2>&1; echo docker_check_ok' | Out-Null
 Write-Ok "Docker + Compose available"
 
 # 1.3 Disk space (warn if <2GB)
@@ -122,7 +124,8 @@ if ($diskGB -lt 2) { Write-Warn "Disk free only ${diskGB}GB — build may fail" 
 else { Write-Ok "Disk free: ${diskGB}GB" }
 
 # 1.4 Container name conflict — chỉ ngăn nếu container thuộc PROJECT KHÁC
-$existingProject = Invoke-Ssh "docker inspect -f '{{ index .Config.Labels `"com.docker.compose.project`"}}' $ContainerName 2>/dev/null || echo ''" -AllowFail
+$inspectCmd = 'docker inspect -f ''{{ index .Config.Labels "com.docker.compose.project"}}'' ' + $ContainerName + ' 2>/dev/null; true'
+$existingProject = Invoke-Ssh $inspectCmd -AllowFail
 $existingProject = ($existingProject -join '').Trim()
 if ($existingProject -and $existingProject -ne $ComposeProject) {
   Write-Err "Container '$ContainerName' đang thuộc compose project '$existingProject' — KHÔNG phải '$ComposeProject'."
@@ -146,11 +149,12 @@ if ($portCheck -and ($portCheck -join '').Trim()) {
   }
   Write-Ok "Port $ExpectedPort đang dùng bởi docker (service hiện tại — OK)"
 } else {
-  Write-Ok "Port $ExpectedPort: free"
+  Write-Ok "Port ${ExpectedPort}: free"
 }
 
 # 1.6 Repo tồn tại
-$repoExists = Invoke-Ssh "test -d $RepoDir/.git && echo yes || echo no" -AllowFail
+$repoExistsCmd = 'test -d ' + $RepoDir + '/.git; if [ $? -eq 0 ]; then echo yes; else echo no; fi'
+$repoExists = Invoke-Ssh $repoExistsCmd -AllowFail
 $repoExists = ($repoExists -join '').Trim()
 if ($repoExists -ne 'yes') {
   if ($CloneIfMissing) {
@@ -187,14 +191,16 @@ if ($UploadEnv) {
   }
 }
 
-$envOk = Invoke-Ssh "test -f $RepoDir/.env && echo yes || echo no" -AllowFail
+$envOkCmd = 'test -f ' + $RepoDir + '/.env; if [ $? -eq 0 ]; then echo yes; else echo no; fi'
+$envOk = Invoke-Ssh $envOkCmd -AllowFail
 $envOk = ($envOk -join '').Trim()
 if ($envOk -ne 'yes') {
   Write-Err ".env missing on VPS at $RepoDir/.env"
   Write-Err "Chạy lại với -UploadEnv để upload từ local."
   exit 1
 }
-Write-Ok ".env present (mode $((Invoke-Ssh "stat -c %a $RepoDir/.env") -join '').Trim())"
+$envMode = ((Invoke-Ssh "stat -c %a $RepoDir/.env") -join '').Trim()
+Write-Ok ".env present (mode $envMode)"
 
 # =====================================================================
 # PHASE 3 — Git pull
@@ -203,14 +209,14 @@ Write-Step "Phase 3/6: Sync code"
 if ($SkipPull) {
   Write-Warn "Skip git pull (-SkipPull)"
 } elseif ($DryRun) {
-  Invoke-Ssh "cd $RepoDir && git fetch --dry-run 2>&1 | head -20" | Out-Null
-  Write-Warn "[DryRun] Would git pull --ff-only"
+  Invoke-Ssh ('cd ' + $RepoDir + ' && git fetch --dry-run 2>&1 | head -20') | Out-Null
+  Write-Warn "(DryRun) Would git pull --ff-only"
 } else {
-  $beforeSha = (Invoke-Ssh "cd $RepoDir && git rev-parse --short HEAD") -join ''
-  Invoke-Ssh "cd $RepoDir && git pull --ff-only" | Out-Null
-  $afterSha = (Invoke-Ssh "cd $RepoDir && git rev-parse --short HEAD") -join ''
+  $beforeSha = (Invoke-Ssh ('cd ' + $RepoDir + ' && git rev-parse --short HEAD')) -join ''
+  Invoke-Ssh ('cd ' + $RepoDir + ' && git pull --ff-only') | Out-Null
+  $afterSha = (Invoke-Ssh ('cd ' + $RepoDir + ' && git rev-parse --short HEAD')) -join ''
   if ($beforeSha -eq $afterSha) { Write-Ok "Already up-to-date ($afterSha)" }
-  else { Write-Ok "Updated: $beforeSha → $afterSha" }
+  else { Write-Ok "Updated: $beforeSha -> $afterSha" }
 }
 
 if ($DryRun) {
@@ -224,28 +230,30 @@ if ($DryRun) {
 # PHASE 4 — Backup current image (for rollback)
 # =====================================================================
 Write-Step "Phase 4/6: Backup current image (for rollback)"
-$currentImage = (Invoke-Ssh "docker inspect -f '{{.Config.Image}}' $ContainerName 2>/dev/null || echo none" -AllowFail) -join ''
-$currentImage = $currentImage.Trim()
+$currentImageCmd = 'docker inspect -f ''{{.Config.Image}}'' ' + $ContainerName + ' 2>/dev/null; true'
+$currentImage = ((Invoke-Ssh $currentImageCmd -AllowFail) -join '').Trim()
+if (-not $currentImage) { $currentImage = 'none' }
 if ($currentImage -and $currentImage -ne 'none') {
-  Invoke-Ssh "docker tag $currentImage ${ContainerName}:rollback" | Out-Null
-  Write-Ok "Tagged $currentImage → ${ContainerName}:rollback"
+  $tagCmd = 'docker tag ' + $currentImage + ' ' + $ContainerName + ':rollback'
+  Invoke-Ssh $tagCmd | Out-Null
+  Write-Ok "Tagged $currentImage to ${ContainerName}:rollback"
 } else {
-  Write-Warn "No existing container → no rollback image"
+  Write-Warn "No existing container — no rollback image"
 }
 
 # =====================================================================
 # PHASE 5 — Build + deploy + healthcheck (auto-rollback if fail)
 # =====================================================================
-Write-Step "Phase 5/6: Build & deploy (downtime ~2-5s)"
+Write-Step "Phase 5/6: Build and deploy (downtime ~2-5s)"
 
 Confirm-Or-Exit "Build + restart container '$ContainerName'?"
 
 # Build first (không restart) để giảm downtime
-Invoke-Ssh "cd $RepoDir && docker compose build 2>&1 | tail -10"
+Invoke-Ssh ('cd ' + $RepoDir + ' && docker compose build 2>&1 | tail -10')
 Write-Ok "Build OK"
 
 # Up -d sẽ recreate container vì image SHA đã đổi
-Invoke-Ssh "cd $RepoDir && docker compose up -d"
+Invoke-Ssh ('cd ' + $RepoDir + ' && docker compose up -d')
 Write-Ok "Container started"
 
 # Healthcheck với retry
@@ -254,9 +262,10 @@ if ($SkipHealthCheck) {
 } else {
   Write-Step "Healthcheck (wait up to 30s)..."
   $healthy = $false
+  $healthCheckCmd = 'curl -sf -m 3 http://127.0.0.1:' + $ExpectedPort + '/healthz 2>/dev/null; true'
   for ($i = 1; $i -le 10; $i++) {
     Start-Sleep -Seconds 3
-    $health = Invoke-Ssh "curl -sf -m 3 http://127.0.0.1:$ExpectedPort/healthz 2>/dev/null || echo FAIL" -AllowFail
+    $health = Invoke-Ssh $healthCheckCmd -AllowFail
     $healthStr = ($health -join '').Trim()
     if ($healthStr -match '"ok":\s*true') {
       Write-Ok "Healthz passed: $healthStr"
@@ -268,9 +277,13 @@ if ($SkipHealthCheck) {
   if (-not $healthy) {
     Write-Err "Healthz failed after 30s. ROLLING BACK..."
     if ($currentImage -and $currentImage -ne 'none') {
-      Invoke-Ssh "docker tag ${ContainerName}:rollback $currentImage && cd $RepoDir && docker compose up -d"
+      $rollbackTag = 'docker tag ' + $ContainerName + ':rollback ' + $currentImage
+      $rollbackUp  = 'cd ' + $RepoDir + ' && docker compose up -d'
+      Invoke-Ssh $rollbackTag
+      Invoke-Ssh $rollbackUp
       Start-Sleep -Seconds 5
-      $rollHealth = (Invoke-Ssh "curl -sf -m 3 http://127.0.0.1:$ExpectedPort/healthz" -AllowFail) -join ''
+      $rollHealthCmd = 'curl -sf -m 3 http://127.0.0.1:' + $ExpectedPort + '/healthz'
+      $rollHealth = (Invoke-Ssh $rollHealthCmd -AllowFail) -join ''
       if ($rollHealth -match '"ok":\s*true') {
         Write-Warn "Rolled back to previous image. Healthz: $rollHealth"
       } else {
@@ -281,7 +294,7 @@ if ($SkipHealthCheck) {
     }
     Write-Host ""
     Write-Host "Logs tail:" -ForegroundColor Yellow
-    Invoke-Ssh "cd $RepoDir && docker compose logs --tail=30 $ContainerName" -AllowFail
+    Invoke-Ssh ('cd ' + $RepoDir + ' && docker compose logs --tail=30 ' + $ContainerName) -AllowFail
     exit 1
   }
 }
@@ -297,7 +310,8 @@ Write-Ok "Pruned project images only (other services untouched)"
 
 # Nginx reload (optional, skip nếu chưa setup vhost)
 if (-not $SkipNginxReload) {
-  $hasVhost = (Invoke-Ssh "test -L /etc/nginx/sites-enabled/minigames.conf -o -f /etc/nginx/sites-enabled/minigames.conf && echo yes || echo no" -AllowFail) -join ''
+  $hasVhostCmd = 'test -e /etc/nginx/sites-enabled/minigames.conf; if [ $? -eq 0 ]; then echo yes; else echo no; fi'
+  $hasVhost = (Invoke-Ssh $hasVhostCmd -AllowFail) -join ''
   if ($hasVhost.Trim() -eq 'yes') {
     Invoke-Ssh "nginx -t 2>&1 | tail -3"
     Invoke-Ssh "systemctl reload nginx"
