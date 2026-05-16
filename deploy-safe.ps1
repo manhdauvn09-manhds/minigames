@@ -1,46 +1,46 @@
 # =====================================================================
-# allin1site Mini Games — SAFE deploy from local PowerShell
-# Designed for VPS chạy nhiều service — KHÔNG ảnh hưởng container khác
+# allin1site Mini Games - SAFE deploy from local PowerShell
+# Designed for VPS running multiple services - does NOT affect other containers
 # =====================================================================
-# Cách dùng:
-#   .\deploy-safe.ps1                                    (config mặc định)
+# Usage:
+#   .\deploy-safe.ps1                                    (default config)
 #   .\deploy-safe.ps1 -VpsHost 1.2.3.4 -VpsUser root     (override)
-#   .\deploy-safe.ps1 -DryRun                            (chỉ check, không deploy)
-#   .\deploy-safe.ps1 -SkipPull                          (chỉ rebuild)
-#   .\deploy-safe.ps1 -UploadEnv                         (scp .env local → VPS)
-#   .\deploy-safe.ps1 -Logs                              (tail log sau deploy)
-#   .\deploy-safe.ps1 -CloneIfMissing                    (lần đầu: tự git clone)
+#   .\deploy-safe.ps1 -DryRun                            (check only, no deploy)
+#   .\deploy-safe.ps1 -SkipPull                          (rebuild only)
+#   .\deploy-safe.ps1 -UploadEnv                         (scp .env local to VPS)
+#   .\deploy-safe.ps1 -Logs                              (tail log after deploy)
+#   .\deploy-safe.ps1 -CloneIfMissing                    (first time: auto git clone)
 #
-# An toàn so với deploy.ps1 cũ:
-#   ✓ Pre-flight: check port conflict, container conflict, disk space
-#   ✓ Backup image cũ thành :rollback trước khi build mới
-#   ✓ Healthz check + auto rollback nếu fail
-#   ✓ Safe prune (chỉ image của project minigames, không động service khác)
-#   ✓ Confirm trước mỗi destructive action (trừ khi -Force)
-#   ✓ Log lưu tại .\deploy-logs\YYYY-MM-DD_HHMMSS.log
+# Safety vs old deploy.ps1:
+#   - Pre-flight: check port conflict, container conflict, disk space
+#   - Backup old image as :rollback before building new
+#   - Healthz check + auto rollback if fail
+#   - Safe prune (only minigames project image, does NOT touch other services)
+#   - Confirm before destructive action (unless -Force)
+#   - Log saved to .\deploy-logs\YYYY-MM-DD_HHMMSS.log
 #
-# Yêu cầu:
-#   - SSH key đã đăng ký trên VPS, hoặc dùng -SshKey param
-#   - VPS đã cài docker + docker compose
-#   - Repo `minigames` đã clone trên VPS (hoặc dùng -CloneIfMissing)
-#   - File .env tồn tại trong $RepoDir trên VPS (hoặc dùng -UploadEnv)
+# Requirements:
+#   - SSH key registered on VPS, or use -SshKey param
+#   - VPS has docker + docker compose installed
+#   - Repo minigames cloned on VPS (or use -CloneIfMissing)
+#   - File .env exists in $RepoDir on VPS (or use -UploadEnv)
 # =====================================================================
 
 [CmdletBinding()]
 param(
-  # ── VPS info ──────────────────────────────────────────────────────────
+  # VPS info
   [string]$VpsHost   = "62.238.8.222",
   [string]$VpsUser   = "root",
   [string]$RepoDir   = "~/minigames",
   [string]$RepoUrl   = "https://github.com/manhdauvn09-manhds/minigames.git",
   [string]$SshKey    = "",
 
-  # ── Container expectations ────────────────────────────────────────────
+  # Container expectations
   [string]$ContainerName    = "minigames",
   [int]   $ExpectedPort     = 3333,
   [string]$ComposeProject   = "minigames",
 
-  # ── Behavior flags ────────────────────────────────────────────────────
+  # Behavior flags
   [switch]$DryRun,
   [switch]$SkipPull,
   [switch]$Logs,
@@ -54,17 +54,17 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-# ── Logging setup ───────────────────────────────────────────────────────
+# Logging setup
 $logDir = ".\deploy-logs"
 if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Path $logDir | Out-Null }
 $logFile = Join-Path $logDir ("{0:yyyy-MM-dd_HHmmss}.log" -f (Get-Date))
 function Log-Line($msg) { Add-Content -Path $logFile -Value $msg -Encoding utf8 }
-function Write-Step($msg) { Write-Host "▶ $msg" -ForegroundColor Cyan; Log-Line "STEP: $msg" }
-function Write-Ok($msg)   { Write-Host "✓ $msg" -ForegroundColor Green; Log-Line "OK: $msg" }
-function Write-Warn($msg) { Write-Host "⚠ $msg" -ForegroundColor Yellow; Log-Line "WARN: $msg" }
-function Write-Err($msg)  { Write-Host "✗ $msg" -ForegroundColor Red; Log-Line "ERR: $msg" }
+function Write-Step($msg) { Write-Host ">> $msg" -ForegroundColor Cyan; Log-Line "STEP: $msg" }
+function Write-Ok($msg)   { Write-Host "OK $msg" -ForegroundColor Green; Log-Line "OK: $msg" }
+function Write-Warn($msg) { Write-Host "! $msg" -ForegroundColor Yellow; Log-Line "WARN: $msg" }
+function Write-Err($msg)  { Write-Host "X $msg" -ForegroundColor Red; Log-Line "ERR: $msg" }
 
-# ── SSH wrapper ─────────────────────────────────────────────────────────
+# SSH wrapper
 $sshArgs = @()
 if ($SshKey) { $sshArgs += @('-i', $SshKey) }
 $sshArgs += @('-o', 'StrictHostKeyChecking=accept-new', '-o', 'ConnectTimeout=10', "$VpsUser@$VpsHost")
@@ -83,103 +83,103 @@ function Invoke-Ssh($remoteCmd, [switch]$AllowFail) {
 }
 
 function Confirm-Or-Exit($prompt) {
-  if ($Force) { Write-Warn "$prompt — auto-confirmed (-Force)"; return }
+  if ($Force) { Write-Warn "$prompt - auto-confirmed (-Force)"; return }
   $ans = Read-Host "$prompt (yes/no)"
   if ($ans -ne 'yes') { Write-Err "User cancelled"; exit 1 }
 }
 
 # =====================================================================
-# PHASE 0 — Banner + DryRun notice
+# PHASE 0 - Banner + DryRun notice
 # =====================================================================
 Write-Host ""
-Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Magenta
-Write-Host "║   MINIGAMES SAFE DEPLOY — multi-service host edition       ║" -ForegroundColor Magenta
-Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Magenta
-Write-Host "  VPS:        ${VpsUser}@${VpsHost}"
-Write-Host "  Repo dir:   ${RepoDir}"
-Write-Host "  Container:  ${ContainerName}"
-Write-Host "  Project:    ${ComposeProject}"
-Write-Host "  Port:       ${ExpectedPort}"
-Write-Host "  Log:        ${logFile}"
-if ($DryRun) { Write-Host "  [DRY RUN — no changes will be applied]" -ForegroundColor Yellow }
+Write-Host "========================================================" -ForegroundColor Magenta
+Write-Host "   MINIGAMES SAFE DEPLOY - multi-service host edition   " -ForegroundColor Magenta
+Write-Host "========================================================" -ForegroundColor Magenta
+Write-Host "  VPS:        $VpsUser@$VpsHost"
+Write-Host "  Repo dir:   $RepoDir"
+Write-Host "  Container:  $ContainerName"
+Write-Host "  Project:    $ComposeProject"
+Write-Host "  Port:       $ExpectedPort"
+Write-Host "  Log:        $logFile"
+if ($DryRun) { Write-Host "  [DRY RUN - no changes will be applied]" -ForegroundColor Yellow }
 Write-Host ""
 
 # =====================================================================
-# PHASE 1 — Pre-flight checks (read-only, không thay đổi gì)
+# PHASE 1 - Pre-flight checks (read-only)
 # =====================================================================
 Write-Step "Phase 1/6: Pre-flight checks"
 
-# 1.1 SSH connectivity
+# SSH connectivity
 Invoke-Ssh "echo ssh_ok" | Out-Null
 Write-Ok "SSH connection"
 
-# 1.2 Docker available
+# Docker available
 Invoke-Ssh 'command -v docker >/dev/null 2>&1; docker compose version >/dev/null 2>&1; echo docker_check_ok' | Out-Null
 Write-Ok "Docker + Compose available"
 
-# 1.3 Disk space (warn if <2GB)
+# Disk space (warn if <2GB)
 $diskOut = Invoke-Ssh "df -BG --output=avail / | tail -1 | tr -dc '0-9'"
 $diskGB = [int]$diskOut
-if ($diskGB -lt 2) { Write-Warn "Disk free only ${diskGB}GB — build may fail" }
+if ($diskGB -lt 2) { Write-Warn "Disk free only ${diskGB}GB - build may fail" }
 else { Write-Ok "Disk free: ${diskGB}GB" }
 
-# 1.4 Container name conflict — chỉ ngăn nếu container thuộc PROJECT KHÁC
+# Container name conflict - check if container belongs to different project
 $inspectCmd = 'docker inspect -f ''{{ index .Config.Labels "com.docker.compose.project"}}'' ' + $ContainerName + ' 2>/dev/null; true'
 $existingProject = Invoke-Ssh $inspectCmd -AllowFail
 $existingProject = ($existingProject -join '').Trim()
 if ($existingProject -and $existingProject -ne $ComposeProject) {
-  Write-Err "Container '$ContainerName' đang thuộc compose project '$existingProject' — KHÔNG phải '$ComposeProject'."
-  Write-Err "Dừng để tránh ghi đè service khác. Đổi -ContainerName hoặc xử lý thủ công."
+  Write-Err "Container '$ContainerName' belongs to compose project '$existingProject' - NOT '$ComposeProject'."
+  Write-Err "Stopping to avoid overwriting other service. Change -ContainerName or handle manually."
   exit 1
 }
-if ($existingProject -eq $ComposeProject) { Write-Ok "Container '$ContainerName' đã thuộc project '$ComposeProject' — sẽ update" }
-else { Write-Ok "Container '$ContainerName' chưa tồn tại — sẽ tạo mới" }
+if ($existingProject -eq $ComposeProject) { Write-Ok "Container '$ContainerName' belongs to project '$ComposeProject' - will update" }
+else { Write-Ok "Container '$ContainerName' does not exist - will create new" }
 
-# 1.5 Port conflict — kiểm tra port 3333 ở 127.0.0.1
+# Port conflict - check if port 3333 is in use
 $portCheck = Invoke-Ssh "ss -tlnp 2>/dev/null | awk '`$4 ~ /127.0.0.1:$ExpectedPort\$/ || `$4 ~ /:::$ExpectedPort\$/ || `$4 ~ /\\*:$ExpectedPort\$/ {print `$0}' | head -3" -AllowFail
 if ($portCheck -and ($portCheck -join '').Trim()) {
-  # Có process — check có phải container minigames không
+  # Port in use - check if it's our container
   $portOwner = Invoke-Ssh "ss -tlnp 2>/dev/null | awk '`$4 ~ /:$ExpectedPort\$/' | head -1" -AllowFail
   $isOurs = ($portOwner -match 'docker-proxy' -or $portOwner -match $ContainerName)
   if (-not $isOurs) {
-    Write-Err "Port $ExpectedPort đang bị process KHÁC chiếm:"
+    Write-Err "Port $ExpectedPort in use by DIFFERENT process:"
     Write-Host ($portOwner -join "`n") -ForegroundColor Red
-    Write-Err "Dừng. Đổi -ExpectedPort hoặc dừng service kia trước."
+    Write-Err "Stopping. Change -ExpectedPort or stop other service first."
     exit 1
   }
-  Write-Ok "Port $ExpectedPort đang dùng bởi docker (service hiện tại — OK)"
+  Write-Ok "Port $ExpectedPort in use by docker (current service - OK)"
 } else {
   Write-Ok "Port ${ExpectedPort}: free"
 }
 
-# 1.6 Repo tồn tại
+# Repo exists
 $repoExistsCmd = 'test -d ' + $RepoDir + '/.git; if [ $? -eq 0 ]; then echo yes; else echo no; fi'
 $repoExists = Invoke-Ssh $repoExistsCmd -AllowFail
 $repoExists = ($repoExists -join '').Trim()
 if ($repoExists -ne 'yes') {
   if ($CloneIfMissing) {
-    if ($DryRun) { Write-Warn "[DryRun] Would clone: $RepoUrl → $RepoDir" }
+    if ($DryRun) { Write-Warn "[DryRun] Would clone: $RepoUrl to $RepoDir" }
     else {
-      Write-Step "Cloning $RepoUrl → $RepoDir (lần đầu)"
-      Confirm-Or-Exit "Clone repo vào '$RepoDir'?"
+      Write-Step "Cloning $RepoUrl to $RepoDir (first time)"
+      Confirm-Or-Exit "Clone repo to '$RepoDir'?"
       Invoke-Ssh "git clone $RepoUrl $RepoDir"
       Write-Ok "Repo cloned"
     }
   } else {
-    Write-Err "Repo không tồn tại tại $RepoDir trên VPS."
-    Write-Err "Chạy lại với -CloneIfMissing để tự clone, hoặc clone thủ công."
+    Write-Err "Repo does not exist at $RepoDir on VPS."
+    Write-Err "Re-run with -CloneIfMissing to auto clone, or clone manually."
     exit 1
   }
 } else { Write-Ok "Repo present at $RepoDir" }
 
 # =====================================================================
-# PHASE 2 — Upload .env (optional) + verify
+# PHASE 2 - Upload .env (optional) + verify
 # =====================================================================
 Write-Step "Phase 2/6: Environment config"
 
 if ($UploadEnv) {
   if (-not (Test-Path $EnvFile)) { Write-Err ".env not found at $EnvFile"; exit 1 }
-  Confirm-Or-Exit "Upload local '$EnvFile' → VPS:$RepoDir/.env (ghi đè nếu có)?"
+  Confirm-Or-Exit "Upload local '$EnvFile' to VPS:$RepoDir/.env (overwrite if exists)?"
   if (-not $DryRun) {
     $scpArgs = @()
     if ($SshKey) { $scpArgs += @('-i', $SshKey) }
@@ -196,14 +196,14 @@ $envOk = Invoke-Ssh $envOkCmd -AllowFail
 $envOk = ($envOk -join '').Trim()
 if ($envOk -ne 'yes') {
   Write-Err ".env missing on VPS at $RepoDir/.env"
-  Write-Err "Chạy lại với -UploadEnv để upload từ local."
+  Write-Err "Re-run with -UploadEnv to upload from local."
   exit 1
 }
 $envMode = ((Invoke-Ssh "stat -c %a $RepoDir/.env") -join '').Trim()
 Write-Ok ".env present (mode $envMode)"
 
 # =====================================================================
-# PHASE 3 — Git pull
+# PHASE 3 - Git pull
 # =====================================================================
 Write-Step "Phase 3/6: Sync code"
 if ($SkipPull) {
@@ -221,13 +221,13 @@ if ($SkipPull) {
 
 if ($DryRun) {
   Write-Host ""
-  Write-Host "════ DRY RUN COMPLETE — no changes applied ════" -ForegroundColor Yellow
-  Write-Host "Re-run without -DryRun để thực sự deploy."
+  Write-Host "==== DRY RUN COMPLETE - no changes applied ====" -ForegroundColor Yellow
+  Write-Host "Re-run without -DryRun to actually deploy."
   exit 0
 }
 
 # =====================================================================
-# PHASE 4 — Backup current image (for rollback)
+# PHASE 4 - Backup current image (for rollback)
 # =====================================================================
 Write-Step "Phase 4/6: Backup current image (for rollback)"
 $currentImageCmd = 'docker inspect -f ''{{.Config.Image}}'' ' + $ContainerName + ' 2>/dev/null; true'
@@ -238,25 +238,25 @@ if ($currentImage -and $currentImage -ne 'none') {
   Invoke-Ssh $tagCmd | Out-Null
   Write-Ok "Tagged $currentImage to ${ContainerName}:rollback"
 } else {
-  Write-Warn "No existing container — no rollback image"
+  Write-Warn "No existing container - no rollback image"
 }
 
 # =====================================================================
-# PHASE 5 — Build + deploy + healthcheck (auto-rollback if fail)
+# PHASE 5 - Build + deploy + healthcheck (auto-rollback if fail)
 # =====================================================================
 Write-Step "Phase 5/6: Build and deploy (downtime ~2-5s)"
 
 Confirm-Or-Exit "Build + restart container '$ContainerName'?"
 
-# Build first (không restart) để giảm downtime
+# Build first to minimize downtime
 Invoke-Ssh ('cd ' + $RepoDir + ' && docker compose build 2>&1 | tail -10')
 Write-Ok "Build OK"
 
-# Up -d sẽ recreate container vì image SHA đã đổi
+# Up -d will recreate container since image SHA changed
 Invoke-Ssh ('cd ' + $RepoDir + ' && docker compose up -d')
 Write-Ok "Container started"
 
-# Healthcheck với retry
+# Healthcheck with retry
 if ($SkipHealthCheck) {
   Write-Warn "Skip healthcheck (-SkipHealthCheck)"
 } else {
@@ -300,15 +300,15 @@ if ($SkipHealthCheck) {
 }
 
 # =====================================================================
-# PHASE 6 — Safe cleanup + nginx reload (optional)
+# PHASE 6 - Safe cleanup + nginx reload (optional)
 # =====================================================================
 Write-Step "Phase 6/6: Cleanup + finalize"
 
-# SAFE prune: chỉ xóa dangling images CỦA project này
+# SAFE prune: only delete dangling images of this project
 $pruneOut = Invoke-Ssh "docker image prune -f --filter 'label=com.docker.compose.project=$ComposeProject' 2>&1 | tail -3"
 Write-Ok "Pruned project images only (other services untouched)"
 
-# Nginx reload (optional, skip nếu chưa setup vhost)
+# Nginx reload (optional, skip if not setup)
 if (-not $SkipNginxReload) {
   $hasVhostCmd = 'test -e /etc/nginx/sites-enabled/minigames.conf; if [ $? -eq 0 ]; then echo yes; else echo no; fi'
   $hasVhost = (Invoke-Ssh $hasVhostCmd -AllowFail) -join ''
@@ -317,7 +317,7 @@ if (-not $SkipNginxReload) {
     Invoke-Ssh "systemctl reload nginx"
     Write-Ok "Nginx reloaded (config tested OK)"
   } else {
-    Write-Warn "No nginx vhost for minigames found — skipping reload"
+    Write-Warn "No nginx vhost for minigames found - skipping reload"
   }
 }
 
@@ -326,12 +326,12 @@ Write-Step "Final status"
 Invoke-Ssh "docker ps --filter name=^${ContainerName}$ --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'"
 
 Write-Host ""
-Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║   ✓ DEPLOY SUCCESS — minigames is live                     ║" -ForegroundColor Green
-Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "========================================================" -ForegroundColor Green
+Write-Host "   OK DEPLOY SUCCESS - minigames is live                 " -ForegroundColor Green
+Write-Host "========================================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Verify online:  https://minigames.allin1site.com/" -ForegroundColor White
-Write-Host "Cloudflare:     Caching → Purge Everything" -ForegroundColor Yellow
+Write-Host "Cloudflare:     Caching - Purge Everything" -ForegroundColor Yellow
 Write-Host "Log saved:      $logFile" -ForegroundColor DarkGray
 Write-Host ""
 
