@@ -160,10 +160,14 @@ if ($repoExists -ne 'yes') {
   if ($CloneIfMissing) {
     if ($DryRun) { Write-Warn "[DryRun] Would clone: $RepoUrl to $RepoDir" }
     else {
-      Write-Step "Cloning $RepoUrl to $RepoDir (first time)"
+      Write-Step "Cloning $RepoUrl to $RepoDir (first time, ~30-60s)"
       Confirm-Or-Exit "Clone repo to '$RepoDir'?"
-      Invoke-Ssh "git clone $RepoUrl $RepoDir"
-      Write-Ok "Repo cloned"
+      $sshArgsClone = $sshArgs.Clone()
+      $sshArgsClone[0] = 'ssh'
+      $sshArgsClone += @('-o', 'ConnectTimeout=60', '-o', 'ServerAliveInterval=10')
+      $cloneCmd = "git clone --progress $RepoUrl $RepoDir 2>&1 | grep -E '(Cloning|Resolving|Receiving|Unpacking|done)' | tail -10"
+      Invoke-Ssh $cloneCmd | Write-Host
+      Write-Ok "Repo cloned successfully"
     }
   } else {
     Write-Err "Repo does not exist at $RepoDir on VPS."
