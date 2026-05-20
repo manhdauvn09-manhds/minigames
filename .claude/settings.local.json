@@ -10,7 +10,28 @@
       "Bash(for f *)",
       "Bash(git init *)",
       "Bash(git config *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(grep -E \"\\\\.env$|node_modules|\\\\.next\")",
+      "Bash(grep -cE \"\\\\.env$\")",
+      "Bash(git commit -m ' *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(git -c credential.helper= push \"https://manhdauvn09-manhds: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@github.com/manhdauvn09-manhds/minigames.git\" main:main)",
+      "Bash(git branch *)",
+      "Bash(git -c credential.helper= fetch origin main)",
+      "Bash(git -c credential.helper= fetch \"https://manhdauvn09-manhds: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@github.com/manhdauvn09-manhds/minigames.git\" main:refs/remotes/origin/main)",
+      "PowerShell($null = [System.Management.Automation.PSParser]::Tokenize\\(\\(Get-Content -Raw \"E:\\\\SourceCode\\\\GAMES\\\\minigames\\\\deploy-safe.ps1\"\\), [ref]$null\\); if \\($?\\) { \"Parse OK\" } else { \"Parse FAIL\" })",
+      "PowerShell($errors = $null; $null = [System.Management.Automation.PSParser]::Tokenize\\(\\(Get-Content -Raw \"E:\\\\SourceCode\\\\GAMES\\\\minigames\\\\deploy-safe.ps1\"\\), [ref]$errors\\); if \\($errors -and $errors.Count -gt 0\\) { \"ERRORS: $\\($errors.Count\\)\"; $errors | Select-Object -First 10 | ForEach-Object { \"$\\($_.Token.StartLine\\):$\\($_.Token.StartColumn\\) $\\($_.Message\\)\" } } else { \"Parse OK — 0 errors\" })",
+      "Bash(powershell -Command \"@\\(Get-Content -Path 'E:\\\\SourceCode\\\\GAMES\\\\minigames\\\\deploy-safe.ps1' -Encoding UTF8\\) | Out-File -FilePath 'E:\\\\SourceCode\\\\GAMES\\\\minigames\\\\deploy-safe.ps1' -Encoding UTF8BOM -Force\")",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File \".\\\\deploy-safe.ps1\" -DryRun)",
+      "Bash(grep -n '\\\\$[A-Za-z]*:' \"E:\\\\SourceCode\\\\GAMES\\\\minigames\\\\deploy-safe.ps1\")",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File \".\\\\deploy-safe.ps1\" -DryRun -CloneIfMissing)",
+      "Bash(git commit -m 'Fix: Convert deploy-safe.ps1 to English-only to fix PowerShell 5.1 locale parsing errors *)",
+      "Bash(git commit -m 'Update: Change VPS IP from 62.238.8.222 to 62.238.28.106 *)",
+      "Bash(Get-ChildItem -Recurse -Depth 2)",
+      "Bash(Select-Object FullName)",
+      "Bash(ping -c 3 62.238.28.106)",
+      "Bash(ssh -vvv -i \"C:\\\\Users\\\\ManhDS\\\\.ssh\\\\github_minigames\" root@62.238.28.106 \"echo OK\")"
     ]
   }
 }

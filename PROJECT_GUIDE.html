@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MinigGames Project Guide — Architecture & Logic</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f7fa;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    header h1 { font-size: 2.5em; margin-bottom: 10px; }
+    header p { font-size: 1.1em; opacity: 0.95; }
+
+    .toc {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      border-left: 4px solid #667eea;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .toc h2 { margin-bottom: 15px; color: #667eea; }
+    .toc ul { list-style: none; }
+    .toc li { margin: 8px 0; }
+    .toc a {
+      color: #667eea;
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .toc a:hover { background: #f0f4ff; color: #764ba2; }
+
+    section {
+      background: white;
+      padding: 30px;
+      margin-bottom: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    section h2 {
+      color: #667eea;
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 10px;
+    }
+    section h3 {
+      color: #764ba2;
+      font-size: 1.3em;
+      margin-top: 20px;
+      margin-bottom: 12px;
+    }
+
+    .info-box {
+      background: #f0f4ff;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 15px 0;
+      border-left: 4px solid #667eea;
+    }
+    .info-box strong { color: #667eea; }
+
+    .tech-stack {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .tech-item {
+      background: #f9fafb;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+    }
+    .tech-item h4 {
+      color: #764ba2;
+      margin-bottom: 8px;
+    }
+    .tech-item p { font-size: 0.95em; color: #666; }
+
+    .game-card {
+      background: #f9fafb;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 12px 0;
+      border-left: 4px solid #667eea;
+      display: flex;
+      gap: 15px;
+    }
+    .game-icon {
+      font-size: 2.5em;
+      flex-shrink: 0;
+    }
+    .game-info h4 { color: #333; margin-bottom: 5px; }
+    .game-info p { color: #666; font-size: 0.95em; line-height: 1.5; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      font-size: 0.95em;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th {
+      background: #f0f4ff;
+      color: #667eea;
+      font-weight: 600;
+    }
+    tr:hover { background: #f9fafb; }
+
+    .api-endpoint {
+      background: #f9fafb;
+      padding: 12px;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-family: 'Courier New', monospace;
+      border-left: 4px solid #667eea;
+    }
+    .api-endpoint strong { color: #667eea; }
+
+    .code-block {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 15px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      line-height: 1.5;
+    }
+
+    .folder-tree {
+      background: #f9fafb;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+      margin: 15px 0;
+      border-left: 4px solid #667eea;
+      overflow-x: auto;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    .badge-live { background: #d1fae5; color: #065f46; }
+    .badge-new { background: #fef3c7; color: #92400e; }
+    .badge-dev { background: #fed7aa; color: #9a3412; }
+    .badge-wip { background: #fed7aa; color: #9a3412; }
+
+    .flow-diagram {
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 6px;
+      margin: 15px 0;
+      border: 2px dashed #e5e7eb;
+      font-family: monospace;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+
+    .warning {
+      background: #fef2f2;
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 4px solid #dc2626;
+      margin: 15px 0;
+    }
+    .warning strong { color: #dc2626; }
+
+    .success {
+      background: #f0fdf4;
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 4px solid #16a34a;
+      margin: 15px 0;
+    }
+    .success strong { color: #16a34a; }
+
+    footer {
+      text-align: center;
+      color: #999;
+      margin-top: 40px;
+      padding: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <h1>🎮 MinigGames Project Guide</h1>
+      <p>Architecture, Features, Logic & Development Handbook</p>
+    </header>
+
+    <div class="toc">
+      <h2>📑 Mục lục nhanh</h2>
+      <ul>
+        <li><a href="#overview">1. Tổng quan dự án</a></li>
+        <li><a href="#tech-stack">2. Tech Stack & Dependencies</a></li>
+        <li><a href="#folder-structure">3. Cấu trúc folder</a></li>
+        <li><a href="#games-list">4. Game catalog (11 games)</a></li>
+        <li><a href="#architecture">5. Architecture diagram</a></li>
+        <li><a href="#api-endpoints">6. API Endpoints</a></li>
+        <li><a href="#database">7. Database Schema</a></li>
+        <li><a href="#features">8. Core Features</a></li>
+        <li><a href="#user-flow">9. User Flow</a></li>
+        <li><a href="#deployment">10. Deployment & VPS</a></li>
+        <li><a href="#dev-guide">11. Development Guide</a></li>
+      </ul>
+    </div>
+
+    <!-- 1. OVERVIEW -->
+    <section id="overview">
+      <h2>🎯 1. Tổng quan dự án</h2>
+
+      <div class="info-box">
+        <strong>MinigGames Hub v2.1.0</strong><br>
+        🌍 URL: <strong>minigames.allin1site.com</strong><br>
+        📦 Type: <strong>GenZ Web Game Factory</strong><br>
+        💾 Database: <strong>MySQL (leaderboard + analytics)</strong><br>
+        🐳 Hosting: <strong>Docker container trên VPS private (62.238.28.106:3333)</strong>
+      </div>
+
+      <h3>Mục đích & Tính năng chính</h3>
+      <ul style="margin-left: 20px; line-height: 1.8;">
+        <li>🎮 <strong>11 tựa game</strong> độc lập, không cần tải về, chơi trực tiếp trên browser</li>
+        <li>📈 <strong>30 cấp độ</strong> tiến triển cho mỗi game (dễ → khó)</li>
+        <li>🌐 <strong>Online leaderboard</strong> (Google OAuth2 optional)</li>
+        <li>📊 <strong>Player analytics</strong>: visitor, views, online count real-time</li>
+        <li>🔄 <strong>Daily Challenge & Streak system</strong> (client-side localStorage)</li>
+        <li>🌍 <strong>Multi-language</strong>: English, Tiếng Việt, 日本語</li>
+        <li>🌓 <strong>Dark/Light mode</strong></li>
+        <li>📱 <strong>Responsive design</strong>: phone, tablet, desktop</li>
+        <li>⚡ <strong>No ads (MVP)</strong> — pure gameplay</li>
+      </ul>
+
+      <h3>Tech highlights</h3>
+      <ul style="margin-left: 20px; line-height: 1.8;">
+        <li><strong>Node.js + Express</strong> (v4.21.2) — REST API server</li>
+        <li><strong>MySQL2</strong> (v3.11.5) — connection pooling, prepared statements</li>
+        <li><strong>Vanilla JS</strong> + IndexedDB — no framework overhead</li>
+        <li><strong>Google Identity Services</strong> — OAuth2 login</li>
+        <li><strong>Cloudflare</strong> — reverse proxy, caching, DDoS protection</li>
+        <li><strong>Docker</strong> — container orchestration on VPS</li>
+      </ul>
+    </section>
+
+    <!-- 2. TECH STACK -->
+    <section id="tech-stack">
+      <h2>⚙️ 2. Tech Stack & Dependencies</h2>
+
+      <div class="tech-stack">
+        <div class="tech-item">
+          <h4>🖥️ Backend</h4>
+          <p><strong>Node.js</strong> ≥ 20.0<br><strong>Express.js</strong> 4.21.2<br><strong>MySQL2/Promise</strong> 3.11.5</p>
+        </div>
+        <div class="tech-item">
+          <h4>🎨 Frontend</h4>
+          <p><strong>Vanilla JS</strong> (ES6 modules)<br><strong>HTML5 Canvas</strong> (game rendering)<br><strong>CSS3</strong> (animations, gradients)</p>
+        </div>
+        <div class="tech-item">
+          <h4>💾 Storage</h4>
+          <p><strong>IndexedDB</strong> (local game history)<br><strong>localStorage</strong> (settings, language)<br><strong>MySQL</strong> (leaderboard)</p>
+        </div>
+        <div class="tech-item">
+          <h4>🔐 Auth</h4>
+          <p><strong>Google OAuth2</strong> (optional)<br><strong>Guest mode</strong> (local user ID)<br><strong>JWT-style token</strong> (ID token verification)</p>
+        </div>
+      </div>
+
+      <h3>package.json</h3>
+      <div class="code-block">
+{
+  "name": "allin1site-minigames",
+  "version": "2.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mysql2": "^3.11.5"
+  }
+}
+      </div>
+    </section>
+
+    <!-- 3. FOLDER STRUCTURE -->
+    <section id="folder-structure">
+      <h2>📁 3. Cấu trúc Folder</h2>
+
+      <div class="folder-tree">
+minigames/
+├── server.js                    ← Express server entry point
+├── index.html                   ← Game Hub landing page
+├── game-platform.js             ← Shared game shell + overlay framework
+├── game-platform.css
+├── package.json
+├── deploy-safe.ps1            ← Deployment script (PowerShell)
+│
+├── api/
+│   ├── _db.js                  ← MySQL pool, game whitelist, utils
+│   ├── score.js                ← POST /api/score (record play result)
+│   ├── leaderboard.js          ← GET /api/leaderboard?game=xxx
+│   ├── user.js                 ← GET /api/user?id=xxx (profile)
+│   ├── stats.js                ← GET /api/stats?all=1 (aggregated)
+│   ├── track.js                ← POST /api/track (visitor tracking)
+│   └── heartbeat.js            ← POST /api/heartbeat (online ping)
+│
+├── games/
+│   ├── ballmerge/              ← 🎱 BallMerge (merge puzzle)
+│   │   ├── index.html
+│   │   ├── game.js
+│   │   └── [assets]
+│   ├── chromamatch/            ← 🎨 ChromaMatch (match-3)
+│   ├── stacktower/             ← 🏗️ StackTower (stacking)
+│   ├── memoryflip/             ← 🃏 MemoryFlip (memory card)
+│   ├── snakerush/              ← 🐍 SnakeRush (snake game)
+│   ├── bubbleblast/            ← 🫧 BubbleBlast (bubble shooter)
+│   ├── arkanoidx/              ← 🏓 ArkanoidX (breakout)
+│   ├── numberslide/            ← 🔢 NumberSlide (sliding puzzle)
+│   ├── Sodoku/                 ← 🔢 Sodoku (9×9 sudoku)
+│   ├── kaya/                   ← ⚫ Kaya/Caro (5-in-a-row + AI)
+│   ├── Penumbra/               ← 🌙 Penumbra (WIP — line tracing)
+│   └── [others]
+│
+├── state/
+│   ├── generated_games.json    ← Aggregated game metadata
+│   ├── fingerprints.json       ← (deprecated)
+│   └── seen_inspirations.json
+│
+├── engine/
+│   ├── audio.js                ← Sound effects (simple beep/pop)
+│   └── input.js                ← Touch/keyboard input handler
+│
+├── scripts/
+│   └── generate-games.js       ← Auto-generate game list from folders
+│
+└── .claude/
+    └── settings.local.json     ← Claude Code local config
+      </div>
+
+      <h3>Trọng tâm quan trọng</h3>
+      <ul style="margin-left: 20px;">
+        <li><strong>server.js</strong> — Single Node.js process, Express adapter, serves all static files + API routes</li>
+        <li><strong>game-platform.js</strong> — Shared shell framework (status bar, overlay system, i18n, Google login)</li>
+        <li><strong>api/_db.js</strong> — MySQL pool + game whitelist (prevents SQL injection)</li>
+        <li><strong>games/*/</strong> — Mỗi game là một folder độc lập với index.html + game.js</li>
+      </ul>
+    </section>
+
+    <!-- 4. GAMES LIST -->
+    <section id="games-list">
+      <h2>🎮 4. Game Catalog (11 Games)</h2>
+
+      <h3>Featured Games (3 NEW)</h3>
+      <div class="game-card">
+        <div class="game-icon">🔢</div>
+        <div class="game-info">
+          <h4>Sodoku — Classic 9×9 Sudoku</h4>
+          <p><strong>Status:</strong> <span class="status-badge badge-new">NEW</span></p>
+          <p><strong>Description:</strong> Classic Sudoku puzzle with 5 difficulty levels. Daily challenge, 2-player race mode coming soon.</p>
+          <p><strong>Stack:</strong> Vite + React/Tailwind CSS (modern build)</p>
+          <p><strong>Features:</strong> 5 difficulty, timer, hint system</p>
+        </div>
+      </div>
+
+      <div class="game-card">
+        <div class="game-icon">⚫</div>
+        <div class="game-info">
+          <h4>Kaya — Five-in-a-row (Gomoku)</h4>
+          <p><strong>Status:</strong> <span class="status-badge badge-live">LIVE</span></p>
+          <p><strong>Description:</strong> Turn-based Gomoku with 5-level AI opponent. Beat the bot, climb the leaderboard.</p>
+          <p><strong>Stack:</strong> Vanilla JS + Zobrist hashing, AI patterns, level-based difficulty</p>
+          <p><strong>Features:</strong> 5 AI levels, sound, persist game state</p>
+        </div>
+      </div>
+
+      <div class="game-card">
+        <div class="game-icon">🌙</div>
+        <div class="game-info">
+          <h4>Penumbra — Line Tracing Puzzle</h4>
+          <p><strong>Status:</strong> <span class="status-badge badge-dev">WIP</span></p>
+          <p><strong>Description:</strong> Meditative puzzle game — trace the line, find the light. UI mockups in progress.</p>
+          <p><strong>Features:</strong> Zen gameplay, progressive levels</p>
+        </div>
+      </div>
+
+      <h3>Live Games (8 Classic Arcade/Puzzle)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Game</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Levels</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🎱 BallMerge</td>
+            <td>Puzzle</td>
+            <td>Drop balls to merge into bigger ones. Chain combos.</td>
+            <td>30</td>
+            <td><span class="status-badge badge-live">LIVE</span></td>
+          </tr>
+          <tr>
+            <td>🎨 ChromaMatch</td>
+            <td>Match-3</td>
+            <td>Swap colorful tiles to match 3+ for combos.</td>
+            <td>30</td>
+            <td><span class="status-badge badge-live">LIVE</span></td>
+          </tr>
+          <tr>
+            <td>🏗️ StackTower</td>
+            <td>Arcade</td>
+            <td>Drop blocks to stack a tower. Land perfectly.</td>
+            <td>30</td>
+            <td><span class="status-badge badge-live">LIVE</span></td>
+          </tr>
+          <tr>
+            <td>🃏 MemoryFlip</td>
+            <td>Memory</td>
+            <td>Flip cards to match pairs. Combo multipliers.</td>
+            <td>30</td>
+            <td><span class="status-badge badge-live">LIVE</span></td>
+          </tr>
+          <tr>
+            <td>🐍 SnakeRush</td>
+            <td>Arcade</td>
+            <td>Classic snake + power-ups + countdown timer.</td>
+            <td>30</td>
+            <td><span class="status-badge badge-live">LIVE</span></td>
+          </tr>
+          <tr>
+            <td>🫧 BubbleBlast</td>
+            <td>Shooter</td>
+            <td>Aim & shoot hex bubbles. Bomb + rainbow specials.</td>
+            <td>30</td>
+            <td><span class="status-badge badge-live">LIVE</span></td>
+          </tr>
+          <tr>
+            <td>🏓 ArkanoidX</td>
+            <td>Breakout</td>
+            <td>Modern breakout — 30 levels, 5 power-ups.</td>
+            <td>30</td>
+            <td><span class="status-badge badge-live">LIVE</span></td>
+          </tr>
+          <tr>
+            <td>🔢 NumberSlide</td>
+            <td>Puzzle</td>
+            <td>Slide tiles into order. 3 sizes, fewest moves wins.</td>
+            <td>30</td>
+            <td><span class="status-badge badge-live">LIVE</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Upcoming / WIP (2)</h3>
+      <div class="game-card">
+        <div class="game-icon">♟️</div>
+        <div class="game-info">
+          <h4>象棋 (Xiangqi) — Chinese Chess</h4>
+          <p><strong>Status:</strong> <span class="status-badge badge-dev">UI Mockups</span></p>
+          <p>Chinese Chess with AI opponent. Gameplay coming soon.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. ARCHITECTURE -->
+    <section id="architecture">
+      <h2>🏗️ 5. Architecture Diagram</h2>
+
+      <h3>System flow</h3>
+      <div class="flow-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│  Browser / Client (Responsive Web)                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │ index.html (Game Hub)                                │   │
+│  │  • Game catalog + featured section                   │   │
+│  │  • Daily Challenge + Streak counter                  │   │
+│  │  • Language selector (EN/VI/JA)                      │   │
+│  │  • Theme toggle (Dark/Light)                         │   │
+│  │  • Stats display (visitors, plays, online)           │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                           ↓                                   │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │ game-platform.js (Shared Shell Framework)            │   │
+│  │  • Phone-style status bar (clock, signal, battery)   │   │
+│  │  • Top/bottom ad slots (30px each)                   │   │
+│  │  • Google OAuth2 login modal                         │   │
+│  │  • Game overlay system (pause, settings, how-to)     │   │
+│  │  • IndexedDB storage (history, top scores, profile)  │   │
+│  │  • Audio/input handler                               │   │
+│  │  • i18n provider (auto-detect language)              │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                           ↓                                   │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │ Individual Game (Canvas/WebGL)                       │   │
+│  │  • game.js: game logic, physics, rendering           │   │
+│  │  • 30 levels: progressive difficulty                 │   │
+│  │  • Scoring system + combo multipliers                │   │
+│  │  • Level completion detection                        │   │
+│  │  • Optional AI (Kaya, Sudoku, etc)                   │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                           ↓                                   │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │ localStorage + IndexedDB (Client-side Cache)         │   │
+│  │  • gp_lang: language preference                      │   │
+│  │  • gp_theme: dark/light mode                         │   │
+│  │  • gp_user: guest profile (guest_xxxx)              │   │
+│  │  • game_<gameId>: level history                      │   │
+│  │  • streak_count, daily_played: daily challenge       │   │
+│  └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                           ↓ HTTP/CORS
+┌─────────────────────────────────────────────────────────────┐
+│  Express.js Server (Node.js)                                │
+│  Port: 3333 (internal VPS) → Cloudflare proxy              │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  POST /api/score              ← Record play result          │
+│  GET  /api/leaderboard        ← Fetch top 20 players       │
+│  GET  /api/user?id=xxx        ← Fetch user profile         │
+│  GET  /api/stats?all=1        ← Real-time game stats       │
+│  POST /api/track              ← Visitor tracking            │
+│  POST /api/heartbeat          ← Online presence ping        │
+│  GET  /healthz                ← Health check                │
+│  (Static files serving with cache headers)                  │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+                           ↓ MySQL connection pool
+┌─────────────────────────────────────────────────────────────┐
+│  MySQL Database                                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  • users: user_id, name, email, type (google|guest)        │
+│  • scores_<gameId>: game-specific play results             │
+│  • sessions: online tracking (user_id, expires_at)         │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+      </div>
+
+      <h3>Request → Response Flow</h3>
+      <div class="flow-diagram">
+User clicks "Play Game"
+  ↓
+game-platform.js loads individual game (games/gameId/)
+  ↓
+Canvas/game rendering begins (or WebGL)
+  ↓
+User plays levels 1–30, completes level N
+  ↓
+Game calls: GamePlatform.recordResult({
+  game: 'ballmerge',
+  userId: 'guest_abc123' or 'google_xyz',
+  score: 15000,
+  level: 5,
+  mode: 'normal'
+})
+  ↓
+POST /api/score (with body)
+  ↓
+Express processes: validates game ID, inserts into scores_ballmerge, upserts users table
+  ↓
+Response: { ok: true } or { error: 'db_error' }
+  ↓
+game-platform.js updates local leaderboard if offline mode or caches result
+  ↓
+Next level auto-loads OR user returns to hub
+      </div>
+    </section>
+
+    <!-- 6. API ENDPOINTS -->
+    <section id="api-endpoints">
+      <h2>🔌 6. API Endpoints</h2>
+
+      <h3>1. POST /api/score — Record play result</h3>
+      <div class="api-endpoint">
+        <strong>POST</strong> /api/score
+      </div>
+      <p><strong>Body:</strong></p>
+      <div class="code-block">
+{
+  "game": "ballmerge",              // ✓ required, must be in whitelist
+  "userId": "guest_abc123",         // ✓ required
+  "name": "Player Name",            // ✓ required (max 30 chars)
+  "email": "player@example.com",    // optional
+  "score": 15000,                   // ✓ required, clamped [0, 9999999]
+  "level": 5,                       // ✓ required, clamped [0, 99]
+  "mode": "normal",                 // ✓ required, "normal" or "adventure"
+  "extra": "bonus_item_collected"   // optional, game-specific metadata (max 200 chars)
+}
+      </div>
+      <p><strong>Response (200):</strong> <code>{ "ok": true }</code></p>
+      <p><strong>Error (400/401/500):</strong> <code>{ "error": "invalid_game"|"invalid_user"|"invalid_token"|"db_error" }</code></p>
+      <p><strong>Security:</strong> Google token verification (optional) — if token sent, must match userId prefix.</p>
+
+      <h3>2. GET /api/leaderboard — Fetch top 20 players</h3>
+      <div class="api-endpoint">
+        <strong>GET</strong> /api/leaderboard?game=ballmerge&period=all
+      </div>
+      <p><strong>Query params:</strong></p>
+      <ul style="margin-left: 20px;">
+        <li><code>game=ballmerge</code> ✓ required, must be in whitelist</li>
+        <li><code>period=all|week</code> optional, default "all"</li>
+      </ul>
+      <p><strong>Response (200):</strong></p>
+      <div class="code-block">
+{
+  "period": "all",
+  "rows": [
+    {
+      "user_id": "google_12345",
+      "name": "Top Player",
+      "best_score": 999999,
+      "best_level": 30,
+      "last_play": "2026-05-17T10:30:00Z"
+    },
+    ...
+  ]
+}
+      </div>
+      <p><strong>Cache:** 30s (public, both client & server)</p>
+
+      <h3>3. GET /api/user — Fetch user profile</h3>
+      <div class="api-endpoint">
+        <strong>GET</strong> /api/user?id=guest_abc123
+      </div>
+      <p><strong>Response (200):</strong></p>
+      <div class="code-block">
+{
+  "user_id": "guest_abc123",
+  "name": "Player Name",
+  "email": "player@example.com",
+  "type": "guest",
+  "created_at": "2026-05-10T08:00:00Z",
+  "last_seen": "2026-05-17T10:30:00Z"
+}
+      </div>
+
+      <h3>4. GET /api/stats — Real-time aggregated stats</h3>
+      <div class="api-endpoint">
+        <strong>GET</strong> /api/stats?all=1
+      </div>
+      <p><strong>Response (200):</strong></p>
+      <div class="code-block">
+{
+  "totalVisitors": 12500,
+  "totalPageviews": 45000,
+  "games": [
+    {
+      "game": "ballmerge",
+      "players": 2300,
+      "online": 45,
+      "plays": 8200,
+      "visitors": 3100,
+      "views": 12500
+    },
+    ...
+  ]
+}
+      </div>
+      <p><strong>Note:</strong> Calculated from MySQL aggregates. Refreshed on index.html load.</p>
+
+      <h3>5. POST /api/track — Visitor tracking</h3>
+      <div class="api-endpoint">
+        <strong>POST</strong> /api/track
+      </div>
+      <p><strong>Body:</strong></p>
+      <div class="code-block">
+{
+  "type": "session" | "pageview",   // session = new visitor, pageview = click
+  "sid": "uuid-from-sessionStorage" // unique session ID
+}
+      </div>
+
+      <h3>6. POST /api/heartbeat — Online presence ping</h3>
+      <div class="api-endpoint">
+        <strong>POST</strong> /api/heartbeat
+      </div>
+      <p><strong>Body:</strong></p>
+      <div class="code-block">
+{
+  "userId": "guest_abc123",
+  "game": "ballmerge"  // optional, current game
+}
+      </div>
+      <p><strong>Function:</strong> Updates sessions table, marks user online for 30s.</p>
+
+      <h3>7. GET /healthz — Health check</h3>
+      <div class="api-endpoint">
+        <strong>GET</strong> /healthz
+      </div>
+      <p><strong>Response:</strong> <code>{ "ok": true, "ts": 1234567890 }</code><br>
+      <strong>Use case:</strong> Docker health probe, load balancer check.</p>
+    </section>
+
+    <!-- 7. DATABASE -->
+    <section id="database">
+      <h2>💾 7. Database Schema</h2>
+
+      <h3>Tables structure</h3>
+      <div class="code-block">
+-- Users (cross-game profile)
+CREATE TABLE users (
+  user_id VARCHAR(64) PRIMARY KEY,     -- guest_xxx or google_sub
+  name VARCHAR(30),
+  email VARCHAR(120),
+  type ENUM('guest', 'google'),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  last_seen TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Game-specific scores (one table per game)
+CREATE TABLE scores_ballmerge (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(64) NOT NULL,
+  name VARCHAR(30),
+  email VARCHAR(120),
+  score INT DEFAULT 0,              -- clamped [0, 9999999]
+  level INT DEFAULT 0,              -- [0, 99]
+  mode ENUM('normal', 'adventure'),
+  extra VARCHAR(200),               -- game-specific metadata
+  played_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_user_game (user_id, played_at),
+  INDEX idx_score (score DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- (similar for: chromamatch, stacktower, memoryflip, snakerush,
+--               bubbleblast, arkanoidx, numberslide)
+
+-- Session tracking (for online count)
+CREATE TABLE sessions (
+  session_id VARCHAR(64) PRIMARY KEY,
+  user_id VARCHAR(64),
+  game VARCHAR(32),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP,
+  INDEX idx_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+      </div>
+
+      <h3>SQL Injection Prevention</h3>
+      <div class="info-box">
+        <strong>Whitelist approach (in _db.js):</strong>
+        <pre style="background: white; padding: 10px; margin-top: 10px; border-radius: 4px; overflow-x: auto;">
+const GAMES = new Set(['ballmerge', 'chromamatch', ...]);
+function tableFor(gameId) {
+  if (!GAMES.has(gameId)) throw new Error('Invalid game');
+  return '`scores_' + gameId.replace(/[^a-z0-9_]/g, '') + '`';
+}
+        </pre>
+      </div>
+
+      <h3>Connection pooling (MySQL2)</h3>
+      <ul style="margin-left: 20px;">
+        <li>Pool size: <strong>5 connections</strong> (suitable for single-instance)</li>
+        <li>Keep-alive: <strong>10s initial delay</strong></li>
+        <li>Prepared statements: ✅ <strong>All queries use ?</strong> placeholders</li>
+        <li>SSL: <strong>Optional</strong> (controlled via MYSQL_SSL env var)</li>
+      </ul>
+    </section>
+
+    <!-- 8. FEATURES -->
+    <section id="features">
+      <h2>⭐ 8. Core Features</h2>
+
+      <h3>🎮 Game Platform</h3>
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>Implementation</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>30 Levels per game</strong></td>
+            <td>game.js defines level config, difficulty ramp</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Scoring system</strong></td>
+            <td>Game calculates score, combo multiplier</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Level progression</strong></td>
+            <td>Auto-unlock next level on complete</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Pause & Resume</strong></td>
+            <td>game-platform.js overlay</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Sound effects</strong></td>
+            <td>engine/audio.js (Web Audio API)</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Touch & Keyboard</strong></td>
+            <td>engine/input.js normalizes events</td>
+            <td>✅ LIVE</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>👤 User & Authentication</h3>
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>Implementation</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Guest mode</strong></td>
+            <td>Auto-generate guest_uuid on first visit</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Google OAuth2</strong></td>
+            <td>Google Identity Services SDK (optional)</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>User profile</strong></td>
+            <td>name, email, type (guest|google)</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Token verification</strong></td>
+            <td>POST /api/score validates Google ID token</td>
+            <td>✅ LIVE</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>📊 Leaderboard & Analytics</h3>
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>Implementation</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Global leaderboard</strong></td>
+            <td>Top 20 all-time per game</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Weekly leaderboard</strong></td>
+            <td>Query: last 7 days plays</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Real-time player count</strong></td>
+            <td>sessions table, /api/stats aggregates</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Per-game stats</strong></td>
+            <td>players, online, plays, visitors, views</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Site-wide stats</strong></td>
+            <td>Total visitors, total pageviews</td>
+            <td>✅ LIVE</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>⏰ Daily Challenge & Streak</h3>
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>Implementation</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Daily Challenge</strong></td>
+            <td>Deterministic hash(today) → pick game</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Streak counter</strong></td>
+            <td>localStorage: gp_streak_count, gp_last_streak_day</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Reset logic</strong></td>
+            <td>Reset if gap > 1 day</td>
+            <td>✅ LIVE</td>
+          </tr>
+          <tr>
+            <td><strong>Played today check</strong></td>
+            <td>localStorage: gp_daily_played (date)</td>
+            <td>✅ LIVE</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>🌍 Internationalization (i18n)</h3>
+      <ul style="margin-left: 20px;">
+        <li><strong>Languages:</strong> English, Tiếng Việt, 日本語</li>
+        <li><strong>Detection:</strong> URL param ?lang=vi → localStorage → browser navigator.language</li>
+        <li><strong>Storage:</strong> gp_lang in localStorage</li>
+        <li><strong>Fallback:</strong> English</li>
+      </ul>
+
+      <h3>🌓 Dark/Light Mode</h3>
+      <ul style="margin-left: 20px;">
+        <li><strong>Implementation:</strong> CSS variables, data-theme attribute</li>
+        <li><strong>Default:</strong> Auto (respects prefers-color-scheme media query)</li>
+        <li><strong>Modes:</strong> auto / dark / light</li>
+        <li><strong>Storage:</strong> gp_theme in localStorage</li>
+      </ul>
+
+      <h3>📱 Responsive Design</h3>
+      <ul style="margin-left: 20px;">
+        <li><strong>Mobile:</strong> ≤520px — 2-column grid, adjusted spacing</li>
+        <li><strong>Tablet:</strong> 520px–1200px — responsive grid</li>
+        <li><strong>Desktop:</strong> 1200px+ — full-width layout</li>
+        <li><strong>Viewport:</strong> initial-scale=1.0, viewport-fit=cover</li>
+      </ul>
+    </section>
+
+    <!-- 9. USER FLOW -->
+    <section id="user-flow">
+      <h2>👥 9. User Flow</h2>
+
+      <h3>New User Journey</h3>
+      <div class="flow-diagram">
+1. User visits minigames.allin1site.com
+   ↓
+2. Browser auto-detects language (or shows selector)
+   ↓
+3. index.html loads:
+   • Game Hub with 11 game cards
+   • Daily Challenge section
+   • Streak counter (initially 0)
+   • Site-wide stats fetched from /api/stats
+   ↓
+4. User clicks game card (e.g., BallMerge)
+   ↓
+5. game-platform.js initializes:
+   • Auto-generate guest_uuid → localStorage
+   • Create session in IndexedDB
+   • Render status bar, overlay system
+   • Initialize game-specific code
+   ↓
+6. Game loads (games/ballmerge/index.html):
+   • Load canvas/rendering engine
+   • Display Level 1 intro
+   ↓
+7. User plays Level 1 → completes
+   ↓
+8. Game calls: GamePlatform.recordResult({
+     game: 'ballmerge', userId: 'guest_xxx',
+     score: 5000, level: 1, mode: 'normal'
+   })
+   ↓
+9. POST /api/score → MySQL:
+   • Insert into scores_ballmerge
+   • Upsert users table
+   • Response: { ok: true }
+   ↓
+10. Level 2 auto-unlocked, or:
+    • User reviews stats (score, best level)
+    • User pauses & returns to hub
+    • Streak counter bumps +1
+      </div>
+
+      <h3>Returning User (Signed In)</h3>
+      <div class="flow-diagram">
+1. User returns to hub
+2. Click on hub header → login modal appears
+3. "Sign in with Google" button
+4. Google Identity Services flow
+5. Verify token in POST /api/score
+6. User ID changes from guest_xxx → google_123456
+7. Leaderboard shows google user name
+8. Best scores saved under google account
+      </div>
+
+      <h3>Leaderboard Access</h3>
+      <div class="flow-diagram">
+1. User clicks "🌐 Online" in game overlay
+2. Modal fetches GET /api/leaderboard?game=ballmerge&period=all
+3. Displays top 20 players (all-time)
+4. Alternative tab: "This Week" (period=week)
+5. Shows: name, best_score, best_level, last_play
+      </div>
+    </section>
+
+    <!-- 10. DEPLOYMENT -->
+    <section id="deployment">
+      <h2>🚀 10. Deployment & VPS</h2>
+
+      <h3>Current Setup</h3>
+      <div class="info-box">
+        <strong>VPS Host:</strong> 62.238.28.106:3333<br>
+        <strong>Domain:</strong> minigames.allin1site.com (via Cloudflare)<br>
+        <strong>Container:</strong> Docker (Node.js 20 + Express + MySQL2)<br>
+        <strong>Database:</strong> Hosted on same VPS or remote<br>
+        <strong>SSH Key:</strong> ~/.ssh/github_minigames (for GitHub clone)
+      </div>
+
+      <h3>Deploy Script (PowerShell)</h3>
+      <div class="code-block">
+# deploy-safe.ps1 — Multi-service safe deploy
+
+.\deploy-safe.ps1 -CloneIfMissing -UploadEnv
+
+# What it does:
+1. SSH into VPS (62.238.28.106)
+2. Clone repo (if missing) or pull latest
+3. Upload .env (DATABASE_URL, CORS_ORIGIN, etc)
+4. Restart Docker container
+5. Verify health check (/healthz)
+6. Prune old images/containers safely
+      </div>
+
+      <h3>Environment Variables (`.env`)</h3>
+      <table>
+        <thead>
+          <tr><th>Variable</th><th>Example</th><th>Required</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>DATABASE_URL</code></td>
+            <td><code>mysql://user:pass@localhost/minigames</code></td>
+            <td>✅ YES</td>
+          </tr>
+          <tr>
+            <td><code>CORS_ORIGIN</code></td>
+            <td><code>https://minigames.allin1site.com</code></td>
+            <td>Optional (default: *)</td>
+          </tr>
+          <tr>
+            <td><code>GOOGLE_CLIENT_ID</code></td>
+            <td><code>xxx.apps.googleusercontent.com</code></td>
+            <td>Optional (for token verification)</td>
+          </tr>
+          <tr>
+            <td><code>PORT</code></td>
+            <td><code>3333</code></td>
+            <td>Optional (default: 3333)</td>
+          </tr>
+          <tr>
+            <td><code>MYSQL_SSL</code></td>
+            <td><code>true</code></td>
+            <td>Optional (default: false)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Docker Command</h3>
+      <div class="code-block">
+docker run -d \
+  --name minigames \
+  -p 3333:3333 \
+  -e DATABASE_URL="mysql://..." \
+  -e CORS_ORIGIN="https://minigames.allin1site.com" \
+  node:20-alpine \
+  sh -c "cd /app && npm install && npm start"
+      </div>
+
+      <h3>Health Check</h3>
+      <div class="info-box">
+        <strong>Endpoint:</strong> GET /healthz<br>
+        <strong>Response:</strong> <code>{ "ok": true, "ts": 1234567890 }</code><br>
+        <strong>Use:</strong> Docker health probe, load balancer checks
+      </div>
+
+      <h3>Cloudflare Setup</h3>
+      <ul style="margin-left: 20px;">
+        <li><strong>Reverse proxy:</strong> minigames.allin1site.com → 62.238.28.106:3333</li>
+        <li><strong>Cache rules:</strong> Static files (JS/CSS/images) 1h, HTML 5m</li>
+        <li><strong>Security:</strong> Rate limiting, DDoS protection, WAF enabled</li>
+        <li><strong>SSL:</strong> Full (end-to-end encryption)</li>
+      </ul>
+
+      <div class="success">
+        <strong>✅ Deployment checklist:</strong><br>
+        1. SSH key added to GitHub Deploy Keys<br>
+        2. VPS SSH configured for git clone<br>
+        3. DATABASE_URL set in .env<br>
+        4. Docker container running & healthy<br>
+        5. Cloudflare DNS pointing to VPS<br>
+        6. Test: curl https://minigames.allin1site.com/healthz
+      </div>
+    </section>
+
+    <!-- 11. DEVELOPMENT -->
+    <section id="dev-guide">
+      <h2>👨‍💻 11. Development Guide</h2>
+
+      <h3>Local Setup</h3>
+      <div class="code-block">
+# 1. Clone & install
+git clone https://github.com/manhdauvn09-manhds/minigames.git
+cd minigames
+npm install
+
+# 2. Create .env (local MySQL or test DB)
+echo "DATABASE_URL=mysql://user:pass@localhost/minigames_dev" > .env
+
+# 3. Run dev server (auto-reload)
+npm run dev
+
+# 4. Open browser
+# http://localhost:3333
+      </div>
+
+      <h3>Game Development Workflow</h3>
+      <div class="code-block">
+Step 1: Create new game folder
+  mkdir games/mynewgame
+
+Step 2: Create index.html (use existing game as template)
+  games/mynewgame/index.html
+
+Step 3: Create game.js (game logic)
+  • Define 30 levels: levels = [{...}, {...}, ...]
+  • Implement: init(), update(dt), render(), onLevelComplete()
+  • Call: GamePlatform.recordResult(result) on level complete
+
+Step 4: Add to game whitelist
+  api/_db.js: GAMES.add('mynewgame')
+
+Step 5: Update index.html game list
+  games[] array in index.html
+
+Step 6: Test locally
+  npm run dev → http://localhost:3333 → click game
+      </div>
+
+      <h3>Game API (GamePlatform)</h3>
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Usage</th><th>Example</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>GamePlatform.init(config)</strong></td>
+            <td>Initialize game platform</td>
+            <td><code>GamePlatform.init({ gameId: 'ballmerge' })</code></td>
+          </tr>
+          <tr>
+            <td><strong>GamePlatform.recordResult(result)</strong></td>
+            <td>Save score + level</td>
+            <td><code>GamePlatform.recordResult({ score: 5000, level: 1 })</code></td>
+          </tr>
+          <tr>
+            <td><strong>GamePlatform.pause()</strong></td>
+            <td>Show pause overlay</td>
+            <td><code>GamePlatform.pause()</code></td>
+          </tr>
+          <tr>
+            <td><strong>GamePlatform.resume()</strong></td>
+            <td>Hide pause overlay, resume game</td>
+            <td><code>GamePlatform.resume()</code></td>
+          </tr>
+          <tr>
+            <td><strong>GamePlatform.playSound(type)</strong></td>
+            <td>Play sound effect</td>
+            <td><code>GamePlatform.playSound('pop')</code></td>
+          </tr>
+          <tr>
+            <td><strong>GamePlatform.showHome()</strong></td>
+            <td>Return to hub</td>
+            <td><code>GamePlatform.showHome()</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Level Design Template</h3>
+      <div class="code-block">
+const levels = [
+  {
+    id: 1,
+    difficulty: 1,        // 1-30, difficulty increases
+    targetScore: 1000,
+    timeLimit: 60,        // seconds (optional)
+    initialState: {
+      boardWidth: 4,
+      boardHeight: 6,
+      startingBalls: 3
+    },
+    description: "Get familiar with controls"
+  },
+  {
+    id: 2,
+    difficulty: 2,
+    targetScore: 2000,
+    timeLimit: 55,
+    initialState: { ... }
+  },
+  // ... up to level 30
+];
+      </div>
+
+      <h3>Common Patterns</h3>
+
+      <h4>🎮 Canvas Rendering Loop</h4>
+      <div class="code-block">
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let lastTime = 0;
+
+function gameLoop(currentTime) {
+  const dt = (currentTime - lastTime) / 1000;
+  lastTime = currentTime;
+
+  // Update game state
+  updateGame(dt);
+
+  // Clear & render
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  renderGame(ctx);
+
+  // Loop
+  requestAnimationFrame(gameLoop);
+}
+
+requestAnimationFrame(gameLoop);
+      </div>
+
+      <h4>📤 Send Score to Server</h4>
+      <div class="code-block">
+async function submitScore(score, level) {
+  try {
+    const res = await fetch('/api/score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        game: 'ballmerge',
+        userId: getUserId(),       // from GamePlatform
+        name: getName(),           // from local storage
+        score: score,
+        level: level,
+        mode: 'normal',
+        extra: null
+      })
+    });
+
+    if (res.ok) {
+      console.log('Score saved!');
+      // Proceed to next level or show leaderboard
+    } else {
+      console.error('Score save failed');
+      // Fall back to local storage
+    }
+  } catch (e) {
+    console.error('Network error:', e);
+    // Offline mode — queue for later
+  }
+}
+      </div>
+
+      <h4>💾 Store User Profile Locally</h4>
+      <div class="code-block">
+// Guest mode auto-generated UUID
+function getOrCreateUserId() {
+  let userId = localStorage.getItem('gp_user_id');
+  if (!userId) {
+    userId = 'guest_' + generateUUID();
+    localStorage.setItem('gp_user_id', userId);
+  }
+  return userId;
+}
+
+// Save player name
+function saveName(name) {
+  localStorage.setItem('gp_player_name', name.slice(0, 30));
+}
+
+function getName() {
+  return localStorage.getItem('gp_player_name') || 'Guest Player';
+}
+      </div>
+
+      <h3>Testing Checklist</h3>
+      <div class="info-box">
+        <strong>Before each deploy:</strong><br><br>
+        ✅ Game mechanics tested (all 30 levels playable)<br>
+        ✅ Score submission works (POST /api/score succeeds)<br>
+        ✅ Leaderboard loads (GET /api/leaderboard returns top 20)<br>
+        ✅ Guest mode works (no Google login required)<br>
+        ✅ Pause/resume works<br>
+        ✅ Sound plays (or gracefully fails)<br>
+        ✅ i18n works (EN/VI/JA selectable)<br>
+        ✅ Dark/light theme toggles<br>
+        ✅ Mobile responsive (test on phone)<br>
+        ✅ Database health: <code>npm run test:db</code>
+      </div>
+
+      <h3>Debugging Tips</h3>
+      <ul style="margin-left: 20px;">
+        <li><strong>Console logs:</strong> Browser DevTools → Console</li>
+        <li><strong>Network requests:</strong> DevTools → Network tab, filter by /api/</li>
+        <li><strong>Local storage:</strong> DevTools → Application → Local Storage</li>
+        <li><strong>Database:</strong> SSH into VPS, connect to MySQL: <code>mysql -u user -p minigames</code></li>
+        <li><strong>Server logs:</strong> <code>docker logs minigames</code></li>
+      </ul>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <p>📚 <strong>MinigGames Project Guide v2.1.0</strong></p>
+      <p>Last updated: 2026-05-17 | For internal developer reference</p>
+      <p style="margin-top: 20px; color: #aaa;">
+        Generated for: Claude Code | Maintained by: ManhDS
+      </p>
+    </footer>
+
+  </div>
+</body>
+</html>
