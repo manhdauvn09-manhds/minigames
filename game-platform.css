@@ -6,67 +6,68 @@
    ─────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  color-scheme: light dark;
-  /* Dark mode v3 — WCAG AA contrast tested */
-  --gp-bg-primary: #0f172a;       /* slate-900 */
-  --gp-bg-secondary: #1e293b;     /* slate-800 */
-  --gp-bg-tertiary: #334155;      /* slate-700 */
-  --gp-bg-elevated: #1e293b;      /* card surface */
-  --gp-text-primary: #f8fafc;     /* slate-50, contrast 17:1 on primary */
-  --gp-text-secondary: #cbd5e1;   /* slate-300, contrast 9:1 (was 94a3b8 = 5:1) */
-  --gp-text-muted: #94a3b8;       /* slate-400 for least-important */
-  --gp-border: rgba(255,255,255,.12);
-  --gp-border-strong: rgba(255,255,255,.20);
-  --gp-accent: #818cf8;           /* indigo-400 */
-  --gp-accent-hover: #a5b4fc;
-  --gp-accent-strong: #6366f1;    /* indigo-500 for buttons */
-  --gp-success: #4ade80;          /* green-400 */
-  --gp-warning: #fbbf24;          /* amber-400 */
-  --gp-danger: #f87171;           /* red-400 */
-  --gp-stage-bg: linear-gradient(135deg,#1e293b 0%, #0f172a 50%, #1e1b4b 100%);
-  --gp-shadow: 0 10px 30px rgba(0,0,0,.4);
+  color-scheme: dark;
+  /* Dark mode — high contrast */
+  --gp-bg-primary: #09090f;
+  --gp-bg-secondary: #13131f;
+  --gp-bg-tertiary: #1e1e30;
+  --gp-bg-elevated: #1a1a2a;
+  --gp-text-primary: #f0f0ff;
+  --gp-text-secondary: #c8c8e8;
+  --gp-text-muted: #8888aa;
+  --gp-border: rgba(255,255,255,.18);
+  --gp-border-strong: rgba(255,255,255,.30);
+  --gp-accent: #a78bfa;
+  --gp-accent-hover: #c4b5fd;
+  --gp-accent-strong: #7c3aed;
+  --gp-success: #34d399;
+  --gp-warning: #fbbf24;
+  --gp-danger: #f87171;
+  --gp-stage-bg: #09090f;
+  --gp-shadow: 0 10px 30px rgba(0,0,0,.6);
 }
 
 [data-theme="light"] {
-  /* Light mode v3 — WCAG AA contrast tested */
-  --gp-bg-primary: #ffffff;
-  --gp-bg-secondary: #f8fafc;     /* slate-50 */
-  --gp-bg-tertiary: #e2e8f0;      /* slate-200 */
+  /* Light mode — strong contrast */
+  --gp-bg-primary: #f0f0f5;
+  --gp-bg-secondary: #ffffff;
+  --gp-bg-tertiary: #e0e0ea;
   --gp-bg-elevated: #ffffff;
-  --gp-text-primary: #0f172a;     /* slate-900, contrast 18:1 on primary */
-  --gp-text-secondary: #475569;   /* slate-600, contrast 8:1 (was 6b7280 = 5:1) */
-  --gp-text-muted: #64748b;       /* slate-500 */
-  --gp-border: rgba(15,23,42,.10);
-  --gp-border-strong: rgba(15,23,42,.18);
-  --gp-accent: #4f46e5;           /* indigo-600 */
-  --gp-accent-hover: #4338ca;
-  --gp-accent-strong: #4338ca;
-  --gp-success: #16a34a;
+  --gp-text-primary: #0a0a14;
+  --gp-text-secondary: #1e1e3a;
+  --gp-text-muted: #44445a;
+  --gp-border: rgba(0,0,0,.18);
+  --gp-border-strong: rgba(0,0,0,.30);
+  --gp-accent: #5b21b6;
+  --gp-accent-hover: #4c1d95;
+  --gp-accent-strong: #4c1d95;
+  --gp-success: #059669;
   --gp-warning: #d97706;
   --gp-danger: #dc2626;
-  --gp-stage-bg: linear-gradient(135deg,#dbeafe 0%, #e0e7ff 50%, #fce7f3 100%);
-  --gp-shadow: 0 10px 30px rgba(15,23,42,.10);
+  --gp-stage-bg: #e8e8f0;
+  --gp-shadow: 0 10px 30px rgba(0,0,0,.15);
 }
 
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {
-    --gp-bg-primary: #ffffff;
-    --gp-bg-secondary: #f8fafc;
-    --gp-bg-tertiary: #e2e8f0;
+    color-scheme: light;
+    --gp-bg-primary: #f0f0f5;
+    --gp-bg-secondary: #ffffff;
+    --gp-bg-tertiary: #e0e0ea;
     --gp-bg-elevated: #ffffff;
-    --gp-text-primary: #0f172a;
-    --gp-text-secondary: #475569;
-    --gp-text-muted: #64748b;
-    --gp-border: rgba(15,23,42,.10);
-    --gp-border-strong: rgba(15,23,42,.18);
-    --gp-accent: #4f46e5;
-    --gp-accent-hover: #4338ca;
-    --gp-accent-strong: #4338ca;
-    --gp-success: #16a34a;
+    --gp-text-primary: #0a0a14;
+    --gp-text-secondary: #1e1e3a;
+    --gp-text-muted: #44445a;
+    --gp-border: rgba(0,0,0,.18);
+    --gp-border-strong: rgba(0,0,0,.30);
+    --gp-accent: #5b21b6;
+    --gp-accent-hover: #4c1d95;
+    --gp-accent-strong: #4c1d95;
+    --gp-success: #059669;
     --gp-warning: #d97706;
     --gp-danger: #dc2626;
-    --gp-stage-bg: linear-gradient(135deg,#dbeafe 0%, #e0e7ff 50%, #fce7f3 100%);
-    --gp-shadow: 0 10px 30px rgba(15,23,42,.10);
+    --gp-stage-bg: #e8e8f0;
+    --gp-shadow: 0 10px 30px rgba(0,0,0,.15);
   }
 }
 
