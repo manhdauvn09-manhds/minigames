@@ -48,28 +48,7 @@
   --gp-shadow: 0 10px 30px rgba(0,0,0,.15);
 }
 
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme]) {
-    color-scheme: light;
-    --gp-bg-primary: #f0f0f5;
-    --gp-bg-secondary: #ffffff;
-    --gp-bg-tertiary: #e0e0ea;
-    --gp-bg-elevated: #ffffff;
-    --gp-text-primary: #0a0a14;
-    --gp-text-secondary: #1e1e3a;
-    --gp-text-muted: #44445a;
-    --gp-border: rgba(0,0,0,.18);
-    --gp-border-strong: rgba(0,0,0,.30);
-    --gp-accent: #5b21b6;
-    --gp-accent-hover: #4c1d95;
-    --gp-accent-strong: #4c1d95;
-    --gp-success: #059669;
-    --gp-warning: #d97706;
-    --gp-danger: #dc2626;
-    --gp-stage-bg: #e8e8f0;
-    --gp-shadow: 0 10px 30px rgba(0,0,0,.15);
-  }
-}
+/* Game shell is always dark — light mode only via explicit data-theme="light" toggle */
 
 html, body {
   height: 100%;
