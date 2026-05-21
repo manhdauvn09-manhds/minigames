@@ -32,7 +32,7 @@ param(
   [string]$VpsHost   = "62.238.28.106",
   [string]$VpsUser   = "root",
   [string]$RepoDir   = "~/minigames",
-  [string]$RepoUrl   = "https://github.com/manhdauvn09-manhds/minigames.git",
+  [string]$RepoUrl   = "git@github-minigames:manhdauvn09-manhds/minigames.git",
   [string]$SshKey    = "",
 
   # Container expectations
