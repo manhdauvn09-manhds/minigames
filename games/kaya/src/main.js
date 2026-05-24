@@ -518,7 +518,16 @@ async function triggerBot() {
     const pick = await pickMove(level, board.cells, board.size, botColor, aiClient);
     if (myEpoch !== botEpoch) return;
     if (!pick) return;
-    const move = board.place(pick.r, pick.c);
+    let move = board.place(pick.r, pick.c);
+    if (!move) {
+      // AI returned coordinates that are already occupied or out-of-bounds.
+      // This leaves board.turn === botColor with botPending about to be reset,
+      // causing a permanent stuck state where neither side can move.
+      // Use a level-3 sync pick as emergency fallback to keep the game alive.
+      console.warn('[kaya] bot pick was rejected by board – trying fallback', pick);
+      const emergency = pickMoveSync(3, board.cells, board.size, botColor);
+      if (emergency) move = board.place(emergency.r, emergency.c);
+    }
     if (move) onMove(move);
   } catch (err) {
     const msg = String(err?.message || err);

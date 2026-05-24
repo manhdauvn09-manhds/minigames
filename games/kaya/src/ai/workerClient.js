@@ -52,8 +52,13 @@ export class AIWorkerClient {
     if (!this._fallback) {
       this._fallback = await import('./index.js');
     }
+    // Levels 4-5 are designed for the Web Worker (300-2500 ms compute time).
+    // Running them synchronously on the main thread blocks all user input for
+    // that duration — the user perceives it as "JavaScript blocking movement."
+    // Cap to level 3 (≤ 200 ms) so the main thread stays responsive.
+    const safeLevel = Math.min(level, 3);
     const t0 = performance.now();
-    const pick = await this._fallback.pickMoveSync(level, cells, size, botColor, budgetMs);
+    const pick = this._fallback.pickMoveSync(safeLevel, cells, size, botColor, budgetMs);
     return { ...pick, elapsedMs: Math.round(performance.now() - t0), level };
   }
 
