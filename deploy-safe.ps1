@@ -71,7 +71,9 @@ $sshArgs += @('-o', 'StrictHostKeyChecking=accept-new', '-o', 'ConnectTimeout=10
 
 function Invoke-Ssh($remoteCmd, [switch]$AllowFail) {
   Log-Line "SSH: $remoteCmd"
-  $output = & ssh @sshArgs $remoteCmd 2>&1
+  # Use Continue so git/other tools writing to stderr do not throw
+  # a NativeCommandError under $ErrorActionPreference = 'Stop'.
+  $output = & { $ErrorActionPreference = 'Continue'; & ssh @sshArgs $remoteCmd 2>&1 }
   $code = $LASTEXITCODE
   Log-Line "SSH-OUT($code): $output"
   if ($code -ne 0 -and -not $AllowFail) {
