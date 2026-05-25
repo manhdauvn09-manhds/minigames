@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SRS — ShadowLing: Nền Tảng Luyện Shadowing Đa Ngôn Ngữ</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #eef2ff;
+      --accent: #06b6d4;
+      --accent-light: #ecfeff;
+      --success: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --code-bg: #1e293b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── Sidebar TOC ── */
+    .layout { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 24px 0;
+    }
+
+    .sidebar-logo {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    .sidebar-logo .logo-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+    .sidebar-logo .logo-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .toc-section { margin-bottom: 4px; }
+    .toc-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      padding: 8px 20px 4px;
+    }
+    .toc-link {
+      display: block;
+      padding: 6px 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .toc-link:hover, .toc-link.active {
+      color: var(--primary);
+      background: var(--primary-light);
+      border-left-color: var(--primary);
+    }
+
+    /* ── Main content ── */
+    .main { flex: 1; padding: 48px 56px; max-width: 960px; }
+
+    /* ── Cover ── */
+    .cover {
+      background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 48px;
+      margin-bottom: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 240px; height: 240px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 50%;
+    }
+    .cover::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: 40px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    .cover-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    .cover h1 {
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+    .cover .cover-subtitle {
+      font-size: 17px;
+      opacity: 0.85;
+      margin-bottom: 28px;
+    }
+    .cover-meta {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .cover-meta-item { font-size: 13px; opacity: 0.75; }
+    .cover-meta-item strong { opacity: 1; font-weight: 600; display: block; }
+
+    /* ── Sections ── */
+    .section { margin-bottom: 56px; scroll-margin-top: 24px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+    }
+    .section-number {
+      width: 36px; height: 36px;
+      background: var(--primary);
+      color: white;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 28px 0 12px;
+    }
+    h3::before {
+      content: '▸ ';
+      color: var(--primary);
+    }
+
+    p { margin-bottom: 12px; font-size: 14.5px; color: var(--text); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--primary);
+    }
+
+    /* ── User cards ── */
+    .user-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 16px 0; }
+    .user-card {
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--border);
+    }
+    .user-card.en { background: linear-gradient(135deg,#dbeafe,#eff6ff); border-color: #bfdbfe; }
+    .user-card.vi { background: linear-gradient(135deg,#fef2f2,#fff7ed); border-color: #fecaca; }
+    .user-card.ja { background: linear-gradient(135deg,#f0fdf4,#ecfdf5); border-color: #bbf7d0; }
+    .user-card-flag { font-size: 28px; margin-bottom: 8px; }
+    .user-card-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .user-card-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 16px 0; border-radius: 10px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    thead { background: var(--primary); color: white; }
+    thead th { padding: 11px 16px; text-align: left; font-weight: 600; font-size: 12px; letter-spacing: 0.3px; }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--bg); }
+    tbody td { padding: 10px 16px; vertical-align: top; }
+    td code { background: var(--primary-light); color: var(--primary); padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+
+    /* ── Code blocks ── */
+    pre {
+      background: var(--code-bg);
+      color: #e2e8f0;
+      border-radius: 10px;
+      padding: 20px 24px;
+      overflow-x: auto;
+      font-size: 12.5px;
+      line-height: 1.7;
+      margin: 16px 0;
+      font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    }
+    pre .c { color: #64748b; font-style: italic; }
+    pre .k { color: #a78bfa; }
+    pre .s { color: #86efac; }
+    pre .n { color: #7dd3fc; }
+    pre .v { color: #fbbf24; }
+    pre .f { color: #fb923c; }
+
+    code {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    }
+
+    /* ── Architecture diagram ── */
+    .arch-box {
+      background: var(--code-bg);
+      color: #cbd5e1;
+      border-radius: 12px;
+      padding: 24px;
+      font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    .arch-box .hl { color: #7dd3fc; font-weight: bold; }
+    .arch-box .hl2 { color: #86efac; }
+    .arch-box .hl3 { color: #fbbf24; }
+    .arch-box .dim { color: #475569; }
+
+    /* ── Screen grid ── */
+    .screen-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin: 16px 0; }
+    .screen-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      transition: box-shadow 0.2s;
+    }
+    .screen-card:hover { box-shadow: 0 4px 16px rgba(79,70,229,0.1); border-color: #c7d2fe; }
+    .screen-num { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .screen-name { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+    .screen-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-primary { background: var(--primary-light); color: var(--primary); }
+    .badge-success { background: #d1fae5; color: #065f46; }
+    .badge-warn { background: #fef3c7; color: #92400e; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+    .badge-accent { background: var(--accent-light); color: #0e7490; }
+    .badge-free { background: #d1fae5; color: #065f46; font-size: 11px; font-weight: 700; }
+
+    /* ── Karaoke demo ── */
+    .karaoke-demo {
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin: 16px 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .karaoke-demo .k-line {
+      font-size: 22px;
+      line-height: 1.9;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+    .karaoke-demo .k-word { padding: 2px 4px; border-radius: 4px; transition: all 0.2s; }
+    .karaoke-demo .k-past { color: #475569; }
+    .karaoke-demo .k-active {
+      color: #fbbf24;
+      background: rgba(251,191,36,0.15);
+      font-weight: 700;
+      font-size: 25px;
+    }
+    .karaoke-demo .k-next { color: #94a3b8; }
+    .karaoke-demo .k-bar {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .karaoke-demo .k-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .karaoke-demo .k-speed {
+      background: rgba(255,255,255,0.1);
+      color: #94a3b8;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+    .karaoke-demo .k-speed.sel { background: #4f46e5; color: white; }
+
+    /* ── Phase roadmap ── */
+    .roadmap { position: relative; margin: 20px 0; }
+    .roadmap::before {
+      content: '';
+      position: absolute;
+      left: 17px; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .phase {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .phase-dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 13px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+      border: 2px solid white;
+    }
+    .phase-dot.p1 { background: var(--primary); color: white; }
+    .phase-dot.p2 { background: var(--accent); color: white; }
+    .phase-dot.p3 { background: var(--success); color: white; }
+    .phase-body { flex: 1; }
+    .phase-title { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+    .phase-period { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+    .phase-items { list-style: none; }
+    .phase-items li { font-size: 13px; color: var(--text-muted); padding: 2px 0; }
+    .phase-items li::before { content: '✓ '; color: var(--success); font-weight: 700; }
+
+    /* ── Risk table ── */
+    .risk-high { color: #dc2626; font-weight: 600; }
+    .risk-med  { color: #d97706; font-weight: 600; }
+    .risk-low  { color: #059669; font-weight: 600; }
+
+    /* ── Cost table ── */
+    .cost-zero { color: #059669; font-weight: 700; }
+    .cost-total {
+      background: linear-gradient(90deg,#d1fae5,#ecfdf5);
+      font-weight: 700;
+    }
+
+    /* ── Info box ── */
+    .info-box {
+      border-left: 4px solid var(--primary);
+      background: var(--primary-light);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 13.5px;
+    }
+    .warn-box {
+      border-left: 4px solid var(--warn);
+      background: #fffbeb;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 13.5px;
+    }
+
+    /* ── DB schema ── */
+    .db-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin: 16px 0; }
+    .db-table {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .db-table-header {
+      background: var(--code-bg);
+      color: #7dd3fc;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 14px;
+      font-family: monospace;
+    }
+    .db-table-body { padding: 10px 14px; }
+    .db-field { font-size: 12px; color: var(--text-muted); padding: 2px 0; font-family: monospace; }
+    .db-field .type { color: #f59e0b; }
+    .db-field .pk { color: #a78bfa; font-weight: 700; }
+
+    /* ── API endpoint list ── */
+    .api-group { margin-bottom: 20px; }
+    .api-group-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px; }
+    .api-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 12px;
+      border-radius: 7px;
+      margin-bottom: 4px;
+      font-size: 13px;
+      font-family: monospace;
+      background: var(--card);
+      border: 1px solid var(--border);
+    }
+    .method {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      min-width: 46px;
+      text-align: center;
+    }
+    .GET    { background:#dcfce7; color:#166534; }
+    .POST   { background:#dbeafe; color:#1e40af; }
+    .PUT    { background:#fef3c7; color:#92400e; }
+    .DELETE { background:#fee2e2; color:#991b1b; }
+    .api-path { color: var(--primary); flex: 1; }
+    .api-desc { font-family: 'Segoe UI',sans-serif; font-size: 12px; color: var(--text-muted); }
+
+    /* ── Voice table ── */
+    .voice-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 16px 0; }
+    .voice-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      background: var(--card);
+    }
+    .voice-lang { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px; }
+    .voice-item { font-size: 12.5px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .voice-gender { font-size: 11px; padding: 1px 6px; border-radius: 10px; }
+    .f-voice { background: #fce7f3; color: #9d174d; }
+    .m-voice { background: #dbeafe; color: #1e40af; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { padding: 24px 20px; }
+      .user-cards, .screen-grid, .db-grid, .voice-grid { grid-template-columns: 1fr; }
+      .cover h1 { font-size: 26px; }
+    }
+
+    /* ── Print ── */
+    @media print {
+      .sidebar { display: none; }
+      .main { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-title">🎤 ShadowLing</div>
+      <div class="logo-sub">Software Requirements Specification</div>
+    </div>
+
+    <div class="toc-section">
+      <div class="toc-section-title">Tổng quan</div>
+      <a class="toc-link" href="#s1">1. Giới thiệu</a>
+      <a class="toc-link" href="#s2">2. Mục tiêu & Người dùng</a>
+    </div>
+    <div class="toc-section">
+      <div class="toc-section-title">Tính năng</div>
+      <a class="toc-link" href="#s3">3. Danh sách màn hình</a>
+      <a class="toc-link" href="#s4">4. Tính năng chi tiết</a>
+      <a class="toc-link" href="#s5">5. Karaoke & TTS</a>
+      <a class="toc-link" href="#s6">6. Giọng đọc & Tốc độ</a>
+      <a class="toc-link" href="#s7">7. Danh mục nội dung</a>
+    </div>
+    <div class="toc-section">
+      <div class="toc-section-title">Kỹ thuật</div>
+      <a class="toc-link" href="#s8">8. Kiến trúc hệ thống</a>
+      <a class="toc-link" href="#s9">9. Tech Stack</a>
+      <a class="toc-link" href="#s10">10. Cơ sở dữ liệu</a>
+      <a class="toc-link" href="#s11">11. API Design</a>
+      <a class="toc-link" href="#s12">12. Hệ thống Crawl</a>
+    </div>
+    <div class="toc-section">
+      <div class="toc-section-title">Triển khai</div>
+      <a class="toc-link" href="#s13">13. Chi phí ($0)</a>
+      <a class="toc-link" href="#s14">14. Roadmap</a>
+      <a class="toc-link" href="#s15">15. Rủi ro</a>
+    </div>
+  </nav>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- Cover -->
+    <div class="cover">
+      <div class="cover-tag">SRS v1.0 — Software Requirements Specification</div>
+      <h1>🎤 ShadowLing</h1>
+      <div class="cover-subtitle">Nền Tảng Luyện Shadowing Đa Ngôn Ngữ — Tiếng Anh · Tiếng Việt · Tiếng Nhật</div>
+      <div class="cover-meta">
+        <div class="cover-meta-item"><strong>Phiên bản</strong> 1.0.0</div>
+        <div class="cover-meta-item"><strong>Ngày tạo</strong> 25/05/2026</div>
+        <div class="cover-meta-item"><strong>Trạng thái</strong> Bản thảo kỹ thuật</div>
+        <div class="cover-meta-item"><strong>Chi phí hạ tầng</strong> $0 / tháng</div>
+      </div>
+    </div>
+
+    <!-- ── Section 1: Giới thiệu ── -->
+    <section class="section" id="s1">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <h2>Giới Thiệu</h2>
+      </div>
+
+      <h3>Tầm nhìn sản phẩm</h3>
+      <p>ShadowLing là nền tảng web luyện nghe-nói theo phương pháp <strong>shadowing</strong> — người học nghe và nhại theo âm thanh gần như đồng thời. Giao diện hiển thị text đổi màu theo từng từ/câu đang được đọc (kiểu karaoke đơn giản), giúp người học theo dõi và bắt chước chính xác.</p>
+      <p>Toàn bộ hệ thống sử dụng các dịch vụ <strong>miễn phí hoàn toàn</strong> — không phát sinh chi phí hạ tầng.</p>
+
+      <h3>Phạm vi hệ thống</h3>
+      <div class="card">
+        <div class="card-title">Trong phạm vi (In Scope)</div>
+        <p>✅ Web app đa ngôn ngữ (EN, VI, JA) &nbsp;|&nbsp; ✅ TTS browser built-in (Web Speech API) &nbsp;|&nbsp; ✅ Text highlight karaoke &nbsp;|&nbsp; ✅ Tốc độ 0.5x–2.0x &nbsp;|&nbsp; ✅ Repeat modes &nbsp;|&nbsp; ✅ Progress tracking &nbsp;|&nbsp; ✅ Admin panel &nbsp;|&nbsp; ✅ Data crawling tự động</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Ngoài phạm vi (Out of Scope — Phase 1)</div>
+        <p>❌ Mobile app native &nbsp;|&nbsp; ❌ Ghi âm & chấm điểm phát âm &nbsp;|&nbsp; ❌ Thanh toán / Premium &nbsp;|&nbsp; ❌ Video content &nbsp;|&nbsp; ❌ Real-time multiplayer</p>
+      </div>
+    </section>
+
+    <!-- ── Section 2: Mục tiêu ── -->
+    <section class="section" id="s2">
+      <div class="section-header">
+        <div class="section-number">2</div>
+        <h2>Mục Tiêu & Người Dùng</h2>
+      </div>
+
+      <h3>Nhóm người dùng mục tiêu</h3>
+      <div class="user-cards">
+        <div class="user-card en">
+          <div class="user-card-flag">🇺🇸🇬🇧</div>
+          <div class="user-card-name">Tiếng Anh</div>
+          <div class="user-card-desc">Trẻ em 6–12 tuổi. Giao diện vui nhộn, màu sắc, nhân vật hoạt hình, gamification. Giọng American & British English.</div>
+        </div>
+        <div class="user-card vi">
+          <div class="user-card-flag">🇻🇳</div>
+          <div class="user-card-name">Tiếng Việt</div>
+          <div class="user-card-desc">Trẻ em 6–12 tuổi. Nội dung theo chương trình tiểu học VN. Giọng Bắc và Nam chuẩn mực.</div>
+        </div>
+        <div class="user-card ja">
+          <div class="user-card-flag">🇯🇵</div>
+          <div class="user-card-name">Tiếng Nhật</div>
+          <div class="user-card-desc">Người đi làm ngành IT, 18–40 tuổi. Giao diện chuyên nghiệp. Tập trung IT business, thuật ngữ kỹ thuật.</div>
+        </div>
+      </div>
+
+      <h3>Chỉ số thành công (KPIs)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>KPI</th><th>Mục tiêu</th><th>Đo lường</th></tr></thead>
+          <tbody>
+            <tr><td>Tỷ lệ hoàn thành bài học</td><td><strong>&gt; 70%</strong></td><td>completed_sessions / started_sessions</td></tr>
+            <tr><td>Thời gian luyện tập / phiên</td><td><strong>&gt; 10 phút</strong></td><td>avg(session_duration_minutes)</td></tr>
+            <tr><td>Retention 7 ngày</td><td><strong>&gt; 50%</strong></td><td>users active day 7 / registered day 0</td></tr>
+            <tr><td>Streak trung bình</td><td><strong>&gt; 5 ngày</strong></td><td>avg(streak_days) active users</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Section 3: Màn hình ── -->
+    <section class="section" id="s3">
+      <div class="section-header">
+        <div class="section-number">3</div>
+        <h2>Danh Sách Màn Hình</h2>
+      </div>
+
+      <h3>User-facing (9 màn hình)</h3>
+      <div class="screen-grid">
+        <div class="screen-card">
+          <div class="screen-num">Screen 01</div>
+          <div class="screen-name">🏠 Landing Page</div>
+          <div class="screen-desc">Hero section, demo karaoke, 3 card ngôn ngữ, CTA đăng ký / đăng nhập, testimonial, tính năng nổi bật.</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-num">Screen 02</div>
+          <div class="screen-name">🌐 Chọn Ngôn Ngữ</div>
+          <div class="screen-desc">3 card lớn (EN/VI/JA) với tiến độ cá nhân trên từng ngôn ngữ, chỉ báo bài chưa học.</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-num">Screen 03</div>
+          <div class="screen-name">📂 Chọn Danh Mục</div>
+          <div class="screen-desc">Grid danh mục theo ngôn ngữ, thanh % hoàn thành, filter Chưa/Đang/Xong, nút học ngẫu nhiên.</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-num">Screen 04</div>
+          <div class="screen-name">📋 Danh Sách Bài Học</div>
+          <div class="screen-desc">Card bài học: tên, thời lượng, độ khó (⭐), trạng thái, điểm cao nhất, nút Tiếp tục nếu bài dở.</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-num">Screen 05 ★</div>
+          <div class="screen-name">🎤 Màn Hình Luyện Tập</div>
+          <div class="screen-desc"><strong>Màn hình cốt lõi.</strong> Text karaoke đổi màu, controls đầy đủ, voice/speed/repeat, mascot (trẻ em).</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-num">Screen 06</div>
+          <div class="screen-name">🏆 Kết Thúc Bài</div>
+          <div class="screen-desc">Stats (từ đã luyện, phút, tốc độ cao nhất), huy hiệu mở khóa, nút Luyện lại / Bài tiếp theo.</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-num">Screen 07</div>
+          <div class="screen-name">📈 Tiến Độ & Lịch Sử</div>
+          <div class="screen-desc">Streak heatmap calendar, biểu đồ tốc độ theo tuần, tổng phút luyện, lịch sử bài đã học.</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-num">Screen 08</div>
+          <div class="screen-name">⚙️ Cài Đặt</div>
+          <div class="screen-desc">Giọng/tốc độ mặc định, cỡ chữ karaoke, dark mode, ngôn ngữ UI, thông báo nhắc học.</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-num">Screen 09</div>
+          <div class="screen-name">🔐 Xác Thực</div>
+          <div class="screen-desc">Đăng ký (email + Google OAuth), đăng nhập, quên mật khẩu, tạo tài khoản con cho phụ huynh.</div>
+        </div>
+      </div>
+
+      <h3>Admin (5 màn hình)</h3>
+      <div class="screen-grid">
+        <div class="screen-card">
+          <div class="screen-num">Admin 01</div>
+          <div class="screen-name">📊 Dashboard</div>
+          <div class="screen-desc">Users active, tổng bài học, phiên luyện 24h/7d, trạng thái crawl jobs gần nhất.</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-num">Admin 02</div>
+          <div class="screen-name">📝 Quản Lý Nội Dung</div>
+          <div class="screen-desc">CRUD bài học, filter theo ngôn ngữ/danh mục/trạng thái, generate TTS, bulk publish.</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-num">Admin 03</div>
+          <div class="screen-name">🕷️ Cấu Hình Crawl</div>
+          <div class="screen-desc">Thêm/sửa nguồn crawl (URL + CSS selectors), lịch cron, trigger thủ công, xem log.</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-num">Admin 04</div>
+          <div class="screen-name">🔍 Review Raw Content</div>
+          <div class="screen-desc">Duyệt nội dung crawl thô trước khi publish, approve/reject từng item.</div>
+        </div>
+        <div class="screen-card">
+          <div class="screen-num">Admin 05</div>
+          <div class="screen-name">👥 Quản Lý Người Dùng</div>
+          <div class="screen-desc">Tìm kiếm, xem hồ sơ, ban/unban, reset mật khẩu, phân quyền user/teacher/admin.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Section 4: Tính năng chi tiết ── -->
+    <section class="section" id="s4">
+      <div class="section-header">
+        <div class="section-number">4</div>
+        <h2>Tính Năng Chi Tiết</h2>
+      </div>
+
+      <h3>Chế độ lặp (Repeat Modes)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Chế độ</th><th>Hành vi</th><th>Cài đặt</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Loop cùng tốc độ</strong></td>
+              <td>Audio lặp vô hạn ở tốc độ đã chọn, người dùng tự dừng</td>
+              <td>Không cần cài thêm</td>
+            </tr>
+            <tr>
+              <td><strong>Tăng dần tốc độ</strong></td>
+              <td>Sau mỗi lần lặp hoàn thành → tự động tăng lên mức tiếp theo. Đạt mức cuối → hiển thị animation "Hoàn thành!"</td>
+              <td>Sequence mặc định: <code>[0.75x → 1.0x → 1.25x → 1.5x]</code>, có thể tùy chỉnh trong Settings</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Gamification (Trẻ em)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Hành động</th><th>Thưởng</th><th>Loại</th></tr></thead>
+          <tbody>
+            <tr><td>Hoàn thành bài lần đầu</td><td>10 xu</td><td><span class="badge badge-primary">Xu</span></td></tr>
+            <tr><td>Đạt tốc độ 1.5x</td><td>5 xu bonus</td><td><span class="badge badge-primary">Xu</span></td></tr>
+            <tr><td>Streak 7 ngày liên tiếp</td><td>50 xu + huy hiệu</td><td><span class="badge badge-success">Huy hiệu</span></td></tr>
+            <tr><td>Hoàn thành cả danh mục</td><td>Huy hiệu đặc biệt + animation</td><td><span class="badge badge-success">Huy hiệu</span></td></tr>
+            <tr><td>Lần đầu đạt 2.0x</td><td>Huy hiệu "Siêu âm" ⚡</td><td><span class="badge badge-success">Huy hiệu</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>Cấp tốc độ:</strong> 🐢 Rùa (0.75x) → 🐰 Thỏ (1.0x) → 🦅 Chim ưng (1.5x) → ⚡ Siêu âm (2.0x)</p>
+      <p><strong>Mascot:</strong> Tiếng Anh: "Panda" | Tiếng Việt: "Lạc Long" — nhảy múa, cổ vũ theo tiến trình bài học.</p>
+
+      <h3>Theo dõi tiến độ</h3>
+      <p>Mỗi phiên học lưu: <code>lesson_id</code>, <code>user_id</code>, <code>started_at</code>, <code>completed_at</code>, <code>max_speed_reached</code>, <code>repeat_count</code>, <code>voice_used</code>, <code>completion_pct</code>.</p>
+      <p>Aggregations: streak ngày liên tiếp, tổng phút luyện, phân bố tốc độ trung bình theo tuần.</p>
+    </section>
+
+    <!-- ── Section 5: Karaoke ── -->
+    <section class="section" id="s5">
+      <div class="section-header">
+        <div class="section-number">5</div>
+        <h2>Karaoke Text Highlight & TTS</h2>
+      </div>
+
+      <h3>Cách hoạt động</h3>
+      <p>Không dùng file audio lưu trữ. Toàn bộ TTS chạy trong browser bằng <strong>Web Speech API</strong> — miễn phí, không cần server. Sự kiện <code>onboundary</code> của <code>SpeechSynthesisUtterance</code> cung cấp vị trí ký tự đang đọc (<code>charIndex</code>, <code>charLength</code>) → highlight đúng từ/câu trên màn hình.</p>
+
+      <div class="karaoke-demo">
+        <div class="k-line">
+          <span class="k-word k-past">Good</span>
+          <span class="k-word k-active">morning</span>
+          <span class="k-word k-next"> everyone, how are you today?</span>
+        </div>
+        <div class="k-line" style="color:#475569">
+          I am fine, thank you very much!
+        </div>
+        <div class="k-bar">
+          <button class="k-btn">⏸ Pause</button>
+          <span class="k-speed">0.75x</span>
+          <span class="k-speed sel">1.0x</span>
+          <span class="k-speed">1.25x</span>
+          <span class="k-speed">1.5x</span>
+          <span class="k-speed">2.0x</span>
+          <span style="color:#64748b;font-size:12px;font-family:sans-serif">🔄 Tăng dần tốc độ: bật</span>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);text-align:center">Demo giao diện karaoke — từ "morning" đang được highlight (màu vàng)</p>
+
+      <h3>Hai chế độ highlight</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Chế độ</th><th>Mô tả</th><th>Phù hợp</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Word level</strong></td>
+              <td>Từng từ đổi màu theo tiến trình, từ đã qua mờ đi, từ active in đậm + màu nổi</td>
+              <td>Tiếng Anh, Tiếng Nhật</td>
+            </tr>
+            <tr>
+              <td><strong>Sentence level</strong></td>
+              <td>Cả câu đang đọc đổi màu nền, các câu khác mờ hơn</td>
+              <td>Tiếng Việt, bài dài</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Code cốt lõi — Web Speech API</h3>
+<pre>
+<span class="k">const</span> utterance = <span class="k">new</span> <span class="n">SpeechSynthesisUtterance</span>(text);
+utterance.<span class="f">rate</span>  = <span class="v">0.75</span>;   <span class="c">// tốc độ 0.5–2.0</span>
+utterance.<span class="f">voice</span> = selectedVoice;  <span class="c">// giọng nam/nữ đã chọn</span>
+utterance.<span class="f">lang</span>  = <span class="s">"en-US"</span>;
+
+<span class="c">// Sự kiện quan trọng: biết chính xác từ nào đang đọc</span>
+utterance.<span class="f">onboundary</span> = (event) => {
+  <span class="k">const</span> { charIndex, charLength } = event;
+  highlightText(charIndex, charLength); <span class="c">// đổi màu đoạn text</span>
+};
+
+utterance.<span class="f">onend</span> = () => {
+  <span class="k">if</span> (repeatMode === <span class="s">"progressive"</span>) {
+    currentSpeed = nextSpeed(currentSpeed); <span class="c">// tăng tốc độ</span>
+    <span class="k">if</span> (!currentSpeed) showCompletionScreen();
+    <span class="k">else</span> startSpeaking();
+  } <span class="k">else</span> {
+    startSpeaking(); <span class="c">// loop cùng tốc độ</span>
+  }
+};
+
+speechSynthesis.<span class="f">speak</span>(utterance);
+</pre>
+
+      <h3>Furigana — Tiếng Nhật</h3>
+      <p>Lưu dữ liệu furigana trong DB <code>{"word": "会議", "reading": "かいぎ"}</code>. Render bằng HTML5 <code>&lt;ruby&gt;</code> tag:</p>
+<pre>
+<span class="c">&lt;!-- Hiển thị: 会議 với かいぎ ở trên --&gt;</span>
+&lt;<span class="n">ruby</span>&gt;会議&lt;<span class="n">rt</span>&gt;かいぎ&lt;/<span class="n">rt</span>&gt;&lt;/<span class="n">ruby</span>&gt;
+</pre>
+
+      <div class="warn-box">
+        ⚠️ <strong>Giới hạn Web Speech API:</strong> iOS Safari không có đầy đủ giọng <code>vi-VN</code> và <code>ja-JP</code>. Sẽ hiển thị cảnh báo "Khuyên dùng Chrome để có trải nghiệm tốt nhất" trên iOS.
+      </div>
+    </section>
+
+    <!-- ── Section 6: Giọng đọc ── -->
+    <section class="section" id="s6">
+      <div class="section-header">
+        <div class="section-number">6</div>
+        <h2>Giọng Đọc & Tốc Độ</h2>
+      </div>
+
+      <h3>Giọng đọc theo ngôn ngữ (Web Speech API)</h3>
+      <div class="voice-grid">
+        <div class="voice-card">
+          <div class="voice-lang">🇺🇸 English — en-US / en-GB</div>
+          <div class="voice-item"><span class="voice-gender f-voice">Nữ</span> Mỹ — en-US (American)</div>
+          <div class="voice-item"><span class="voice-gender m-voice">Nam</span> Mỹ — en-US (American)</div>
+          <div class="voice-item"><span class="voice-gender f-voice">Nữ</span> Anh — en-GB (British)</div>
+          <div class="voice-item"><span class="voice-gender m-voice">Nam</span> Anh — en-GB (British)</div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-lang">🇻🇳 Tiếng Việt — vi-VN</div>
+          <div class="voice-item"><span class="voice-gender f-voice">Nữ</span> Giọng Bắc chuẩn</div>
+          <div class="voice-item"><span class="voice-gender m-voice">Nam</span> Giọng Bắc chuẩn</div>
+          <div class="voice-item"><span class="voice-gender f-voice">Nữ</span> Giọng Nam (nếu có)</div>
+          <div class="voice-item"><span class="voice-gender m-voice">Nam</span> Giọng Nam (nếu có)</div>
+        </div>
+        <div class="voice-card">
+          <div class="voice-lang">🇯🇵 Tiếng Nhật — ja-JP</div>
+          <div class="voice-item"><span class="voice-gender f-voice">Nữ</span> Chuẩn Tokyo (NHK)</div>
+          <div class="voice-item"><span class="voice-gender m-voice">Nam</span> Chuẩn Tokyo (NHK)</div>
+          <div class="voice-item" style="color:var(--text-muted);font-size:11px">Chất lượng cao trên Chrome/Edge</div>
+        </div>
+      </div>
+      <p style="font-size:12.5px;color:var(--text-muted)">* Danh sách giọng thực tế phụ thuộc OS và browser. Code dùng <code>speechSynthesis.getVoices()</code> để liệt kê và lọc theo <code>lang</code>.</p>
+
+      <h3>Điều khiển tốc độ</h3>
+      <p>Sử dụng thuộc tính <code>SpeechSynthesisUtterance.rate</code>, range <strong>0.1–10</strong> (browser native). UI hiển thị preset buttons:</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0">
+        <span class="badge badge-accent">0.5x</span>
+        <span class="badge badge-accent">0.75x</span>
+        <span class="badge badge-primary">1.0x ✓</span>
+        <span class="badge badge-accent">1.25x</span>
+        <span class="badge badge-accent">1.5x</span>
+        <span class="badge badge-accent">1.75x</span>
+        <span class="badge badge-accent">2.0x</span>
+      </div>
+      <p>Ngoài ra có slider fine-grained để chọn tốc độ bất kỳ trong khoảng 0.5–2.0.</p>
+    </section>
+
+    <!-- ── Section 7: Danh mục ── -->
+    <section class="section" id="s7">
+      <div class="section-header">
+        <div class="section-number">7</div>
+        <h2>Danh Mục Nội Dung</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ngôn ngữ</th><th>Danh mục</th><th>Nguồn nội dung đề xuất</th></tr></thead>
+          <tbody>
+            <tr>
+              <td rowspan="5"><span class="badge badge-primary">🇺🇸 Tiếng Anh</span><br><small>Trẻ em 6–12</small></td>
+              <td>Chào hỏi & Câu cơ bản</td>
+              <td>British Council LearnEnglish Kids</td>
+            </tr>
+            <tr><td>Gia đình, Màu sắc, Số đếm</td><td>BBC Learning English (trẻ em)</td></tr>
+            <tr><td>Động vật & Thiên nhiên</td><td>VOA Special English</td></tr>
+            <tr><td>Bài hát thiếu nhi</td><td>Nursery rhymes public domain</td></tr>
+            <tr><td>Trường học & Đồ vật</td><td>Nhập thủ công</td></tr>
+
+            <tr>
+              <td rowspan="4"><span class="badge badge-danger">🇻🇳 Tiếng Việt</span><br><small>Trẻ em 6–12</small></td>
+              <td>Bài tập đọc lớp 1–2</td>
+              <td>Sách giáo khoa public / nhập thủ công</td>
+            </tr>
+            <tr><td>Bài thơ & Ca dao thiếu nhi</td><td>Public domain VN</td></tr>
+            <tr><td>Chào hỏi & Gia đình</td><td>Nhập thủ công</td></tr>
+            <tr><td>Truyện ngắn</td><td>Nhập thủ công / crawl nguồn giáo dục</td></tr>
+
+            <tr>
+              <td rowspan="6"><span class="badge badge-success">🇯🇵 Tiếng Nhật</span><br><small>IT Business</small></td>
+              <td>会議 (Cuộc họp)</td>
+              <td>NHK Web Easy, nhập thủ công</td>
+            </tr>
+            <tr><td>メール (Email công việc)</td><td>Biz keigo sites</td></tr>
+            <tr><td>技術用語 (Thuật ngữ IT)</td><td>e-words.jp (IT用語辞典)</td></tr>
+            <tr><td>面接 (Phỏng vấn IT)</td><td>Nhập thủ công</td></tr>
+            <tr><td>プレゼン (Thuyết trình)</td><td>Nhập thủ công</td></tr>
+            <tr><td>ビジネス敬語 (Kính ngữ)</td><td>Biz keigo sites, crawl</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warn-box">
+        ⚠️ <strong>Lưu ý pháp lý:</strong> Crawler chỉ thu thập nội dung public domain, Creative Commons, hoặc có API chính thức. Admin phải xác nhận quyền sử dụng trước khi publish qua màn hình Review Raw Content.
+      </div>
+    </section>
+
+    <!-- ── Section 8: Kiến trúc ── -->
+    <section class="section" id="s8">
+      <div class="section-header">
+        <div class="section-number">8</div>
+        <h2>Kiến Trúc Hệ Thống (SAD)</h2>
+      </div>
+
+      <h3>Sơ đồ tổng thể</h3>
+      <div class="arch-box">
+<span class="hl">┌─────────────────────────────────────────────────────────┐</span>
+<span class="hl">│                    BROWSER (User)                       │</span>
+<span class="hl">│                                                         │</span>
+<span class="hl">│  ┌──────────────────────────────────────────────────┐  │</span>
+<span class="hl">│  │              Next.js 14 App (React)              │  │</span>
+<span class="hl">│  │                                                  │  │</span>
+<span class="hl2">│  │  Web Speech API ──────────────────────────────   │  │</span>
+<span class="hl2">│  │    ├── speechSynthesis.getVoices()               │  │</span>
+<span class="hl2">│  │    ├── utterance.rate  (0.5 – 2.0)               │  │</span>
+<span class="hl2">│  │    └── onboundary → highlight text               │  │</span>
+<span class="hl">│  │                                                  │  │</span>
+<span class="hl">│  │  Next.js API Routes ──────────────────────────   │  │</span>
+<span class="hl3">│  │    └── Supabase JS Client                        │  │</span>
+<span class="hl3">│  │          ├── PostgreSQL  (lessons, progress)      │  │</span>
+<span class="hl3">│  │          ├── Auth        (email + Google OAuth)   │  │</span>
+<span class="hl3">│  │          └── Storage     (thumbnails, assets)     │  │</span>
+<span class="hl">│  └──────────────────────────────────────────────────┘  │</span>
+<span class="hl">└──────────────────────────┬──────────────────────────────┘</span>
+                           │ Deploy
+                           ▼
+<span class="hl2">         ┌──────────────────────────────────┐</span>
+<span class="hl2">         │   Vercel (free tier)             │</span>
+<span class="hl2">         │   Frontend + API Routes          │</span>
+<span class="hl2">         └──────────────────────────────────┘</span>
+
+<span class="hl3">         ┌──────────────────────────────────┐</span>
+<span class="hl3">         │   Supabase (free tier)           │</span>
+<span class="hl3">         │   PostgreSQL + Auth + Storage    │</span>
+<span class="hl3">         └──────────────────────────────────┘</span>
+
+<span class="hl">         ┌──────────────────────────────────┐</span>
+<span class="hl">         │   GitHub Actions (free)          │</span>
+<span class="hl">         │   Scheduled crawl jobs           │</span>
+<span class="hl">         │   → insert to Supabase DB        │</span>
+<span class="hl">         └──────────────────────────────────┘</span>
+      </div>
+
+      <h3>Cấu trúc thư mục Frontend</h3>
+<pre>
+<span class="n">shadowling/</span>
+├── <span class="n">app/</span>
+│   ├── <span class="s">(auth)/</span>login/ register/
+│   ├── <span class="s">(app)/</span>
+│   │   ├── languages/
+│   │   ├── [lang]/categories/
+│   │   ├── [lang]/[category]/lessons/
+│   │   └── [lang]/[category]/[lesson]/practice/
+│   ├── progress/
+│   ├── settings/
+│   ├── admin/          <span class="c"># dashboard, content, crawl, users</span>
+│   └── api/            <span class="c"># Next.js API routes → Supabase</span>
+├── <span class="n">components/</span>
+│   ├── karaoke/        <span class="c"># KaraokeDisplay, WordToken, SentenceBlock</span>
+│   ├── audio/          <span class="c"># SpeechController, SpeedControl, VoiceSelector</span>
+│   ├── gamification/   <span class="c"># MascotWidget, BadgePopup, StreakCalendar</span>
+│   └── admin/          <span class="c"># CrawlConfig, LessonEditor, UserTable</span>
+├── <span class="n">hooks/</span>
+│   ├── useSpeechSynthesis.ts   <span class="c"># Web Speech API wrapper</span>
+│   ├── useKaraokeSync.ts       <span class="c"># text highlight logic</span>
+│   └── useProgressTracker.ts
+├── <span class="n">lib/</span>
+│   ├── supabase.ts
+│   └── voices.ts       <span class="c"># getVoices(), filterByLang()</span>
+└── <span class="n">scripts/</span>
+    └── crawl.js        <span class="c"># chạy bởi GitHub Actions</span>
+</pre>
+    </section>
+
+    <!-- ── Section 9: Tech Stack ── -->
+    <section class="section" id="s9">
+      <div class="section-header">
+        <div class="section-number">9</div>
+        <h2>Tech Stack</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Layer</th><th>Công nghệ</th><th>Phiên bản</th><th>Mục đích</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Frontend</strong></td><td>Next.js</td><td>14.x (App Router)</td><td>SSR/SSG framework</td></tr>
+            <tr><td></td><td>React</td><td>18.x</td><td>UI library</td></tr>
+            <tr><td></td><td>TypeScript</td><td>5.x</td><td>Type safety</td></tr>
+            <tr><td></td><td>Tailwind CSS</td><td>3.x</td><td>Utility-first styling</td></tr>
+            <tr><td></td><td>Framer Motion</td><td>11.x</td><td>Animations (mascot, badge)</td></tr>
+            <tr><td></td><td>Zustand</td><td>4.x</td><td>Global state (light)</td></tr>
+            <tr><td></td><td>TanStack Query</td><td>5.x</td><td>Server state + caching</td></tr>
+            <tr><td><strong>TTS / Audio</strong></td><td>Web Speech API</td><td>Native browser</td><td>TTS + word boundary events</td></tr>
+            <tr><td><strong>Backend</strong></td><td>Next.js API Routes</td><td>14.x</td><td>API — không cần server riêng</td></tr>
+            <tr><td><strong>Database</strong></td><td>Supabase (PostgreSQL)</td><td>Free tier</td><td>DB + Auth + Storage</td></tr>
+            <tr><td><strong>Auth</strong></td><td>Supabase Auth</td><td>Free</td><td>Email + Google OAuth</td></tr>
+            <tr><td><strong>Storage</strong></td><td>Supabase Storage</td><td>1GB free</td><td>Thumbnails, assets</td></tr>
+            <tr><td><strong>Crawling</strong></td><td>Cheerio / Playwright</td><td>Latest</td><td>HTML parsing + JS rendering</td></tr>
+            <tr><td><strong>CI/CD & Crawl</strong></td><td>GitHub Actions</td><td>Free</td><td>Deploy + scheduled crawl</td></tr>
+            <tr><td><strong>Hosting</strong></td><td>Vercel</td><td>Free tier</td><td>Frontend + API routes</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Section 10: Database ── -->
+    <section class="section" id="s10">
+      <div class="section-header">
+        <div class="section-number">10</div>
+        <h2>Cơ Sở Dữ Liệu</h2>
+      </div>
+
+      <h3>ERD — Các bảng chính</h3>
+      <div class="db-grid">
+        <div class="db-table">
+          <div class="db-table-header">users</div>
+          <div class="db-table-body">
+            <div class="db-field"><span class="pk">id</span> uuid PK</div>
+            <div class="db-field">email <span class="type">varchar</span></div>
+            <div class="db-field">display_name <span class="type">varchar</span></div>
+            <div class="db-field">role <span class="type">enum</span> user|teacher|admin</div>
+            <div class="db-field">avatar_url <span class="type">text</span></div>
+            <div class="db-field">created_at <span class="type">timestamptz</span></div>
+            <div class="db-field">last_active_at <span class="type">timestamptz</span></div>
+            <div class="db-field">is_banned <span class="type">boolean</span></div>
+          </div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-header">user_profiles</div>
+          <div class="db-table-body">
+            <div class="db-field"><span class="pk">user_id</span> uuid FK→users</div>
+            <div class="db-field">total_xp <span class="type">integer</span></div>
+            <div class="db-field">coins <span class="type">integer</span></div>
+            <div class="db-field">streak_days <span class="type">integer</span></div>
+            <div class="db-field">last_study_date <span class="type">date</span></div>
+            <div class="db-field">badges_json <span class="type">jsonb</span></div>
+          </div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-header">languages</div>
+          <div class="db-table-body">
+            <div class="db-field"><span class="pk">id</span> uuid PK</div>
+            <div class="db-field">code <span class="type">varchar</span> en|vi|ja</div>
+            <div class="db-field">name <span class="type">varchar</span></div>
+            <div class="db-field">target_audience <span class="type">varchar</span></div>
+            <div class="db-field">ui_theme_config <span class="type">jsonb</span></div>
+          </div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-header">categories</div>
+          <div class="db-table-body">
+            <div class="db-field"><span class="pk">id</span> uuid PK</div>
+            <div class="db-field">language_id <span class="type">uuid</span> FK</div>
+            <div class="db-field">name <span class="type">varchar</span></div>
+            <div class="db-field">description <span class="type">text</span></div>
+            <div class="db-field">icon_url <span class="type">text</span></div>
+            <div class="db-field">display_order <span class="type">integer</span></div>
+            <div class="db-field">is_active <span class="type">boolean</span></div>
+          </div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-header">lessons</div>
+          <div class="db-table-body">
+            <div class="db-field"><span class="pk">id</span> uuid PK</div>
+            <div class="db-field">category_id <span class="type">uuid</span> FK</div>
+            <div class="db-field">title <span class="type">varchar</span></div>
+            <div class="db-field">transcript_text <span class="type">text</span></div>
+            <div class="db-field">word_timings_hint <span class="type">jsonb</span></div>
+            <div class="db-field">difficulty_level <span class="type">smallint</span> 1–5</div>
+            <div class="db-field">source_url <span class="type">text</span></div>
+            <div class="db-field">status <span class="type">enum</span> draft|published|archived</div>
+            <div class="db-field">created_at <span class="type">timestamptz</span></div>
+          </div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-header">study_sessions</div>
+          <div class="db-table-body">
+            <div class="db-field"><span class="pk">id</span> uuid PK</div>
+            <div class="db-field">user_id <span class="type">uuid</span> FK</div>
+            <div class="db-field">lesson_id <span class="type">uuid</span> FK</div>
+            <div class="db-field">started_at <span class="type">timestamptz</span></div>
+            <div class="db-field">completed_at <span class="type">timestamptz</span></div>
+            <div class="db-field">max_speed_reached <span class="type">numeric</span></div>
+            <div class="db-field">repeat_count <span class="type">integer</span></div>
+            <div class="db-field">voice_lang_code <span class="type">varchar</span></div>
+            <div class="db-field">completion_pct <span class="type">numeric</span></div>
+            <div class="db-field">xp_earned <span class="type">integer</span></div>
+          </div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-header">crawl_sources</div>
+          <div class="db-table-body">
+            <div class="db-field"><span class="pk">id</span> uuid PK</div>
+            <div class="db-field">language_id <span class="type">uuid</span> FK</div>
+            <div class="db-field">category_id <span class="type">uuid</span> FK</div>
+            <div class="db-field">source_name <span class="type">varchar</span></div>
+            <div class="db-field">base_url <span class="type">text</span></div>
+            <div class="db-field">selectors_json <span class="type">jsonb</span></div>
+            <div class="db-field">schedule_cron <span class="type">varchar</span></div>
+            <div class="db-field">auto_approve <span class="type">boolean</span></div>
+            <div class="db-field">last_run_at <span class="type">timestamptz</span></div>
+          </div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-header">crawl_raw_items</div>
+          <div class="db-table-body">
+            <div class="db-field"><span class="pk">id</span> uuid PK</div>
+            <div class="db-field">source_id <span class="type">uuid</span> FK</div>
+            <div class="db-field">raw_url <span class="type">text</span></div>
+            <div class="db-field">raw_title <span class="type">text</span></div>
+            <div class="db-field">raw_text <span class="type">text</span></div>
+            <div class="db-field">crawled_at <span class="type">timestamptz</span></div>
+            <div class="db-field">status <span class="type">enum</span> pending|approved|rejected</div>
+            <div class="db-field">lesson_id <span class="type">uuid</span> FK nullable</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Section 11: API ── -->
+    <section class="section" id="s11">
+      <div class="section-header">
+        <div class="section-number">11</div>
+        <h2>API Design</h2>
+      </div>
+
+      <div class="info-box">
+        API được implement dưới dạng <strong>Next.js API Routes</strong> (<code>/app/api/...</code>), không cần server riêng. Tất cả đều gọi Supabase client phía server với Row Level Security (RLS).
+      </div>
+
+      <div class="api-group">
+        <div class="api-group-title">Authentication</div>
+        <div class="api-row"><span class="method POST">POST</span><span class="api-path">/api/auth/register</span><span class="api-desc">Đăng ký email + password</span></div>
+        <div class="api-row"><span class="method POST">POST</span><span class="api-path">/api/auth/login</span><span class="api-desc">Đăng nhập, trả về session cookie</span></div>
+        <div class="api-row"><span class="method POST">POST</span><span class="api-path">/api/auth/logout</span><span class="api-desc">Xóa session</span></div>
+        <div class="api-row"><span class="method GET">GET</span><span class="api-path">/api/auth/me</span><span class="api-desc">Thông tin user hiện tại</span></div>
+        <div class="api-row"><span class="method GET">GET</span><span class="api-path">/api/auth/google/callback</span><span class="api-desc">OAuth callback từ Google</span></div>
+      </div>
+
+      <div class="api-group">
+        <div class="api-group-title">Content</div>
+        <div class="api-row"><span class="method GET">GET</span><span class="api-path">/api/languages</span><span class="api-desc">Danh sách ngôn ngữ</span></div>
+        <div class="api-row"><span class="method GET">GET</span><span class="api-path">/api/languages/:lang/categories</span><span class="api-desc">Danh mục theo ngôn ngữ + tiến độ user</span></div>
+        <div class="api-row"><span class="method GET">GET</span><span class="api-path">/api/categories/:id/lessons</span><span class="api-desc">Bài học trong danh mục</span></div>
+        <div class="api-row"><span class="method GET">GET</span><span class="api-path">/api/lessons/:id</span><span class="api-desc">Chi tiết bài học + transcript</span></div>
+      </div>
+
+      <div class="api-group">
+        <div class="api-group-title">Progress</div>
+        <div class="api-row"><span class="method POST">POST</span><span class="api-path">/api/progress/sessions</span><span class="api-desc">Tạo phiên học mới</span></div>
+        <div class="api-row"><span class="method PUT">PUT</span><span class="api-path">/api/progress/sessions/:id</span><span class="api-desc">Cập nhật / kết thúc phiên + lưu kết quả</span></div>
+        <div class="api-row"><span class="method GET">GET</span><span class="api-path">/api/progress/summary</span><span class="api-desc">Tổng quan tiến độ (XP, streak, phút)</span></div>
+        <div class="api-row"><span class="method GET">GET</span><span class="api-path">/api/progress/history</span><span class="api-desc">Lịch sử bài đã học, phân trang</span></div>
+      </div>
+
+      <div class="api-group">
+        <div class="api-group-title">Admin — Nội dung</div>
+        <div class="api-row"><span class="method GET">GET</span><span class="api-path">/api/admin/lessons</span><span class="api-desc">Danh sách bài + filter lang/category/status</span></div>
+        <div class="api-row"><span class="method POST">POST</span><span class="api-path">/api/admin/lessons</span><span class="api-desc">Tạo bài học thủ công</span></div>
+        <div class="api-row"><span class="method PUT">PUT</span><span class="api-path">/api/admin/lessons/:id</span><span class="api-desc">Sửa bài học</span></div>
+        <div class="api-row"><span class="method POST">POST</span><span class="api-path">/api/admin/lessons/:id/publish</span><span class="api-desc">Publish bài học</span></div>
+      </div>
+
+      <div class="api-group">
+        <div class="api-group-title">Admin — Crawl</div>
+        <div class="api-row"><span class="method GET">GET</span><span class="api-path">/api/admin/crawl/sources</span><span class="api-desc">Danh sách nguồn crawl đã cấu hình</span></div>
+        <div class="api-row"><span class="method POST">POST</span><span class="api-path">/api/admin/crawl/sources</span><span class="api-desc">Thêm nguồn crawl mới</span></div>
+        <div class="api-row"><span class="method POST">POST</span><span class="api-path">/api/admin/crawl/sources/:id/trigger</span><span class="api-desc">Chạy crawl thủ công</span></div>
+        <div class="api-row"><span class="method GET">GET</span><span class="api-path">/api/admin/crawl/raw-items</span><span class="api-desc">Raw items chờ duyệt (?status=pending)</span></div>
+        <div class="api-row"><span class="method POST">POST</span><span class="api-path">/api/admin/crawl/raw-items/:id/approve</span><span class="api-desc">Duyệt → tạo lesson</span></div>
+        <div class="api-row"><span class="method POST">POST</span><span class="api-path">/api/admin/crawl/raw-items/:id/reject</span><span class="api-desc">Từ chối nội dung</span></div>
+      </div>
+    </section>
+
+    <!-- ── Section 12: Crawl ── -->
+    <section class="section" id="s12">
+      <div class="section-header">
+        <div class="section-number">12</div>
+        <h2>Hệ Thống Crawl Dữ Liệu</h2>
+      </div>
+
+      <h3>GitHub Actions — Crawler miễn phí</h3>
+<pre>
+<span class="c"># .github/workflows/crawl.yml</span>
+<span class="n">on</span>:
+  <span class="n">schedule</span>:
+    - <span class="n">cron</span>: <span class="s">'0 2 * * 1'</span>    <span class="c"># Mỗi thứ Hai 2:00 AM UTC</span>
+  <span class="n">workflow_dispatch</span>:        <span class="c"># Admin trigger thủ công từ GitHub UI</span>
+
+<span class="n">jobs</span>:
+  <span class="n">crawl</span>:
+    <span class="n">runs-on</span>: ubuntu-latest
+    <span class="n">steps</span>:
+      - <span class="k">uses</span>: actions/checkout@v4
+      - <span class="k">run</span>: npm ci
+      - <span class="k">run</span>: node scripts/crawl.js
+        <span class="n">env</span>:
+          <span class="v">SUPABASE_URL</span>: ${{ secrets.SUPABASE_URL }}
+          <span class="v">SUPABASE_KEY</span>: ${{ secrets.SUPABASE_KEY }}
+</pre>
+
+      <h3>Workflow crawl → bài học</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Bước</th><th>Công nghệ</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>GitHub Actions kích hoạt script crawl</td><td>GitHub Actions cron</td></tr>
+            <tr><td>2</td><td>Fetch HTML theo URL pattern + CSS selectors trong <code>crawl_sources</code></td><td>Cheerio / Playwright</td></tr>
+            <tr><td>3</td><td>Extract title + text + source_url</td><td>HTML parser</td></tr>
+            <tr><td>4</td><td>Insert vào <code>crawl_raw_items</code> (status=pending)</td><td>Supabase client</td></tr>
+            <tr><td>5</td><td>Admin review trên giao diện → approve</td><td>Admin UI</td></tr>
+            <tr><td>6</td><td>Tạo bản ghi <code>lessons</code> từ raw item</td><td>API route</td></tr>
+            <tr><td>7</td><td>Lesson status = "published"</td><td>Supabase</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Không có TTS server — audio được generate realtime bằng Web Speech API khi người dùng bắt đầu luyện tập.</p>
+
+      <h3>Cấu trúc <code>selectors_json</code> (admin cấu hình)</h3>
+<pre>
+{
+  <span class="s">"title"</span>:  <span class="s">"h1.lesson-title"</span>,
+  <span class="s">"text"</span>:   <span class="s">"div.lesson-content p"</span>,
+  <span class="s">"paginate"</span>: <span class="s">"a.next-page"</span>,
+  <span class="s">"exclude"</span>: [<span class="s">"div.ads"</span>, <span class="s">"nav"</span>, <span class="s">"footer"</span>]
+}
+</pre>
+    </section>
+
+    <!-- ── Section 13: Chi phí ── -->
+    <section class="section" id="s13">
+      <div class="section-header">
+        <div class="section-number">13</div>
+        <h2>Chi Phí Hạ Tầng — $0/tháng</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Dịch vụ</th><th>Vai trò</th><th>Free Limit</th><th>Ước tính dùng</th><th>Chi phí</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Vercel</strong></td>
+              <td>Frontend + API routes</td>
+              <td>100GB bandwidth, unlimited deploys</td>
+              <td>~10GB / 1000 users</td>
+              <td class="cost-zero">$0</td>
+            </tr>
+            <tr>
+              <td><strong>Supabase</strong></td>
+              <td>PostgreSQL + Auth + Storage</td>
+              <td>500MB DB, 1GB storage, 50K users</td>
+              <td>~50MB DB, ~200MB storage</td>
+              <td class="cost-zero">$0</td>
+            </tr>
+            <tr>
+              <td><strong>Web Speech API</strong></td>
+              <td>TTS — chạy trong browser</td>
+              <td>Không giới hạn</td>
+              <td>Không giới hạn</td>
+              <td class="cost-zero">$0</td>
+            </tr>
+            <tr>
+              <td><strong>GitHub Actions</strong></td>
+              <td>CI/CD + Crawl jobs</td>
+              <td>2,000 phút/tháng</td>
+              <td>~100 phút/tháng</td>
+              <td class="cost-zero">$0</td>
+            </tr>
+            <tr>
+              <td><strong>GitHub Repo</strong></td>
+              <td>Source code + Actions</td>
+              <td>Unlimited public repos</td>
+              <td>—</td>
+              <td class="cost-zero">$0</td>
+            </tr>
+            <tr class="cost-total">
+              <td colspan="4"><strong>Tổng cộng</strong></td>
+              <td class="cost-zero">$0 / tháng</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Khi nào cần nâng cấp?</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ngưỡng</th><th>Bottleneck</th><th>Giải pháp</th><th>Chi phí thêm</th></tr></thead>
+          <tbody>
+            <tr><td>&gt; 500MB DB</td><td>Supabase free DB đầy</td><td>Nâng Supabase Pro</td><td>$25/tháng</td></tr>
+            <tr><td>&gt; 50K users</td><td>Supabase Auth limit</td><td>Supabase Pro</td><td>$25/tháng</td></tr>
+            <tr><td>&gt; 100GB bandwidth</td><td>Vercel free limit</td><td>Vercel Pro</td><td>$20/tháng</td></tr>
+            <tr><td>Muốn giọng đẹp hơn</td><td>Web Speech API quality</td><td>Azure TTS F0 (500K chars free)</td><td>$0 → có thể $0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Section 14: Roadmap ── -->
+    <section class="section" id="s14">
+      <div class="section-header">
+        <div class="section-number">14</div>
+        <h2>Roadmap Triển Khai</h2>
+      </div>
+
+      <div class="roadmap">
+        <div class="phase">
+          <div class="phase-dot p1">1</div>
+          <div class="phase-body">
+            <div class="phase-title">Phase 1 — MVP Cốt Lõi</div>
+            <div class="phase-period">Tuần 1–6 | Deliverable: Người dùng có thể học với nội dung nhập thủ công</div>
+            <ul class="phase-items">
+              <li>Khởi tạo Next.js 14 + Supabase + Tailwind CSS</li>
+              <li>Auth: email + Google OAuth (Supabase Auth)</li>
+              <li>DB schema: users, languages, categories, lessons, study_sessions</li>
+              <li>Màn hình chọn ngôn ngữ → danh mục → danh sách bài</li>
+              <li>Màn hình luyện tập: Web Speech API + text highlight karaoke</li>
+              <li>Speed control (0.5x–2.0x) + voice selector</li>
+              <li>Repeat mode: loop cùng tốc độ + tăng dần tốc độ</li>
+              <li>Progress tracking: lưu phiên học, streak cơ bản</li>
+              <li>Deploy Vercel, nhập 5 bài/ngôn ngữ để test</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase-dot p2">2</div>
+          <div class="phase-body">
+            <div class="phase-title">Phase 2 — Nội Dung & Admin</div>
+            <div class="phase-period">Tuần 7–12 | Deliverable: Beta với nội dung crawl tự động</div>
+            <ul class="phase-items">
+              <li>Admin panel đầy đủ (CRUD lessons, categories, users)</li>
+              <li>GitHub Actions crawler + Cheerio HTML parser</li>
+              <li>Admin cấu hình crawl sources (URL + selectors)</li>
+              <li>Review raw content UI</li>
+              <li>Gamification: xu, huy hiệu, mascot animations (Framer Motion)</li>
+              <li>Furigana support cho Tiếng Nhật (<code>&lt;ruby&gt;</code> tags)</li>
+              <li>20+ bài học / ngôn ngữ từ các nguồn crawl</li>
+              <li>Progress screen: streak calendar heatmap, biểu đồ tốc độ</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase-dot p3">3</div>
+          <div class="phase-body">
+            <div class="phase-title">Phase 3 — Tối Ưu & Mở Rộng</div>
+            <div class="phase-period">Tuần 13–20 | Deliverable: Production-ready</div>
+            <ul class="phase-items">
+              <li>Ghi âm người dùng (MediaRecorder API — free) + so sánh</li>
+              <li>Push notifications nhắc học hàng ngày (Web Push API — free)</li>
+              <li>SEO optimization landing page</li>
+              <li>PWA (Progressive Web App) — cài được trên mobile</li>
+              <li>Analytics dashboard admin (charts)</li>
+              <li>Tối ưu hiệu năng: lazy loading, prefetch</li>
+              <li>Tài khoản con cho trẻ em (phụ huynh quản lý)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Section 15: Rủi ro ── -->
+    <section class="section" id="s15">
+      <div class="section-header">
+        <div class="section-number">15</div>
+        <h2>Rủi Ro & Giải Pháp</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Rủi ro</th><th>Xác suất</th><th>Mức độ</th><th>Giải pháp</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>iOS Safari thiếu giọng <code>vi-VN</code>, <code>ja-JP</code></td>
+              <td class="risk-high">Cao</td>
+              <td class="risk-med">Trung bình</td>
+              <td>Hiển thị banner "Dùng Chrome để có trải nghiệm tốt nhất". Fallback về giọng mặc định của browser.</td>
+            </tr>
+            <tr>
+              <td>Web Speech API không đồng nhất giữa browser</td>
+              <td class="risk-high">Cao</td>
+              <td class="risk-med">Trung bình</td>
+              <td>Test trên Chrome (70%+ thị phần desktop). Detect browser và warning nếu không phải Chrome/Edge.</td>
+            </tr>
+            <tr>
+              <td>Supabase free bị ngắt sau 1 tuần inactive</td>
+              <td class="risk-med">Trung bình</td>
+              <td class="risk-high">Cao</td>
+              <td>GitHub Actions ping DB mỗi 5 ngày (keep-alive job). Tự động, không cần thao tác thủ công.</td>
+            </tr>
+            <tr>
+              <td>Crawler bị block bởi target site</td>
+              <td class="risk-med">Trung bình</td>
+              <td class="risk-low">Thấp</td>
+              <td>Rate limit 1 req/5s. User-Agent giả browser. Nếu bị block, chuyển sang nhập thủ công hoặc nguồn thay thế.</td>
+            </tr>
+            <tr>
+              <td>Vi phạm bản quyền nội dung crawl</td>
+              <td class="risk-low">Thấp</td>
+              <td class="risk-high">Rất cao</td>
+              <td>Admin review bắt buộc. Chỉ crawl public domain / CC. Lưu source attribution trên mỗi bài.</td>
+            </tr>
+            <tr>
+              <td>Word boundary event không chính xác với một số ngôn ngữ</td>
+              <td class="risk-med">Trung bình</td>
+              <td class="risk-low">Thấp</td>
+              <td>Fallback: highlight theo sentence thay vì word nếu boundary events không đáng tin cậy. Luôn có sentence-level highlight là backup.</td>
+            </tr>
+            <tr>
+              <td>Vercel cold start chậm cho API routes</td>
+              <td class="risk-low">Thấp</td>
+              <td class="risk-low">Thấp</td>
+              <td>Dùng Supabase client trực tiếp ở frontend với RLS thay vì API routes cho các truy vấn đơn giản.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-box">
+        📌 <strong>Kết luận:</strong> Với stack <strong>Next.js + Supabase + Web Speech API</strong>, có thể xây dựng đầy đủ tính năng với chi phí $0/tháng. Rủi ro lớn nhất là giới hạn browser của Web Speech API trên iOS, có thể giải quyết bằng thông báo rõ ràng cho người dùng.
+      </div>
+
+      <br>
+      <div style="text-align:center;color:var(--text-muted);font-size:12px;padding-top:24px;border-top:1px solid var(--border)">
+        ShadowLing SRS v1.0 — Được tạo ngày 25/05/2026 &nbsp;|&nbsp; Tất cả thay đổi cần cập nhật document này
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Active TOC link on scroll
+  const links = document.querySelectorAll('.toc-link');
+  const sections = document.querySelectorAll('.section');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.toc-link[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
