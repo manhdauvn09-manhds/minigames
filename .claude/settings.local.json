@@ -35,7 +35,8 @@
       "mcp__9e37ddd0-644c-40f5-9d0b-c6376d5a5ec8__list_files",
       "mcp__9e37ddd0-644c-40f5-9d0b-c6376d5a5ec8__read_file",
       "mcp__9e37ddd0-644c-40f5-9d0b-c6376d5a5ec8__run_command",
-      "mcp__9e37ddd0-644c-40f5-9d0b-c6376d5a5ec8__write_file"
+      "mcp__9e37ddd0-644c-40f5-9d0b-c6376d5a5ec8__write_file",
+      "mcp__9e37ddd0-644c-40f5-9d0b-c6376d5a5ec8__deploy"
     ]
   }
 }
