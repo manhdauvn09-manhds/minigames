@@ -31,7 +31,11 @@
       "Bash(Get-ChildItem -Recurse -Depth 2)",
       "Bash(Select-Object FullName)",
       "Bash(ping -c 3 62.238.28.106)",
-      "Bash(ssh -vvv -i \"C:\\\\Users\\\\ManhDS\\\\.ssh\\\\github_minigames\" root@62.238.28.106 \"echo OK\")"
+      "Bash(ssh -vvv -i \"C:\\\\Users\\\\ManhDS\\\\.ssh\\\\github_minigames\" root@62.238.28.106 \"echo OK\")",
+      "mcp__9e37ddd0-644c-40f5-9d0b-c6376d5a5ec8__list_files",
+      "mcp__9e37ddd0-644c-40f5-9d0b-c6376d5a5ec8__read_file",
+      "mcp__9e37ddd0-644c-40f5-9d0b-c6376d5a5ec8__run_command",
+      "mcp__9e37ddd0-644c-40f5-9d0b-c6376d5a5ec8__write_file"
     ]
   }
 }
