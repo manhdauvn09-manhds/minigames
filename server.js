@@ -11,6 +11,7 @@ import leaderboard from './api/leaderboard.js';
 import user        from './api/user.js';
 import heartbeat   from './api/heartbeat.js';
 import stats       from './api/stats.js';
+import track       from './api/track.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -35,6 +36,7 @@ app.options('/api/*', (req, res) => {
 app.post('/api/score',       wrap(score));
 app.post('/api/user',        wrap(user));
 app.post('/api/heartbeat',   wrap(heartbeat));
+app.post('/api/track',       wrap(track));
 app.get ('/api/leaderboard', wrap(leaderboard));
 app.get ('/api/stats',       wrap(stats));
 
