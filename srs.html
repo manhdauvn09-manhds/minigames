@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MinigGames — Software Requirements Specification</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a12;color:#e0e0f0;padding:20px;line-height:1.7;max-width:900px;margin:0 auto}
+h1{color:#a78bfa;margin-bottom:4px;font-size:1.6em}
+h2{color:#60a5fa;margin:24px 0 10px;font-size:1.25em;border-bottom:1px solid #1e1e30;padding-bottom:6px}
+h3{color:#c8c8e8;margin:14px 0 6px;font-size:1.05em}
+.meta{color:#888;font-size:.82em;margin-bottom:20px}
+.new{color:#2196F3;font-weight:bold}
+.del{color:red;text-decoration:line-through}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88em}
+th{background:#1a1a2e;color:#a78bfa;padding:8px;text-align:left;font-weight:600}
+td{padding:6px 8px;border-bottom:1px solid #1a1a2e;vertical-align:top}
+code{background:#1a1a2e;padding:2px 6px;border-radius:3px;font-size:.88em;color:#34d399}
+ul{margin-left:20px;margin-bottom:8px}
+li{margin:3px 0}
+.toc{background:#12121f;padding:14px;border-radius:8px;margin-bottom:20px}
+.toc a{color:#60a5fa;text-decoration:none;display:block;padding:2px 0;font-size:.9em}
+.toc a:hover{color:#a78bfa}
+.endpoint{background:#12121f;padding:10px;border-radius:6px;margin:8px 0;border-left:3px solid #60a5fa;font-family:monospace;font-size:.88em}
+</style>
+</head>
+<body>
+
+<h1>MinigGames — SRS</h1>
+<p class="meta">Software Requirements Specification | v2.1.0 | Last updated: <span class="new">2026-06-01</span></p>
+
+<div class="toc">
+<strong>Table of Contents</strong>
+<a href="#overview">1. Overview</a>
+<a href="#games">2. Game Catalog</a>
+<a href="#api">3. API Endpoints</a>
+<a href="#database">4. Database Schema</a>
+<a href="#auth">5. Authentication</a>
+<a href="#features">6. Platform Features</a>
+<a href="#infra">7. Infrastructure</a>
+<a href="#env">8. Environment Variables</a>
+</div>
+
+<h2 id="overview">1. Overview</h2>
+<table>
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Name</td><td><span class="new">allin1site-minigames v2.1.0</span></td></tr>
+<tr><td>Domain</td><td><span class="new">minigames.allin1site.com</span></td></tr>
+<tr><td>Stack</td><td><span class="new">Node.js 20 + Express 4.21 + MySQL2 3.11</span></td></tr>
+<tr><td>Port</td><td><span class="new">3333</span></td></tr>
+<tr><td>Languages</td><td><span class="new">EN, VI, JA (auto-detect)</span></td></tr>
+<tr><td>Theme</td><td><span class="new">Dark (default) / Light (toggle)</span></td></tr>
+<tr><td>Auth</td><td><span class="new">Guest (auto UUID) + Google OAuth2 (optional)</span></td></tr>
+</table>
+
+<h2 id="games">2. Game Catalog</h2>
+<h3>Featured (2)</h3>
+<table>
+<tr><th>Game</th><th>Type</th><th>Levels</th><th>Path</th><th>Status</th></tr>
+<tr><td><span class="new">Sodoku</span></td><td>Puzzle (9x9)</td><td>5 difficulty</td><td><code>/games/sodoku/</code></td><td>LIVE</td></tr>
+<tr><td><span class="new">Kaya / Caro</span></td><td>Gomoku (5-in-a-row)</td><td>5 AI levels</td><td><code>/games/kaya/</code></td><td>LIVE</td></tr>
+</table>
+
+<h3>All Games (8)</h3>
+<table>
+<tr><th>Game</th><th>Type</th><th>Levels</th><th>Path</th></tr>
+<tr><td>BallMerge</td><td>Merge Puzzle</td><td>30</td><td><code>/games/ballmerge/</code></td></tr>
+<tr><td>ChromaMatch</td><td>Match-3</td><td>30</td><td><code>/games/chromamatch/</code></td></tr>
+<tr><td>StackTower</td><td>Arcade Stack</td><td>30</td><td><code>/games/stacktower/</code></td></tr>
+<tr><td>MemoryFlip</td><td>Memory Card</td><td>30</td><td><code>/games/memoryflip/</code></td></tr>
+<tr><td>SnakeRush</td><td>Arcade Snake</td><td>30</td><td><code>/games/snakerush/</code></td></tr>
+<tr><td>BubbleBlast</td><td>Bubble Shooter</td><td>30</td><td><code>/games/bubbleblast/</code></td></tr>
+<tr><td>ArkanoidX</td><td>Breakout</td><td>30</td><td><code>/games/arkanoidx/</code></td></tr>
+<tr><td>NumberSlide</td><td>Sliding Puzzle</td><td>30</td><td><code>/games/numberslide/</code></td></tr>
+</table>
+
+<h2 id="api">3. API Endpoints</h2>
+
+<div class="endpoint"><strong>POST</strong> /api/score — Record play result<br>Body: { game, userId, name, email?, score, level, mode, extra? }<br>Response: { ok: true }</div>
+
+<div class="endpoint"><strong>GET</strong> /api/leaderboard?game=xxx&period=all|week — Top 20 players<br>Response: { rows: [...], period }<br>Cache: 30s</div>
+
+<div class="endpoint"><strong>POST</strong> /api/user — Upsert user profile<br>Body: { userId, name, email? }</div>
+
+<div class="endpoint"><strong>POST</strong> /api/heartbeat — Online presence ping (30s interval)<br>Body: { userId, game? }</div>
+
+<div class="endpoint"><span class="new"><strong>POST</strong> /api/track — Visitor + pageview tracking<br>Body: { type: 'session'|'pageview', sid, game? }<br>Response: { ok: true, newSession?: boolean }</span></div>
+
+<div class="endpoint"><strong>GET</strong> /api/stats?all=1 — Aggregated stats (players, online, plays, visitors, views)<br>Response: { totalVisitors, totalPageviews, games: [...] }</div>
+
+<div class="endpoint"><strong>GET</strong> /healthz — Health check<br>Response: { ok: true, ts }</div>
+
+<h2 id="database">4. Database Schema</h2>
+<h3>Connection</h3>
+<table>
+<tr><th>Param</th><th>Value</th></tr>
+<tr><td>Host</td><td><span class="new">vultr-prod-*.vultrdb.com:16751</span></td></tr>
+<tr><td>Database</td><td><span class="new">minigame</span></td></tr>
+<tr><td>User</td><td><span class="new">minigames</span></td></tr>
+<tr><td>SSL</td><td><span class="new">Required</span></td></tr>
+<tr><td>Pool</td><td>5 connections, keep-alive 10s</td></tr>
+</table>
+
+<h3>Tables</h3>
+<table>
+<tr><th>Table</th><th>Purpose</th></tr>
+<tr><td><code>users</code></td><td>Cross-game user profiles (user_id, name, email, type)</td></tr>
+<tr><td><code>scores_*</code></td><td>Per-game scores (8 tables: ballmerge, chromamatch, etc.)</td></tr>
+<tr><td><code>presence</code></td><td>Online heartbeat tracking</td></tr>
+<tr><td><code>visitor_sessions</code></td><td>Site-wide visitor sessions (30-min timeout)</td></tr>
+<tr><td><code>game_visitor_sessions</code></td><td>Per-game visitor sessions</td></tr>
+<tr><td><code>site_counters</code></td><td>total_visitors, total_pageviews</td></tr>
+<tr><td><code>game_counters</code></td><td>Per-game visitors, pageviews</td></tr>
+</table>
+
+<h3>Game Whitelist (SQL injection prevention)</h3>
+<p>File: <code>api/_db.js</code> — <code>GAMES = Set(['ballmerge', 'chromamatch', 'stacktower', 'memoryflip', 'snakerush', 'bubbleblast', 'arkanoidx', 'numberslide'])</code></p>
+
+<h2 id="auth">5. Authentication</h2>
+<ul>
+<li><strong>Guest mode:</strong> Auto-generate <code>guest_uuid</code> in localStorage</li>
+<li><strong>Google OAuth2:</strong> Google Identity Services SDK, token verified via <code>oauth2.googleapis.com/tokeninfo</code></li>
+<li><strong>Token flow:</strong> POST /api/score with Bearer token — server validates Google ID token matches userId</li>
+<li><strong>Rejection:</strong> Claims google_ prefix without token = 401</li>
+</ul>
+
+<h2 id="features">6. Platform Features</h2>
+
+<h3>Hub (index.html)</h3>
+<ul>
+<li>Game card grid — Featured (2) + All Games (8)</li>
+<li>Daily Challenge — deterministic hash(today) picks game</li>
+<li>Streak counter — localStorage, resets if gap > 1 day</li>
+<li>Site-wide stats bar — visitors, views (from /api/stats)</li>
+<li>i18n — EN/VI/JA, auto-detect from navigator.language</li>
+<li>Theme toggle — dark/light, stored in localStorage</li>
+</ul>
+
+<h3>Game Shell (game-platform.js)</h3>
+<ul>
+<li>Phone-style status bar (clock, signal, battery)</li>
+<li>Top/bottom ad slots (30px each)</li>
+<li>Overlay system: pause, settings, how-to-play, profile</li>
+<li>IndexedDB storage: history, top scores, profile</li>
+<li>Google login modal</li>
+<li>Heartbeat ping (30s interval)</li>
+<li>Interstitial ad support (disabled in MVP)</li>
+</ul>
+
+<h3>CSP (Content Security Policy)</h3>
+<ul>
+<li><code>script-src:</code> self, unsafe-inline, accounts.google.com, gstatic.com, <span class="new">cloudflareinsights.com, challenges.cloudflare.com</span></li>
+<li><code>frame-src:</code> accounts.google.com, <span class="new">challenges.cloudflare.com</span></li>
+<li><code>connect-src:</code> self, https:</li>
+</ul>
+
+<h2 id="infra">7. Infrastructure</h2>
+<table>
+<tr><th>Component</th><th>Detail</th></tr>
+<tr><td>VPS</td><td><span class="new">62.238.28.106</span></td></tr>
+<tr><td>Container</td><td>Docker — node:20-alpine, port 3333</td></tr>
+<tr><td>Reverse Proxy</td><td>nginx (443 SSL -> 127.0.0.1:3333)</td></tr>
+<tr><td>CDN/Security</td><td>Cloudflare (SSL Full, WAF)</td></tr>
+<tr><td>SSH Deploy</td><td>github-minigames alias in ~/.ssh/config</td></tr>
+<tr><td>Deploy Script</td><td>deploy-safe.ps1 (PowerShell, multi-service safe)</td></tr>
+<tr><td>Health Check</td><td>Docker healthcheck: wget /healthz every 30s</td></tr>
+</table>
+
+<h2 id="env">8. Environment Variables</h2>
+<table>
+<tr><th>Variable</th><th>Required</th><th>Default</th></tr>
+<tr><td><code>DATABASE_URL</code></td><td>YES</td><td>-</td></tr>
+<tr><td><code>GOOGLE_CLIENT_ID</code></td><td>No</td><td>empty</td></tr>
+<tr><td><code>CORS_ORIGIN</code></td><td>No</td><td>*</td></tr>
+<tr><td><code>PORT</code></td><td>No</td><td>3333</td></tr>
+<tr><td><code>MYSQL_SSL</code></td><td>No</td><td>false</td></tr>
+</table>
+
+</body>
+</html>
