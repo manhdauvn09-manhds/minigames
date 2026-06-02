@@ -28,7 +28,7 @@ li{margin:3px 0}
 <body>
 
 <h1>MinigGames — SRS</h1>
-<p class="meta">Software Requirements Specification | v2.1.0 | Last updated: <span class="new">2026-06-01</span></p>
+<p class="meta">Software Requirements Specification | v2.1.0 | Last updated: <span class="new">2026-06-03</span></p>
 
 <div class="toc">
 <strong>Table of Contents</strong>
@@ -95,10 +95,10 @@ li{margin:3px 0}
 <h3>Connection</h3>
 <table>
 <tr><th>Param</th><th>Value</th></tr>
-<tr><td>Host</td><td><span class="new">vultr-prod-*.vultrdb.com:16751</span></td></tr>
-<tr><td>Database</td><td><span class="new">minigame</span></td></tr>
-<tr><td>User</td><td><span class="new">minigames</span></td></tr>
-<tr><td>SSL</td><td><span class="new">Required</span></td></tr>
+<tr><td>Host</td><td><span style="color:red;text-decoration:line-through">vultr-prod-*.vultrdb.com:16751</span> <span class="new">149.28.152.221:3306</span></td></tr>
+<tr><td>Database</td><td>minigame</td></tr>
+<tr><td>User</td><td><span style="color:red;text-decoration:line-through">minigames</span> <span class="new">minigames_user</span></td></tr>
+<tr><td>SSL</td><td><span style="color:red;text-decoration:line-through">Required</span> <span class="new">false (self-host Singapore)</span></td></tr>
 <tr><td>Pool</td><td>5 connections, keep-alive 10s</td></tr>
 </table>
 
