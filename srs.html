@@ -28,7 +28,7 @@ li{margin:3px 0}
 <body>
 
 <h1>MinigGames — SRS</h1>
-<p class="meta">Software Requirements Specification | v2.1.0 | Last updated: <span class="new">2026-06-03</span></p>
+<p class="meta">Software Requirements Specification | v2.1.0 | Last updated: <span class="new">2026-06-15</span></p>
 
 <div class="toc">
 <strong>Table of Contents</strong>
@@ -135,6 +135,8 @@ li{margin:3px 0}
 <li>Site-wide stats bar — visitors, views (from /api/stats)</li>
 <li>i18n — EN/VI/JA, auto-detect from navigator.language</li>
 <li>Theme toggle — dark/light, stored in localStorage</li>
+<li><span class="new">Search + Filter — search box + type pills (puzzle/arcade/memory), instant client-side filter</span></li>
+<li><span class="new">Daily Login Reward — XP economy (gp_xp) + 7-day cycle [10..100 XP], calendar modal auto-opens once/day</span></li>
 </ul>
 
 <h3>Game Shell (game-platform.js)</h3>
@@ -142,10 +144,20 @@ li{margin:3px 0}
 <li>Phone-style status bar (clock, signal, battery)</li>
 <li>Top/bottom ad slots (30px each)</li>
 <li>Overlay system: pause, settings, how-to-play, profile</li>
-<li>IndexedDB storage: history, top scores, profile</li>
+<li>IndexedDB storage: history, top scores, profile<span class="new">, global stats, achievements</span></li>
 <li>Google login modal</li>
 <li>Heartbeat ping (30s interval)</li>
 <li>Interstitial ad support (disabled in MVP)</li>
+<li><span class="new">Sound FX — Web Audio synthesized cues (click/win/lose/levelup/coin/badge), 🔊/🔇 toggle, no asset files</span></li>
+<li><span class="new">Achievements — 14 cross-game badges, local-first (IndexedDB), unlock-on-result toast + Awards screen + profile preview</span></li>
+<li><span class="new">Share Score — Canvas 600×360 score-card → Web Share API, fallback PNG download</span></li>
+</ul>
+
+<h3><span class="new">PWA &amp; Offline (sw.js + manifest.webmanifest)</span></h3>
+<ul>
+<li><span class="new">Service worker — network-first for HTML (fresh on deploy), cache-first for static assets, network-only for /api/*</span></li>
+<li><span class="new">Installable — manifest with shortcuts (BallMerge, Kaya, Sodoku) + maskable icon, standalone display</span></li>
+<li><span class="new">Cache versioning — CACHE_NAME bump purges stale caches on activate</span></li>
 </ul>
 
 <h3>CSP (Content Security Policy)</h3>
@@ -158,12 +170,12 @@ li{margin:3px 0}
 <h2 id="infra">7. Infrastructure</h2>
 <table>
 <tr><th>Component</th><th>Detail</th></tr>
-<tr><td>VPS</td><td><span class="new">62.238.28.106</span></td></tr>
-<tr><td>Container</td><td>Docker — node:20-alpine, port 3333</td></tr>
-<tr><td>Reverse Proxy</td><td>nginx (443 SSL -> 127.0.0.1:3333)</td></tr>
+<tr><td>VPS</td><td><span style="color:red;text-decoration:line-through">62.238.28.106</span> <span class="new">65.108.62.80 (mcp-80, shared host — 12 apps)</span></td></tr>
+<tr><td>Container</td><td>Docker — node:20-alpine, <span style="color:red;text-decoration:line-through">port 3333</span> <span class="new">port 3333 → host 127.0.0.1:9210</span></td></tr>
+<tr><td>Reverse Proxy</td><td>nginx (443 SSL -> <span style="color:red;text-decoration:line-through">127.0.0.1:3333</span> <span class="new">127.0.0.1:9210</span>)</td></tr>
 <tr><td>CDN/Security</td><td>Cloudflare (SSL Full, WAF)</td></tr>
-<tr><td>SSH Deploy</td><td>github-minigames alias in ~/.ssh/config</td></tr>
-<tr><td>Deploy Script</td><td>deploy-safe.ps1 (PowerShell, multi-service safe)</td></tr>
+<tr><td><span class="new">PWA</span></td><td><span class="new">Service worker + manifest — installable, offline-capable</span></td></tr>
+<tr><td>Deploy</td><td><span style="color:red;text-decoration:line-through">deploy-safe.ps1 / github-minigames SSH alias</span> <span class="new">scp 5 files → docker compose up -d --build → sha256 verify + health</span></td></tr>
 <tr><td>Health Check</td><td>Docker healthcheck: wget /healthz every 30s</td></tr>
 </table>
 

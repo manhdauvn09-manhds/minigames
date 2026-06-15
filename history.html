@@ -26,13 +26,30 @@ tr:hover{background:#12121f}
 </head>
 <body>
 <h1>MinigGames — Deploy History</h1>
-<p class="sub">Project: allin1site-minigames v2.1.0 | VPS: 62.238.28.106:3333 | Domain: minigames.allin1site.com</p>
+<p class="sub">Project: allin1site-minigames v2.1.0 | VPS: 65.108.62.80:9210 (mcp-80) | Domain: minigames.allin1site.com</p>
 
 <table>
 <thead>
 <tr><th>Date</th><th>Commit</th><th>Changes</th><th>Type</th><th>Status</th></tr>
 </thead>
 <tbody>
+
+<tr>
+<td>2026-06-15 18:37</td>
+<td><span class="hash">37180f4</span></td>
+<td>
+<strong>Retention 10× — Sound, Achievements, Daily Rewards & PWA</strong><br>
+- <strong>Sound FX:</strong> Web Audio synthesized (no asset files), 6 cues, toggle 🔊/🔇 lưu localStorage<br>
+- <strong>Achievements:</strong> 14 badge cross-game local-first (IndexedDB), unlock on result + toast, màn Awards + profile preview<br>
+- <strong>Daily Reward:</strong> XP economy + chu kỳ 7 ngày [10..100]XP, modal calendar auto-open 1 lần/ngày<br>
+- <strong>Share Score:</strong> Canvas 600×360 → Web Share API, fallback download PNG<br>
+- <strong>Search + Filter:</strong> hub search box + 4 pills (all/puzzle/arcade/memory), i18n EN/VI/JA<br>
+- <strong>PWA:</strong> service worker (network-first HTML, cache-first assets), manifest shortcuts + maskable icon<br>
+- Deploy mcp-80: scp 5 files → docker compose build → recreate. sha256 5/5 khớp, 20 container healthy
+</td>
+<td><span class="tag tag-feat">feat</span> <span class="tag tag-deploy">deploy</span></td>
+<td><span class="ok">OK</span></td>
+</tr>
 
 <tr>
 <td>2026-06-02 23:11</td>
