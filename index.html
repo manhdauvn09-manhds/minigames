@@ -339,6 +339,7 @@
             <button class="lang-btn" data-l="vi">🇻🇳 Tiếng Việt</button>
             <button class="lang-btn" data-l="ja">🇯🇵 日本語</button>
             <button class="lang-btn" id="hubThemeBtn" style="margin-left: auto;">⚙️</button>
+            <button class="lang-btn" id="hubPushBtn" title="Notifications" hidden>🔔</button>
           </div>
         </header>
 
@@ -373,6 +374,14 @@
                 <div class="label" data-i="rewardLabel">Daily Reward</div>
                 <div class="title"><span id="xpTotal">0</span> XP</div>
                 <div class="sub" id="rewardCardSub" data-i="rewardSub">Claim your daily bonus!</div>
+              </div>
+            </div>
+            <div class="daily-card season-card" id="seasonCardBtn" role="button" tabindex="0">
+              <div class="icon">🏆</div>
+              <div class="body">
+                <div class="label" data-i="seasonLabel">Season Pass</div>
+                <div class="title"><span data-i="seasonTierWord">Tier</span> <span id="seasonTier">0</span><span class="season-coins">· <span id="seasonCoins">0</span> 🪙</span></div>
+                <div class="sub" id="seasonCardSub" data-i="seasonSub">Earn XP to climb tiers!</div>
               </div>
             </div>
           </div>
@@ -435,12 +444,47 @@
     </div>
   </div>
 
+  <!-- Season Pass modal -->
+  <div class="reward-modal" id="seasonModal" hidden>
+    <div class="reward-box season-box">
+      <button class="reward-close" id="seasonClose" aria-label="Close">✕</button>
+      <div class="reward-emoji">🏆</div>
+      <h3 class="reward-title" id="seasonName">Season 1</h3>
+      <p class="reward-sub"><span data-i="seasonModalSub">Spend XP-earned tiers, grab rewards.</span> <span id="seasonCountdown" class="season-countdown"></span></p>
+      <div class="season-progress"><div class="season-progress-fill" id="seasonProgFill"></div></div>
+      <p class="season-xpline"><span id="seasonXpNow">0</span> XP · <span data-i="seasonNext">next tier in</span> <span id="seasonXpNext">0</span> XP</p>
+      <div class="season-track" id="seasonTrack"></div>
+    </div>
+  </div>
+
+  <style>
+    .season-card .icon{filter:drop-shadow(0 0 6px rgba(251,191,36,.5))}
+    .season-card.has-reward{box-shadow:0 0 0 1px rgba(251,191,36,.5),0 6px 18px rgba(251,191,36,.18)}
+    .season-coins{font-size:.8rem;color:var(--gp-text-secondary);font-weight:600;margin-left:6px}
+    #hubPushBtn.on{background:rgba(167,139,250,.22);border-color:#a78bfa}
+    .season-box{max-width:440px}
+    .season-countdown{font-size:.78rem;color:#fbbf24;font-weight:600}
+    .season-progress{height:8px;border-radius:6px;background:rgba(255,255,255,.1);overflow:hidden;margin:14px 0 6px}
+    .season-progress-fill{height:100%;background:linear-gradient(90deg,#a78bfa,#fbbf24);border-radius:6px;transition:width .4s}
+    .season-xpline{font-size:.8rem;color:var(--gp-text-secondary);margin-bottom:12px}
+    .season-track{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow-y:auto;padding-right:4px}
+    .season-tier{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+    .season-tier.unlocked{border-color:rgba(167,139,250,.5)}
+    .season-tier.claimed{opacity:.6}
+    .season-tier .st-no{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;background:rgba(167,139,250,.2);color:#a78bfa;flex:0 0 auto}
+    .season-tier.unlocked .st-no{background:#a78bfa;color:#0a0a12}
+    .season-tier .st-rw{flex:1;font-size:.85rem;font-weight:600}
+    .season-tier .st-rw small{display:block;font-weight:500;color:var(--gp-text-secondary);font-size:.74rem}
+    .season-tier .st-btn{border:none;border-radius:7px;padding:6px 13px;font-size:.8rem;font-weight:700;cursor:pointer;background:#fbbf24;color:#1a1a2e}
+    .season-tier .st-btn:disabled{cursor:default;background:rgba(255,255,255,.1);color:var(--gp-text-secondary)}
+  </style>
+
   <script>
     // ── i18n ────────────────────────────────────────────────────────────
     const TXT = {
-      en: { title:'allin1site Mini Games', tagline:'11 fresh browser games · progressive levels · plays on every screen', navGames:'🎮 Games', navManual:'📖 Manual', navHome:'🏠 Home', play:'Play Now →', viewMockup:'👁 View Mockup →', featuredHeading:'🔥 Featured', gamesHeading:'All Games', whyTitle:'Why allin1site Games?', whyBody:'Free, no signup required. Hand-tuned progressive difficulty. Online leaderboards via Google sign-in (optional). Works on any phone, tablet, or desktop browser. No ads in the MVP — pure gameplay.', footManual:'📖 User Manual', footSitemap:'Sitemap', rights:'All rights reserved', players:'players', online:'online', plays:'plays', visitors:'visitors', views:'views', wipBadge:'🚧 WIP', mockupBadge:'Mockup', wipNote:'⚠ Mockup only — game logic still in development. UI preview available.', dailyLabel:'Daily Challenge', dailySub:'One puzzle a day. Keep your streak alive.', dailyPlayed:'✓ Played today', streakLabel:'Your Streak', streakDays:'days', streakSub:'Play any game today to extend it.', streakNew:'Start your streak today!', searchPlaceholder:'Search games…', filterAll:'All (8)', filterPuzzle:'Puzzle', filterArcade:'Arcade', filterMemory:'Memory', filterEmpty:'No games found. Try a different search.', rewardLabel:'Daily Reward', rewardSub:'Claim your daily bonus!', rewardReadySub:'🎁 Reward ready — tap to claim!', rewardDoneSub:'✓ Claimed. Come back tomorrow!', rewardTitle:'Daily Reward', rewardModalSub:'Log in daily — bigger rewards each day!', rewardClaim:'Claim', rewardClaimed:'✓ Claimed today', rewardDay:'Day' },
-      vi: { title:'allin1site Mini Games', tagline:'11 game miễn phí · cấp độ tăng dần · chơi trên mọi thiết bị', navGames:'🎮 Game', navManual:'📖 Hướng dẫn', navHome:'🏠 Trang chủ', play:'Chơi ngay →', viewMockup:'👁 Xem Mockup →', featuredHeading:'🔥 Nổi bật', gamesHeading:'Tất cả game', whyTitle:'Tại sao chọn allin1site Games?', whyBody:'Miễn phí, không cần đăng ký. Cấp độ tăng dần được tinh chỉnh kỹ. Bảng xếp hạng online qua Google (tùy chọn). Chạy trên mọi điện thoại, tablet, máy tính. Không quảng cáo phiền phức — chỉ thuần gameplay.', footManual:'📖 Hướng dẫn', footSitemap:'Sơ đồ trang', rights:'Mọi quyền được bảo lưu', players:'người chơi', online:'đang online', plays:'lượt chơi', visitors:'lượt truy cập', views:'lượt xem', wipBadge:'🚧 Đang làm', mockupBadge:'Mockup', wipNote:'⚠ Mới chỉ có Mockup — game đang phát triển, chưa chơi được. Xem trước giao diện.', dailyLabel:'Thử thách ngày', dailySub:'Mỗi ngày một puzzle. Giữ chuỗi không đứt.', dailyPlayed:'✓ Đã chơi hôm nay', streakLabel:'Chuỗi của bạn', streakDays:'ngày', streakSub:'Chơi bất kỳ game nào hôm nay để nối tiếp.', streakNew:'Bắt đầu chuỗi của bạn hôm nay!', searchPlaceholder:'Tìm game…', filterAll:'Tất cả (8)', filterPuzzle:'Ghép hình', filterArcade:'Hành động', filterMemory:'Trí nhớ', filterEmpty:'Không tìm thấy game. Thử từ khác nhé.', rewardLabel:'Quà Mỗi Ngày', rewardSub:'Nhận thưởng hằng ngày!', rewardReadySub:'🎁 Có quà — bấm để nhận!', rewardDoneSub:'✓ Đã nhận. Mai quay lại nhé!', rewardTitle:'Phần Thưởng Hằng Ngày', rewardModalSub:'Vào mỗi ngày — thưởng tăng dần!', rewardClaim:'Nhận', rewardClaimed:'✓ Đã nhận hôm nay', rewardDay:'Ngày' },
-      ja: { title:'allin1site ミニゲーム', tagline:'11の無料ゲーム · 累進レベル · あらゆる画面で遊べる', navGames:'🎮 ゲーム', navManual:'📖 取扱説明', navHome:'🏠 ホーム', play:'プレイする →', viewMockup:'👁 モックアップを見る →', featuredHeading:'🔥 注目', gamesHeading:'全ゲーム', whyTitle:'なぜ allin1site Games？', whyBody:'無料・登録不要。難易度漸進。Googleログインでオンランク参加（任意）。スマホ・タブレット・PCで動作。MVP は広告なし、純粋なゲームプレイ。', footManual:'📖 取扱説明', footSitemap:'サイトマップ', rights:'無断複製禁止', players:'プレイヤー', online:'オンライン', plays:'プレイ', visitors:'訪問者', views:'閲覧数', wipBadge:'🚧 開発中', mockupBadge:'モックアップ', wipNote:'⚠ モックアップのみ — ゲームロジック開発中。UIプレビュー可能。', dailyLabel:'デイリーチャレンジ', dailySub:'1日1パズル。連続記録を守ろう。', dailyPlayed:'✓ 今日プレイ済み', streakLabel:'連続日数', streakDays:'日', streakSub:'今日どれかをプレイして継続！', streakNew:'今日から連続記録をスタート！', searchPlaceholder:'ゲームを検索…', filterAll:'すべて (8)', filterPuzzle:'パズル', filterArcade:'アクション', filterMemory:'記憶', filterEmpty:'ゲームが見つかりません。別のキーワードを試してください。', rewardLabel:'デイリー報酬', rewardSub:'毎日ボーナスを受取ろう！', rewardReadySub:'🎁 報酬あり — タップで受取！', rewardDoneSub:'✓ 受取済み。また明日！', rewardTitle:'デイリー報酬', rewardModalSub:'毎日ログインで報酬アップ！', rewardClaim:'受け取る', rewardClaimed:'✓ 本日受取済み', rewardDay:'Day' },
+      en: { title:'allin1site Mini Games', tagline:'11 fresh browser games · progressive levels · plays on every screen', navGames:'🎮 Games', navManual:'📖 Manual', navHome:'🏠 Home', play:'Play Now →', viewMockup:'👁 View Mockup →', featuredHeading:'🔥 Featured', gamesHeading:'All Games', whyTitle:'Why allin1site Games?', whyBody:'Free, no signup required. Hand-tuned progressive difficulty. Online leaderboards via Google sign-in (optional). Works on any phone, tablet, or desktop browser. No ads in the MVP — pure gameplay.', footManual:'📖 User Manual', footSitemap:'Sitemap', rights:'All rights reserved', players:'players', online:'online', plays:'plays', visitors:'visitors', views:'views', wipBadge:'🚧 WIP', mockupBadge:'Mockup', wipNote:'⚠ Mockup only — game logic still in development. UI preview available.', dailyLabel:'Daily Challenge', dailySub:'One puzzle a day. Keep your streak alive.', dailyPlayed:'✓ Played today', streakLabel:'Your Streak', streakDays:'days', streakSub:'Play any game today to extend it.', streakNew:'Start your streak today!', searchPlaceholder:'Search games…', filterAll:'All (8)', filterPuzzle:'Puzzle', filterArcade:'Arcade', filterMemory:'Memory', filterEmpty:'No games found. Try a different search.', rewardLabel:'Daily Reward', rewardSub:'Claim your daily bonus!', rewardReadySub:'🎁 Reward ready — tap to claim!', rewardDoneSub:'✓ Claimed. Come back tomorrow!', rewardTitle:'Daily Reward', rewardModalSub:'Log in daily — bigger rewards each day!', rewardClaim:'Claim', rewardClaimed:'✓ Claimed today', rewardDay:'Day', seasonLabel:'Season Pass', seasonSub:'Earn XP to climb tiers!', seasonTierWord:'Tier', seasonModalSub:'Climb tiers with XP, claim rewards.', seasonNext:'next tier in', seasonClaim:'Claim', seasonClaimed:'✓', seasonEnded:'Season ended', seasonDaysLeft:'left', pushOn:'🔔 Notifications on', pushBlocked:'Notifications are blocked in your browser settings.' },
+      vi: { title:'allin1site Mini Games', tagline:'11 game miễn phí · cấp độ tăng dần · chơi trên mọi thiết bị', navGames:'🎮 Game', navManual:'📖 Hướng dẫn', navHome:'🏠 Trang chủ', play:'Chơi ngay →', viewMockup:'👁 Xem Mockup →', featuredHeading:'🔥 Nổi bật', gamesHeading:'Tất cả game', whyTitle:'Tại sao chọn allin1site Games?', whyBody:'Miễn phí, không cần đăng ký. Cấp độ tăng dần được tinh chỉnh kỹ. Bảng xếp hạng online qua Google (tùy chọn). Chạy trên mọi điện thoại, tablet, máy tính. Không quảng cáo phiền phức — chỉ thuần gameplay.', footManual:'📖 Hướng dẫn', footSitemap:'Sơ đồ trang', rights:'Mọi quyền được bảo lưu', players:'người chơi', online:'đang online', plays:'lượt chơi', visitors:'lượt truy cập', views:'lượt xem', wipBadge:'🚧 Đang làm', mockupBadge:'Mockup', wipNote:'⚠ Mới chỉ có Mockup — game đang phát triển, chưa chơi được. Xem trước giao diện.', dailyLabel:'Thử thách ngày', dailySub:'Mỗi ngày một puzzle. Giữ chuỗi không đứt.', dailyPlayed:'✓ Đã chơi hôm nay', streakLabel:'Chuỗi của bạn', streakDays:'ngày', streakSub:'Chơi bất kỳ game nào hôm nay để nối tiếp.', streakNew:'Bắt đầu chuỗi của bạn hôm nay!', searchPlaceholder:'Tìm game…', filterAll:'Tất cả (8)', filterPuzzle:'Ghép hình', filterArcade:'Hành động', filterMemory:'Trí nhớ', filterEmpty:'Không tìm thấy game. Thử từ khác nhé.', rewardLabel:'Quà Mỗi Ngày', rewardSub:'Nhận thưởng hằng ngày!', rewardReadySub:'🎁 Có quà — bấm để nhận!', rewardDoneSub:'✓ Đã nhận. Mai quay lại nhé!', rewardTitle:'Phần Thưởng Hằng Ngày', rewardModalSub:'Vào mỗi ngày — thưởng tăng dần!', rewardClaim:'Nhận', rewardClaimed:'✓ Đã nhận hôm nay', rewardDay:'Ngày', seasonLabel:'Vé Mùa Giải', seasonSub:'Kiếm XP để lên hạng!', seasonTierWord:'Hạng', seasonModalSub:'Lên hạng bằng XP, nhận thưởng.', seasonNext:'hạng kế cần', seasonClaim:'Nhận', seasonClaimed:'✓', seasonEnded:'Mùa đã kết thúc', seasonDaysLeft:'còn lại', pushOn:'🔔 Đã bật thông báo', pushBlocked:'Thông báo đang bị chặn trong cài đặt trình duyệt.' },
+      ja: { title:'allin1site ミニゲーム', tagline:'11の無料ゲーム · 累進レベル · あらゆる画面で遊べる', navGames:'🎮 ゲーム', navManual:'📖 取扱説明', navHome:'🏠 ホーム', play:'プレイする →', viewMockup:'👁 モックアップを見る →', featuredHeading:'🔥 注目', gamesHeading:'全ゲーム', whyTitle:'なぜ allin1site Games？', whyBody:'無料・登録不要。難易度漸進。Googleログインでオンランク参加（任意）。スマホ・タブレット・PCで動作。MVP は広告なし、純粋なゲームプレイ。', footManual:'📖 取扱説明', footSitemap:'サイトマップ', rights:'無断複製禁止', players:'プレイヤー', online:'オンライン', plays:'プレイ', visitors:'訪問者', views:'閲覧数', wipBadge:'🚧 開発中', mockupBadge:'モックアップ', wipNote:'⚠ モックアップのみ — ゲームロジック開発中。UIプレビュー可能。', dailyLabel:'デイリーチャレンジ', dailySub:'1日1パズル。連続記録を守ろう。', dailyPlayed:'✓ 今日プレイ済み', streakLabel:'連続日数', streakDays:'日', streakSub:'今日どれかをプレイして継続！', streakNew:'今日から連続記録をスタート！', searchPlaceholder:'ゲームを検索…', filterAll:'すべて (8)', filterPuzzle:'パズル', filterArcade:'アクション', filterMemory:'記憶', filterEmpty:'ゲームが見つかりません。別のキーワードを試してください。', rewardLabel:'デイリー報酬', rewardSub:'毎日ボーナスを受取ろう！', rewardReadySub:'🎁 報酬あり — タップで受取！', rewardDoneSub:'✓ 受取済み。また明日！', rewardTitle:'デイリー報酬', rewardModalSub:'毎日ログインで報酬アップ！', rewardClaim:'受け取る', rewardClaimed:'✓ 本日受取済み', rewardDay:'Day', seasonLabel:'シーズンパス', seasonSub:'XPでティアを上げよう！', seasonTierWord:'ティア', seasonModalSub:'XPでティアを上げ、報酬を獲得。', seasonNext:'次のティアまで', seasonClaim:'受取', seasonClaimed:'✓', seasonEnded:'シーズン終了', seasonDaysLeft:'残り', pushOn:'🔔 通知オン', pushBlocked:'ブラウザ設定で通知がブロックされています。' },
     };
     const urlLang = new URLSearchParams(location.search).get('lang');
     let lang = (() => {
@@ -544,7 +588,7 @@
       renderGames();
     }
     document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => {
-      lang = b.dataset.l; localStorage.setItem('gp_lang', lang); applyI18n(); renderDaily(); renderStreak(); renderReward();
+      lang = b.dataset.l; localStorage.setItem('gp_lang', lang); applyI18n(); renderDaily(); renderStreak(); renderReward(); if (typeof renderSeason === 'function') renderSeason();
     }));
 
     // ── Search + Filter ────────────────────────────────────────────────
@@ -801,9 +845,137 @@
     fetchStats();
     setInterval(fetchStats, 60000);
 
+    // ── Season Pass (XP → tiers → coins, local-first) ─────────────────
+    const SEASON = {
+      id: 'S1', name: 'Season 1',
+      endsAt: Date.UTC(2026, 6, 16, 0, 0, 0), // 2026-07-16 (≈30-day season)
+      tiers: [
+        { xp: 50,   coins: 20,  icon: '🪙' }, { xp: 120,  coins: 30,  icon: '🪙' },
+        { xp: 220,  coins: 40,  icon: '🎀' }, { xp: 360,  coins: 60,  icon: '🪙' },
+        { xp: 540,  coins: 80,  icon: '⭐' }, { xp: 780,  coins: 110, icon: '🪙' },
+        { xp: 1100, coins: 150, icon: '🏅' }, { xp: 1500, coins: 200, icon: '🪙' },
+        { xp: 2000, coins: 280, icon: '💎' }, { xp: 2600, coins: 400, icon: '👑' },
+      ],
+    };
+    const _seasonKey = 'gp_season_claimed_' + SEASON.id;
+    function _getCoins() { return parseInt(localStorage.getItem('gp_coins') || '0', 10) || 0; }
+    function _claimedTiers() { try { return JSON.parse(localStorage.getItem(_seasonKey) || '[]'); } catch { return []; } }
+    function _currentTier(xp) { let t = 0; for (const tr of SEASON.tiers) { if (xp >= tr.xp) t++; else break; } return t; }
+    function renderSeason() {
+      const T = TXT[lang] || TXT.en;
+      const xp = _getXP(), tier = _currentTier(xp), claimed = _claimedTiers();
+      const tEl = document.getElementById('seasonTier'); if (tEl) tEl.textContent = tier;
+      const cEl = document.getElementById('seasonCoins'); if (cEl) cEl.textContent = fmtNum(_getCoins());
+      const claimable = SEASON.tiers.some((tr, i) => xp >= tr.xp && !claimed.includes(i));
+      const card = document.getElementById('seasonCardBtn');
+      const sub = document.getElementById('seasonCardSub');
+      if (card) card.classList.toggle('has-reward', claimable);
+      if (sub && claimable) sub.textContent = '🎁 ' + T.seasonClaim + '!';
+      else if (sub) sub.textContent = T.seasonSub;
+    }
+    function _seasonCountdownText() {
+      const T = TXT[lang] || TXT.en;
+      const ms = SEASON.endsAt - Date.now();
+      if (ms <= 0) return T.seasonEnded;
+      const days = Math.ceil(ms / 86400000);
+      return '⏳ ' + days + ' ' + (T.seasonDaysLeft) + (lang === 'en' ? ' days' : '');
+    }
+    function openSeasonModal() {
+      const T = TXT[lang] || TXT.en;
+      const xp = _getXP(), tier = _currentTier(xp), claimed = _claimedTiers();
+      document.getElementById('seasonName').textContent = SEASON.name;
+      document.getElementById('seasonCountdown').textContent = _seasonCountdownText();
+      document.getElementById('seasonXpNow').textContent = fmtNum(xp);
+      const next = SEASON.tiers[tier];
+      document.getElementById('seasonXpNext').textContent = next ? fmtNum(Math.max(0, next.xp - xp)) : '—';
+      const prevXp = tier > 0 ? SEASON.tiers[tier - 1].xp : 0;
+      const span = next ? (next.xp - prevXp) : 1;
+      const pct = next ? Math.min(100, Math.round((xp - prevXp) / span * 100)) : 100;
+      document.getElementById('seasonProgFill').style.width = pct + '%';
+      const track = document.getElementById('seasonTrack');
+      track.innerHTML = '';
+      SEASON.tiers.forEach((tr, i) => {
+        const unlocked = xp >= tr.xp, isClaimed = claimed.includes(i);
+        const row = document.createElement('div');
+        row.className = 'season-tier' + (unlocked ? ' unlocked' : '') + (isClaimed ? ' claimed' : '');
+        const btn = `<button class="st-btn" data-tier="${i}" ${(!unlocked || isClaimed) ? 'disabled' : ''}>${isClaimed ? T.seasonClaimed : (unlocked ? T.seasonClaim : '🔒')}</button>`;
+        row.innerHTML = `<div class="st-no">${i + 1}</div>
+          <div class="st-rw">${tr.icon} +${tr.coins} 🪙<small>${tr.xp} XP</small></div>${btn}`;
+        track.appendChild(row);
+      });
+      track.querySelectorAll('.st-btn:not([disabled])').forEach(b =>
+        b.addEventListener('click', () => claimTier(parseInt(b.dataset.tier, 10))));
+      document.getElementById('seasonModal').hidden = false;
+    }
+    function claimTier(i) {
+      const xp = _getXP(), tr = SEASON.tiers[i], claimed = _claimedTiers();
+      if (!tr || xp < tr.xp || claimed.includes(i)) return;
+      localStorage.setItem('gp_coins', String(_getCoins() + tr.coins));
+      claimed.push(i); localStorage.setItem(_seasonKey, JSON.stringify(claimed));
+      renderSeason(); openSeasonModal();
+    }
+    function closeSeasonModal() { document.getElementById('seasonModal').hidden = true; }
+    document.getElementById('seasonCardBtn').addEventListener('click', openSeasonModal);
+    document.getElementById('seasonCardBtn').addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSeasonModal(); }
+    });
+    document.getElementById('seasonClose').addEventListener('click', closeSeasonModal);
+    document.getElementById('seasonModal').addEventListener('click', e => { if (e.target.id === 'seasonModal') closeSeasonModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSeasonModal(); });
+    renderSeason();
+
+    // ── Push Notifications (Web Push, opt-in bell) ────────────────────
+    const _pushSupported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+    function _b64ToU8(base64) {
+      const pad = '='.repeat((4 - base64.length % 4) % 4);
+      const b = (base64 + pad).replace(/-/g, '+').replace(/_/g, '/');
+      const raw = atob(b); const arr = new Uint8Array(raw.length);
+      for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+      return arr;
+    }
+    function _setBell(on) {
+      const btn = document.getElementById('hubPushBtn');
+      if (!btn) return;
+      btn.hidden = false;
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '🔔' : '🔕';
+    }
+    async function _initPush() {
+      if (!_pushSupported) return;
+      try {
+        const r = await fetch('/api/push?action=key');
+        const { key, enabled } = await r.json();
+        if (!enabled || !key) return;              // server push disabled → keep bell hidden
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        _setBell(!!sub);
+        document.getElementById('hubPushBtn').onclick = () => _togglePush(key);
+      } catch {}
+    }
+    async function _togglePush(vapidKey) {
+      const T = TXT[lang] || TXT.en;
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        let sub = await reg.pushManager.getSubscription();
+        if (sub) {                                  // turn OFF
+          const endpoint = sub.endpoint;
+          await sub.unsubscribe().catch(() => {});
+          fetch('/api/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'unsubscribe', endpoint }) }).catch(() => {});
+          _setBell(false); return;
+        }
+        if (Notification.permission === 'denied') { alert(T.pushBlocked); return; }
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted') return;
+        sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: _b64ToU8(vapidKey) });
+        let userId = null; try { userId = (JSON.parse(localStorage.getItem('gp_global_profile') || 'null') || {}).id || null; } catch {}
+        await fetch('/api/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'subscribe', subscription: sub.toJSON(), userId }) });
+        _setBell(true);
+      } catch (e) { console.warn('push toggle failed', e); }
+    }
+
     // ── Service Worker (PWA) ──────────────────────────────────────────
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
+      navigator.serviceWorker.register('/sw.js').then(() => _initPush()).catch(() => {});
     }
   </script>
 </body>
