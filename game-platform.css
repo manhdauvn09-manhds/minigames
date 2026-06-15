@@ -488,6 +488,8 @@ html, body {
   white-space: nowrap;
 }
 .gp-sbtn:hover { background: rgba(255,255,255,.12); }
+.gp-sbtn-share { border-color: rgba(52,211,153,.3) !important; color: #34d399 !important; }
+.gp-sbtn-share:hover { background: rgba(52,211,153,.12) !important; }
 
 .gp-btn-danger {
   background: rgba(239,68,68,.15);
@@ -723,6 +725,54 @@ html, body {
 }
 @keyframes gp-toast-in  { from { opacity: 0; transform: translate(-50%,10px); } }
 @keyframes gp-toast-out { to   { opacity: 0; transform: translate(-50%,10px); } }
+
+/* ── Achievement toast ───────────────────────────────────────────────────── */
+.gp-ach-toast {
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, rgba(167,139,250,.96), rgba(96,165,250,.96));
+  border: 1px solid rgba(255,255,255,.25);
+  color: #fff; padding: 12px 18px;
+  box-shadow: 0 8px 28px rgba(124,58,237,.45);
+  animation: gp-toast-in .35s, gp-toast-out .4s 3.3s forwards;
+}
+.gp-ach-toast .gp-ach-ic { font-size: 1.8rem; line-height: 1; }
+.gp-ach-toast .gp-ach-tx { font-size: .8rem; line-height: 1.35; }
+.gp-ach-toast .gp-ach-tx b { font-size: .72rem; opacity: .9; font-weight: 700; }
+
+/* ── Achievements grid ───────────────────────────────────────────────────── */
+.gp-ach-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px; padding: 4px 14px 18px;
+}
+.gp-ach-card {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 12px; padding: 12px 10px; text-align: center;
+  transition: transform .15s, border-color .15s;
+}
+.gp-ach-card.got {
+  background: linear-gradient(135deg, rgba(167,139,250,.14), rgba(96,165,250,.08));
+  border-color: rgba(167,139,250,.45);
+}
+.gp-ach-card.got:hover { transform: translateY(-2px); border-color: #a78bfa; }
+.gp-ach-card.locked { opacity: .5; filter: grayscale(.6); }
+.gp-ach-card-ic { font-size: 2rem; line-height: 1; margin-bottom: 6px; }
+.gp-ach-card-nm { font-size: .82rem; font-weight: 700; color: #f0f0ff; margin-bottom: 3px; }
+.gp-ach-card-ds { font-size: .68rem; color: #9ca3af; line-height: 1.4; }
+
+/* ── Badges preview (profile) ────────────────────────────────────────────── */
+.gp-badges-preview {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: calc(100% - 28px); margin: 4px 14px 10px;
+  padding: 10px 14px; cursor: pointer;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12); border-radius: 12px;
+  color: #d1d5db; transition: border-color .15s, background .15s;
+}
+.gp-badges-preview:hover { border-color: #a78bfa; background: rgba(167,139,250,.10); }
+.gp-bp-row { display: inline-flex; gap: 2px; }
+.gp-bp-ic { font-size: 1.25rem; }
+.gp-bp-label { font-size: .76rem; font-weight: 600; white-space: nowrap; }
 
 /* ── Game HUD elements ───────────────────────────────────────────────────── */
 .gp-hud {

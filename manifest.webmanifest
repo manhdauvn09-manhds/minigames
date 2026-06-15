@@ -1,16 +1,22 @@
 {
+  "id": "/",
   "name": "allin1site Mini Games",
-  "short_name": "allin1games",
+  "short_name": "MiniGames",
   "description": "8 free browser games — 30 progressive levels each. Plays on phone, tablet, desktop.",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0d1b2a",
-  "theme_color": "#0d1b2a",
+  "background_color": "#09090f",
+  "theme_color": "#a78bfa",
   "lang": "en",
   "categories": ["games", "entertainment"],
   "icons": [
-    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" }
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "BallMerge", "url": "/games/ballmerge/", "description": "Merge puzzle" },
+    { "name": "Kaya · Caro", "url": "/games/kaya/", "description": "Five-in-a-row strategy" },
+    { "name": "Sodoku", "url": "/games/sodoku/", "description": "Classic 9×9 Sudoku" }
   ]
 }

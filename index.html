@@ -227,6 +227,33 @@
     .streak-card{background:linear-gradient(135deg,rgba(245,158,11,.10),rgba(239,68,68,.06));border-color:rgba(245,158,11,.30)}
     .streak-card .icon{filter:drop-shadow(0 0 8px rgba(245,158,11,.4))}
     .streak-count{font-size:1.6rem;font-weight:900;color:#f59e0b;line-height:1}
+    .reward-card{background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(96,165,250,.06));border-color:rgba(167,139,250,.30);cursor:pointer}
+    .reward-card.has-reward .icon{animation:rewardBounce 1.2s infinite}
+    .reward-card.has-reward{box-shadow:0 0 0 2px rgba(167,139,250,.4)}
+    @keyframes rewardBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    .reward-card .title span#xpTotal{color:#a78bfa;font-weight:900}
+
+    /* ── Daily Reward modal ───────────────────────────────────────────── */
+    .reward-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);padding:20px}
+    .reward-modal[hidden]{display:none}
+    .reward-box{position:relative;background:var(--gp-bg-secondary);border:1px solid var(--gp-border);border-radius:18px;padding:24px 22px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:rewardPop .3s ease}
+    @keyframes rewardPop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+    .reward-close{position:absolute;top:12px;right:14px;background:transparent;border:none;color:var(--gp-text-muted);font-size:1.1em;cursor:pointer;padding:4px 8px;border-radius:6px}
+    .reward-close:hover{background:var(--gp-bg-tertiary);color:var(--gp-text-primary)}
+    .reward-emoji{font-size:2.6rem;margin-bottom:4px}
+    .reward-title{color:var(--gp-text-primary);font-size:1.2em;font-weight:800;margin-bottom:4px}
+    .reward-sub{color:var(--gp-text-secondary);font-size:.84em;margin-bottom:16px}
+    .reward-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:18px}
+    .reward-day{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:9px;border:1px solid var(--gp-border);background:var(--gp-bg-tertiary);font-size:.62em;color:var(--gp-text-muted)}
+    .reward-day .rd-xp{font-size:1.05em;font-weight:800;color:var(--gp-text-secondary)}
+    .reward-day.past{opacity:.55}
+    .reward-day.past .rd-ic{color:var(--gp-success)}
+    .reward-day.today{border-color:var(--gp-accent);background:rgba(167,139,250,.18);color:var(--gp-text-primary);box-shadow:0 0 0 1px var(--gp-accent)}
+    .reward-day.today .rd-xp{color:var(--gp-accent)}
+    .reward-day.d7 .rd-xp{color:#f59e0b}
+    .reward-claim{width:100%;padding:12px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--gp-accent),#60a5fa);color:#fff;font-size:.95em;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(124,58,237,.4);transition:transform .15s}
+    .reward-claim:hover{transform:translateY(-2px)}
+    .reward-claim:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
 
     /* ── Site footer ──────────────────────────────────────────────────── */
     .site-footer{
@@ -247,12 +274,36 @@
     }
     #hubThemeBtn:hover{background:rgba(167,139,250,.2);border-color:#a78bfa}
 
+    /* ── Search + Filter bar ─────────────────────────────────────────── */
+    .filter-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+    .filter-search{flex:1 1 180px;position:relative}
+    .filter-search input{
+      width:100%;padding:8px 12px 8px 34px;
+      background:var(--gp-bg-secondary);border:1px solid var(--gp-border);
+      border-radius:20px;color:var(--gp-text-primary);font-size:.88em;outline:none;
+      transition:border-color .2s;
+    }
+    .filter-search input:focus{border-color:var(--gp-accent)}
+    .filter-search input::placeholder{color:var(--gp-text-muted)}
+    .filter-search::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.85em;pointer-events:none}
+    .filter-pills{display:flex;gap:6px;flex-wrap:wrap}
+    .filter-pill{
+      padding:6px 14px;border-radius:20px;border:1px solid var(--gp-border);
+      background:transparent;color:var(--gp-text-muted);font-size:.78em;cursor:pointer;
+      transition:all .2s;white-space:nowrap;
+    }
+    .filter-pill:hover{border-color:var(--gp-accent);color:var(--gp-accent)}
+    .filter-pill.active{background:rgba(167,139,250,.2);border-color:var(--gp-accent);color:var(--gp-text-primary);font-weight:600}
+    .filter-empty{text-align:center;padding:32px 0;color:var(--gp-text-muted);font-size:.9em}
+
     @media (max-width:520px){
       .site-header h1{font-size:1.4em}
       .games-grid{grid-template-columns:1fr 1fr;gap:10px}
       .game-card{padding:12px;gap:6px}
       .game-card h3{font-size:1em}
       .game-tagline{font-size:.76em}
+      .filter-bar{gap:8px}
+      .filter-search{flex:1 1 140px}
     }
   </style>
 </head>
@@ -316,13 +367,33 @@
                 <div class="sub" id="streakSub" data-i="streakSub">Play any game today to extend it.</div>
               </div>
             </div>
+            <div class="daily-card reward-card" id="rewardCardBtn" role="button" tabindex="0">
+              <div class="icon">🎁</div>
+              <div class="body">
+                <div class="label" data-i="rewardLabel">Daily Reward</div>
+                <div class="title"><span id="xpTotal">0</span> XP</div>
+                <div class="sub" id="rewardCardSub" data-i="rewardSub">Claim your daily bonus!</div>
+              </div>
+            </div>
           </div>
 
           <h2 class="section-title" id="featured"><span data-i="featuredHeading">🔥 Featured</span> <span class="pill">NEW</span></h2>
           <div id="featured-container" class="games-grid featured"></div>
 
           <h2 class="section-title" id="games"><span data-i="gamesHeading">All Games</span></h2>
+          <div class="filter-bar">
+            <div class="filter-search">
+              <input type="search" id="gameSearch" autocomplete="off" data-i-ph="searchPlaceholder">
+            </div>
+            <div class="filter-pills" id="filterPills">
+              <button class="filter-pill active" data-type="all" data-i="filterAll">All (8)</button>
+              <button class="filter-pill" data-type="puzzle">🧩 <span data-i="filterPuzzle">Puzzle</span></button>
+              <button class="filter-pill" data-type="arcade">🕹️ <span data-i="filterArcade">Arcade</span></button>
+              <button class="filter-pill" data-type="memory">🃏 <span data-i="filterMemory">Memory</span></button>
+            </div>
+          </div>
           <div id="games-container" class="games-grid"></div>
+          <div id="games-empty" class="filter-empty" style="display:none" data-i="filterEmpty">No games found. Try a different search.</div>
 
           <!-- Why play section (good for SEO content) -->
           <section style="margin-top:28px;padding:18px;background:rgba(255,255,255,.04);border-radius:14px;border:1px solid rgba(255,255,255,.08)">
@@ -352,12 +423,24 @@
     </div>
   </div>
 
+  <!-- Daily Reward modal -->
+  <div class="reward-modal" id="rewardModal" hidden>
+    <div class="reward-box">
+      <button class="reward-close" id="rewardClose" aria-label="Close">✕</button>
+      <div class="reward-emoji">🎁</div>
+      <h3 class="reward-title" data-i="rewardTitle">Daily Reward</h3>
+      <p class="reward-sub" id="rewardModalSub" data-i="rewardModalSub">Log in daily — bigger rewards each day!</p>
+      <div class="reward-cal" id="rewardCal"></div>
+      <button class="reward-claim" id="rewardClaim">Claim</button>
+    </div>
+  </div>
+
   <script>
     // ── i18n ────────────────────────────────────────────────────────────
     const TXT = {
-      en: { title:'allin1site Mini Games', tagline:'11 fresh browser games · progressive levels · plays on every screen', navGames:'🎮 Games', navManual:'📖 Manual', navHome:'🏠 Home', play:'Play Now →', viewMockup:'👁 View Mockup →', featuredHeading:'🔥 Featured', gamesHeading:'All Games', whyTitle:'Why allin1site Games?', whyBody:'Free, no signup required. Hand-tuned progressive difficulty. Online leaderboards via Google sign-in (optional). Works on any phone, tablet, or desktop browser. No ads in the MVP — pure gameplay.', footManual:'📖 User Manual', footSitemap:'Sitemap', rights:'All rights reserved', players:'players', online:'online', plays:'plays', visitors:'visitors', views:'views', wipBadge:'🚧 WIP', mockupBadge:'Mockup', wipNote:'⚠ Mockup only — game logic still in development. UI preview available.', dailyLabel:'Daily Challenge', dailySub:'One puzzle a day. Keep your streak alive.', dailyPlayed:'✓ Played today', streakLabel:'Your Streak', streakDays:'days', streakSub:'Play any game today to extend it.', streakNew:'Start your streak today!' },
-      vi: { title:'allin1site Mini Games', tagline:'11 game miễn phí · cấp độ tăng dần · chơi trên mọi thiết bị', navGames:'🎮 Game', navManual:'📖 Hướng dẫn', navHome:'🏠 Trang chủ', play:'Chơi ngay →', viewMockup:'👁 Xem Mockup →', featuredHeading:'🔥 Nổi bật', gamesHeading:'Tất cả game', whyTitle:'Tại sao chọn allin1site Games?', whyBody:'Miễn phí, không cần đăng ký. Cấp độ tăng dần được tinh chỉnh kỹ. Bảng xếp hạng online qua Google (tùy chọn). Chạy trên mọi điện thoại, tablet, máy tính. Không quảng cáo phiền phức — chỉ thuần gameplay.', footManual:'📖 Hướng dẫn', footSitemap:'Sơ đồ trang', rights:'Mọi quyền được bảo lưu', players:'người chơi', online:'đang online', plays:'lượt chơi', visitors:'lượt truy cập', views:'lượt xem', wipBadge:'🚧 Đang làm', mockupBadge:'Mockup', wipNote:'⚠ Mới chỉ có Mockup — game đang phát triển, chưa chơi được. Xem trước giao diện.', dailyLabel:'Thử thách ngày', dailySub:'Mỗi ngày một puzzle. Giữ chuỗi không đứt.', dailyPlayed:'✓ Đã chơi hôm nay', streakLabel:'Chuỗi của bạn', streakDays:'ngày', streakSub:'Chơi bất kỳ game nào hôm nay để nối tiếp.', streakNew:'Bắt đầu chuỗi của bạn hôm nay!' },
-      ja: { title:'allin1site ミニゲーム', tagline:'11の無料ゲーム · 累進レベル · あらゆる画面で遊べる', navGames:'🎮 ゲーム', navManual:'📖 取扱説明', navHome:'🏠 ホーム', play:'プレイする →', viewMockup:'👁 モックアップを見る →', featuredHeading:'🔥 注目', gamesHeading:'全ゲーム', whyTitle:'なぜ allin1site Games？', whyBody:'無料・登録不要。難易度漸進。Googleログインでオンランク参加（任意）。スマホ・タブレット・PCで動作。MVP は広告なし、純粋なゲームプレイ。', footManual:'📖 取扱説明', footSitemap:'サイトマップ', rights:'無断複製禁止', players:'プレイヤー', online:'オンライン', plays:'プレイ', visitors:'訪問者', views:'閲覧数', wipBadge:'🚧 開発中', mockupBadge:'モックアップ', wipNote:'⚠ モックアップのみ — ゲームロジック開発中。UIプレビュー可能。', dailyLabel:'デイリーチャレンジ', dailySub:'1日1パズル。連続記録を守ろう。', dailyPlayed:'✓ 今日プレイ済み', streakLabel:'連続日数', streakDays:'日', streakSub:'今日どれかをプレイして継続！', streakNew:'今日から連続記録をスタート！' },
+      en: { title:'allin1site Mini Games', tagline:'11 fresh browser games · progressive levels · plays on every screen', navGames:'🎮 Games', navManual:'📖 Manual', navHome:'🏠 Home', play:'Play Now →', viewMockup:'👁 View Mockup →', featuredHeading:'🔥 Featured', gamesHeading:'All Games', whyTitle:'Why allin1site Games?', whyBody:'Free, no signup required. Hand-tuned progressive difficulty. Online leaderboards via Google sign-in (optional). Works on any phone, tablet, or desktop browser. No ads in the MVP — pure gameplay.', footManual:'📖 User Manual', footSitemap:'Sitemap', rights:'All rights reserved', players:'players', online:'online', plays:'plays', visitors:'visitors', views:'views', wipBadge:'🚧 WIP', mockupBadge:'Mockup', wipNote:'⚠ Mockup only — game logic still in development. UI preview available.', dailyLabel:'Daily Challenge', dailySub:'One puzzle a day. Keep your streak alive.', dailyPlayed:'✓ Played today', streakLabel:'Your Streak', streakDays:'days', streakSub:'Play any game today to extend it.', streakNew:'Start your streak today!', searchPlaceholder:'Search games…', filterAll:'All (8)', filterPuzzle:'Puzzle', filterArcade:'Arcade', filterMemory:'Memory', filterEmpty:'No games found. Try a different search.', rewardLabel:'Daily Reward', rewardSub:'Claim your daily bonus!', rewardReadySub:'🎁 Reward ready — tap to claim!', rewardDoneSub:'✓ Claimed. Come back tomorrow!', rewardTitle:'Daily Reward', rewardModalSub:'Log in daily — bigger rewards each day!', rewardClaim:'Claim', rewardClaimed:'✓ Claimed today', rewardDay:'Day' },
+      vi: { title:'allin1site Mini Games', tagline:'11 game miễn phí · cấp độ tăng dần · chơi trên mọi thiết bị', navGames:'🎮 Game', navManual:'📖 Hướng dẫn', navHome:'🏠 Trang chủ', play:'Chơi ngay →', viewMockup:'👁 Xem Mockup →', featuredHeading:'🔥 Nổi bật', gamesHeading:'Tất cả game', whyTitle:'Tại sao chọn allin1site Games?', whyBody:'Miễn phí, không cần đăng ký. Cấp độ tăng dần được tinh chỉnh kỹ. Bảng xếp hạng online qua Google (tùy chọn). Chạy trên mọi điện thoại, tablet, máy tính. Không quảng cáo phiền phức — chỉ thuần gameplay.', footManual:'📖 Hướng dẫn', footSitemap:'Sơ đồ trang', rights:'Mọi quyền được bảo lưu', players:'người chơi', online:'đang online', plays:'lượt chơi', visitors:'lượt truy cập', views:'lượt xem', wipBadge:'🚧 Đang làm', mockupBadge:'Mockup', wipNote:'⚠ Mới chỉ có Mockup — game đang phát triển, chưa chơi được. Xem trước giao diện.', dailyLabel:'Thử thách ngày', dailySub:'Mỗi ngày một puzzle. Giữ chuỗi không đứt.', dailyPlayed:'✓ Đã chơi hôm nay', streakLabel:'Chuỗi của bạn', streakDays:'ngày', streakSub:'Chơi bất kỳ game nào hôm nay để nối tiếp.', streakNew:'Bắt đầu chuỗi của bạn hôm nay!', searchPlaceholder:'Tìm game…', filterAll:'Tất cả (8)', filterPuzzle:'Ghép hình', filterArcade:'Hành động', filterMemory:'Trí nhớ', filterEmpty:'Không tìm thấy game. Thử từ khác nhé.', rewardLabel:'Quà Mỗi Ngày', rewardSub:'Nhận thưởng hằng ngày!', rewardReadySub:'🎁 Có quà — bấm để nhận!', rewardDoneSub:'✓ Đã nhận. Mai quay lại nhé!', rewardTitle:'Phần Thưởng Hằng Ngày', rewardModalSub:'Vào mỗi ngày — thưởng tăng dần!', rewardClaim:'Nhận', rewardClaimed:'✓ Đã nhận hôm nay', rewardDay:'Ngày' },
+      ja: { title:'allin1site ミニゲーム', tagline:'11の無料ゲーム · 累進レベル · あらゆる画面で遊べる', navGames:'🎮 ゲーム', navManual:'📖 取扱説明', navHome:'🏠 ホーム', play:'プレイする →', viewMockup:'👁 モックアップを見る →', featuredHeading:'🔥 注目', gamesHeading:'全ゲーム', whyTitle:'なぜ allin1site Games？', whyBody:'無料・登録不要。難易度漸進。Googleログインでオンランク参加（任意）。スマホ・タブレット・PCで動作。MVP は広告なし、純粋なゲームプレイ。', footManual:'📖 取扱説明', footSitemap:'サイトマップ', rights:'無断複製禁止', players:'プレイヤー', online:'オンライン', plays:'プレイ', visitors:'訪問者', views:'閲覧数', wipBadge:'🚧 開発中', mockupBadge:'モックアップ', wipNote:'⚠ モックアップのみ — ゲームロジック開発中。UIプレビュー可能。', dailyLabel:'デイリーチャレンジ', dailySub:'1日1パズル。連続記録を守ろう。', dailyPlayed:'✓ 今日プレイ済み', streakLabel:'連続日数', streakDays:'日', streakSub:'今日どれかをプレイして継続！', streakNew:'今日から連続記録をスタート！', searchPlaceholder:'ゲームを検索…', filterAll:'すべて (8)', filterPuzzle:'パズル', filterArcade:'アクション', filterMemory:'記憶', filterEmpty:'ゲームが見つかりません。別のキーワードを試してください。', rewardLabel:'デイリー報酬', rewardSub:'毎日ボーナスを受取ろう！', rewardReadySub:'🎁 報酬あり — タップで受取！', rewardDoneSub:'✓ 受取済み。また明日！', rewardTitle:'デイリー報酬', rewardModalSub:'毎日ログインで報酬アップ！', rewardClaim:'受け取る', rewardClaimed:'✓ 本日受取済み', rewardDay:'Day' },
     };
     const urlLang = new URLSearchParams(location.search).get('lang');
     let lang = (() => {
@@ -382,14 +465,14 @@
               ja:'五目並べ — 5段階のAI、ボットを倒してランキングを上げよう！' } },
     ];
     const GAMES = [
-      { id:'ballmerge',   name:'🎱 BallMerge',   tag:{ en:'Drop balls to merge into bigger ones! Chain combos for high scores.', vi:'Thả bóng để gộp! Liên hoàn để được điểm cao.', ja:'ボールを落として合体！連鎖で高得点を狙え。' } },
-      { id:'chromamatch', name:'🎨 ChromaMatch', tag:{ en:'Swap colorful tiles to match 3+! Cascading combos for big points.', vi:'Hoán đổi ô màu để khớp 3+! Combo dây chuyền điểm cao.', ja:'色タイルをスワップして3つ揃え！連鎖で大量得点。' } },
-      { id:'stacktower',  name:'🏗️ StackTower', tag:{ en:'Drop blocks to stack a tower! Land perfectly to keep full width.', vi:'Thả khối để xây tháp! Đặt chuẩn để giữ độ rộng.', ja:'ブロックを落として塔を築け！完璧な配置で幅をキープ。' } },
-      { id:'memoryflip',  name:'🃏 MemoryFlip',  tag:{ en:'Flip cards to find matching pairs! 30 levels with combo multipliers.', vi:'Lật bài tìm cặp giống nhau! 30 cấp với nhân điểm combo.', ja:'カードをめくってペアを揃えよう！30レベル＋コンボ倍率。' } },
-      { id:'snakerush',   name:'🐍 SnakeRush',   tag:{ en:'Classic snake + power-ups + countdown timer! Eat, grow, rush!', vi:'Rắn cổ điển + power-up + đếm ngược! Ăn, dài, lao!', ja:'クラシックスネーク＋パワーアップ＋制限時間！' } },
-      { id:'bubbleblast', name:'🫧 BubbleBlast', tag:{ en:'Aim & shoot hex bubbles! 30 levels, bomb & rainbow specials.', vi:'Ngắm bắn bóng lục giác! 30 cấp + bom + cầu vồng.', ja:'ヘックスバブルを狙って撃て！30レベル。' } },
-      { id:'arkanoidx',   name:'🏓 ArkanoidX',   tag:{ en:'Modern breakout — 30 levels, 5 power-ups, combo multiplier!', vi:'Breakout hiện đại — 30 cấp, 5 power-up, nhân combo!', ja:'モダンブロック崩し — 30レベル、5種パワーアップ。' } },
-      { id:'numberslide', name:'🔢 NumberSlide', tag:{ en:'Slide tiles into order! 3 sizes — fewest moves wins.', vi:'Trượt ô vào thứ tự! 3 cỡ — ít bước nhất thắng.', ja:'タイルを順番にスライド！少ない手数で勝利！' } },
+      { id:'ballmerge',   type:'puzzle', name:'🎱 BallMerge',   tag:{ en:'Drop balls to merge into bigger ones! Chain combos for high scores.', vi:'Thả bóng để gộp! Liên hoàn để được điểm cao.', ja:'ボールを落として合体！連鎖で高得点を狙え。' } },
+      { id:'chromamatch', type:'puzzle', name:'🎨 ChromaMatch', tag:{ en:'Swap colorful tiles to match 3+! Cascading combos for big points.', vi:'Hoán đổi ô màu để khớp 3+! Combo dây chuyền điểm cao.', ja:'色タイルをスワップして3つ揃え！連鎖で大量得点。' } },
+      { id:'stacktower',  type:'arcade', name:'🏗️ StackTower', tag:{ en:'Drop blocks to stack a tower! Land perfectly to keep full width.', vi:'Thả khối để xây tháp! Đặt chuẩn để giữ độ rộng.', ja:'ブロックを落として塔を築け！完璧な配置で幅をキープ。' } },
+      { id:'memoryflip',  type:'memory', name:'🃏 MemoryFlip',  tag:{ en:'Flip cards to find matching pairs! 30 levels with combo multipliers.', vi:'Lật bài tìm cặp giống nhau! 30 cấp với nhân điểm combo.', ja:'カードをめくってペアを揃えよう！30レベル＋コンボ倍率。' } },
+      { id:'snakerush',   type:'arcade', name:'🐍 SnakeRush',   tag:{ en:'Classic snake + power-ups + countdown timer! Eat, grow, rush!', vi:'Rắn cổ điển + power-up + đếm ngược! Ăn, dài, lao!', ja:'クラシックスネーク＋パワーアップ＋制限時間！' } },
+      { id:'bubbleblast', type:'puzzle', name:'🫧 BubbleBlast', tag:{ en:'Aim & shoot hex bubbles! 30 levels, bomb & rainbow specials.', vi:'Ngắm bắn bóng lục giác! 30 cấp + bom + cầu vồng.', ja:'ヘックスバブルを狙って撃て！30レベル。' } },
+      { id:'arkanoidx',   type:'arcade', name:'🏓 ArkanoidX',   tag:{ en:'Modern breakout — 30 levels, 5 power-ups, combo multiplier!', vi:'Breakout hiện đại — 30 cấp, 5 power-up, nhân combo!', ja:'モダンブロック崩し — 30レベル、5種パワーアップ。' } },
+      { id:'numberslide', type:'puzzle', name:'🔢 NumberSlide', tag:{ en:'Slide tiles into order! 3 sizes — fewest moves wins.', vi:'Trượt ô vào thứ tự! 3 cỡ — ít bước nhất thắng.', ja:'タイルを順番にスライド！少ない手数で勝利！' } },
     ];
     let STATS = {}; // populated by /api/stats?all=1
 
@@ -437,9 +520,12 @@
     function renderGames() {
       const T = TXT[lang] || TXT.en;
       const featEl = document.getElementById('featured-container');
-      const allEl  = document.getElementById('games-container');
-      featEl.innerHTML = ''; allEl.innerHTML = '';
+      featEl.innerHTML = '';
       FEATURED.forEach(g => featEl.appendChild(_buildCard(g, T)));
+      // delegate to filter engine if already active, else render all
+      if (typeof _applyFilter === 'function') { _applyFilter(); return; }
+      const allEl = document.getElementById('games-container');
+      allEl.innerHTML = '';
       GAMES.forEach(g => allEl.appendChild(_buildCard(g, T)));
     }
 
@@ -449,14 +535,52 @@
         const k = el.getAttribute('data-i');
         if (T[k]) el.textContent = T[k];
       });
+      document.querySelectorAll('[data-i-ph]').forEach(el => {
+        const k = el.getAttribute('data-i-ph');
+        if (T[k]) el.placeholder = T[k];
+      });
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.l === lang));
       document.documentElement.setAttribute('lang', lang);
       renderGames();
     }
     document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => {
-      lang = b.dataset.l; localStorage.setItem('gp_lang', lang); applyI18n(); renderDaily(); renderStreak();
+      lang = b.dataset.l; localStorage.setItem('gp_lang', lang); applyI18n(); renderDaily(); renderStreak(); renderReward();
     }));
-    applyI18n();
+
+    // ── Search + Filter ────────────────────────────────────────────────
+    let _filterType = 'all', _filterQ = '';
+    applyI18n(); // called AFTER _filterType/_filterQ declared so _applyFilter() is safe
+    function _applyFilter() {
+      const T = TXT[lang] || TXT.en;
+      const q = _filterQ.toLowerCase().trim();
+      const filtered = GAMES.filter(g => {
+        if (_filterType !== 'all' && g.type !== _filterType) return false;
+        if (q && !g.name.toLowerCase().includes(q) && !(g.tag[lang]||g.tag.en).toLowerCase().includes(q)) return false;
+        return true;
+      });
+      const allEl = document.getElementById('games-container');
+      const emptyEl = document.getElementById('games-empty');
+      allEl.innerHTML = '';
+      if (filtered.length === 0) {
+        emptyEl.style.display = '';
+      } else {
+        emptyEl.style.display = 'none';
+        filtered.forEach(g => allEl.appendChild(_buildCard(g, T)));
+      }
+      // Update "All (N)" pill label
+      const allPill = document.querySelector('.filter-pill[data-type="all"]');
+      if (allPill) allPill.textContent = T.filterAll ? T.filterAll.replace('8', String(GAMES.length)) : `All (${GAMES.length})`;
+    }
+    document.getElementById('gameSearch').addEventListener('input', e => {
+      _filterQ = e.target.value; _applyFilter();
+    });
+    document.getElementById('filterPills').addEventListener('click', e => {
+      const pill = e.target.closest('.filter-pill');
+      if (!pill) return;
+      _filterType = pill.dataset.type;
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p === pill));
+      _applyFilter();
+    });
 
     // ── Daily Challenge (deterministic by date) ────────────────────────
     function _ymd(d) { return d.toISOString().slice(0,10); }
@@ -510,6 +634,81 @@
       const a = e.target.closest('.game-card');
       if (a && !a.classList.contains('wip')) _bumpStreak(_ymd(new Date()));
     });
+
+    // ── Daily Login Reward (XP economy, 7-day cycle) ───────────────────
+    const REWARD_XP = [10, 15, 20, 25, 30, 50, 100]; // cycle day 1..7
+    function _getXP() { return parseInt(localStorage.getItem('gp_xp') || '0', 10) || 0; }
+    function _rewardState() {
+      const today = _ymd(new Date());
+      const last = localStorage.getItem('gp_reward_last');
+      const cycle = parseInt(localStorage.getItem('gp_reward_cycle') || '0', 10);
+      const claimedToday = last === today;
+      let nextDay;
+      if (claimedToday) nextDay = cycle || 1;
+      else if (last) {
+        const yesterday = _ymd(new Date(Date.now() - 86400000));
+        nextDay = (last === yesterday) ? (cycle % 7) + 1 : 1; // continue cycle or restart
+      } else nextDay = 1;
+      return { today, last, cycle, claimedToday, nextDay };
+    }
+    function renderReward() {
+      const T = TXT[lang] || TXT.en;
+      const st = _rewardState();
+      const xpEl = document.getElementById('xpTotal');
+      if (xpEl) xpEl.textContent = fmtNum(_getXP());
+      const card = document.getElementById('rewardCardBtn');
+      const sub = document.getElementById('rewardCardSub');
+      if (!card) return;
+      card.classList.toggle('has-reward', !st.claimedToday);
+      if (sub) sub.textContent = st.claimedToday ? T.rewardDoneSub : T.rewardReadySub;
+    }
+    function openRewardModal() {
+      const T = TXT[lang] || TXT.en;
+      const st = _rewardState();
+      const active = st.nextDay;
+      const cal = document.getElementById('rewardCal');
+      cal.innerHTML = '';
+      for (let d = 1; d <= 7; d++) {
+        const isPast  = st.claimedToday ? d <= st.cycle : d < active;
+        const isToday = st.claimedToday ? d === st.cycle : d === active;
+        const div = document.createElement('div');
+        div.className = 'reward-day' + (isPast ? ' past' : '') + (isToday ? ' today' : '') + (d === 7 ? ' d7' : '');
+        div.innerHTML = `<span class="rd-d">${T.rewardDay} ${d}</span><span class="rd-xp">${isPast ? '✓' : '+' + REWARD_XP[d-1]}</span>`;
+        cal.appendChild(div);
+      }
+      const btn = document.getElementById('rewardClaim');
+      if (st.claimedToday) { btn.disabled = true; btn.textContent = T.rewardClaimed; }
+      else { btn.disabled = false; btn.textContent = `${T.rewardClaim} +${REWARD_XP[active-1]} XP`; }
+      document.getElementById('rewardModal').hidden = false;
+    }
+    function closeRewardModal() { document.getElementById('rewardModal').hidden = true; }
+    function claimReward() {
+      const st = _rewardState();
+      if (st.claimedToday) return;
+      const day = st.nextDay;
+      localStorage.setItem('gp_xp', String(_getXP() + REWARD_XP[day-1]));
+      localStorage.setItem('gp_reward_last', st.today);
+      localStorage.setItem('gp_reward_cycle', String(day));
+      renderReward();
+      openRewardModal(); // refresh to claimed state
+    }
+    document.getElementById('rewardCardBtn').addEventListener('click', openRewardModal);
+    document.getElementById('rewardCardBtn').addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRewardModal(); }
+    });
+    document.getElementById('rewardClose').addEventListener('click', closeRewardModal);
+    document.getElementById('rewardModal').addEventListener('click', e => { if (e.target.id === 'rewardModal') closeRewardModal(); });
+    document.getElementById('rewardClaim').addEventListener('click', claimReward);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeRewardModal(); });
+    renderReward();
+    // Auto-open once per day when a reward is waiting
+    (function autoReward() {
+      const st = _rewardState();
+      if (!st.claimedToday && localStorage.getItem('gp_reward_autoshown') !== st.today) {
+        localStorage.setItem('gp_reward_autoshown', st.today);
+        setTimeout(openRewardModal, 700);
+      }
+    })();
 
     // ── Theme (dark/light mode) ────────────────────────────────────────
     let _theme = localStorage.getItem('gp_theme') || 'auto';
@@ -601,6 +800,11 @@
     }
     fetchStats();
     setInterval(fetchStats, 60000);
+
+    // ── Service Worker (PWA) ──────────────────────────────────────────
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
   </script>
 </body>
 </html>

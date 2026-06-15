@@ -64,7 +64,8 @@
       playNormal: '▶ Play', modeHint: 'Play freely. Scores & history saved locally.',
       playAdv: lv => `⚔️ Play Level ${lv}`,
       btnHistory: '📜 History', btnTop: '🏆 Top', btnHowto: '❓ How to Play',
-      btnLeaderboard: '🌐 Online',
+      btnLeaderboard: '🌐 Online', btnAwards: '🏅 Awards',
+      achTitle: 'Achievements', achUnlocked: '🏅 Achievement Unlocked!',
       profileTitle: '👤 Profile', back: '← Back',
       signOut: 'Sign Out', guestHint: 'Play as guest or sign in with Google.',
       namePlaceholder: 'Your name (max 20 chars)', playGuest: 'Play as Guest',
@@ -83,7 +84,7 @@
       gameOver: 'Game Over', scoreLabel: 'Score',
       rankNew: '🥇 New Best!', rankTop: n => `#${n} in Top`,
       nextLv: lv => `▶ Level ${lv}`, retryLv: lv => `🔄 Retry Level ${lv}`, playAgain: '🔄 Play Again',
-      homeBtn: '🏠 Home',
+      homeBtn: '🏠 Home', shareScore: '📤 Share Score',
       fsEnter: 'Fullscreen', fsExit: 'Exit Fullscreen',
       copyright: y => `© ${y} allin1site.com — All rights reserved.`,
       youAtRank: r => `You are ranked #${r}`,
@@ -99,7 +100,8 @@
       playNormal: '▶ プレイ', modeHint: '自由にプレイ。スコアと履歴はローカルに保存されます。',
       playAdv: lv => `⚔️ レベル ${lv} をプレイ`,
       btnHistory: '📜 履歴', btnTop: '🏆 トップ', btnHowto: '❓ 遊び方',
-      btnLeaderboard: '🌐 オンライン',
+      btnLeaderboard: '🌐 オンライン', btnAwards: '🏅 実績',
+      achTitle: '実績', achUnlocked: '🏅 実績を解除！',
       profileTitle: '👤 プロフィール', back: '← 戻る',
       signOut: 'サインアウト', guestHint: 'ゲストとしてプレイするか、Googleでサインインしよう。',
       namePlaceholder: 'お名前（最大20文字）', playGuest: 'ゲストでプレイ',
@@ -118,7 +120,7 @@
       gameOver: 'ゲームオーバー', scoreLabel: 'スコア',
       rankNew: '🥇 自己ベスト更新！', rankTop: n => `トップ ${n} 位`,
       nextLv: lv => `▶ レベル ${lv}`, retryLv: lv => `🔄 レベル ${lv} 再挑戦`, playAgain: '🔄 もう一度',
-      homeBtn: '🏠 ホーム',
+      homeBtn: '🏠 ホーム', shareScore: '📤 シェア',
       fsEnter: '全画面', fsExit: '全画面終了',
       copyright: y => `© ${y} allin1site.com — 無断複製禁止`,
       youAtRank: r => `あなたは ${r} 位`,
@@ -134,7 +136,8 @@
       playNormal: '▶ Chơi', modeHint: 'Chơi tự do. Điểm và lịch sử lưu trên máy.',
       playAdv: lv => `⚔️ Chơi Cấp ${lv}`,
       btnHistory: '📜 Lịch sử', btnTop: '🏆 Top', btnHowto: '❓ Cách chơi',
-      btnLeaderboard: '🌐 Online',
+      btnLeaderboard: '🌐 Online', btnAwards: '🏅 Thành tích',
+      achTitle: 'Thành tích', achUnlocked: '🏅 Mở khóa thành tích!',
       profileTitle: '👤 Hồ sơ', back: '← Quay lại',
       signOut: 'Đăng xuất', guestHint: 'Chơi không cần đăng nhập hoặc dùng Google.',
       namePlaceholder: 'Tên của bạn (tối đa 20 ký tự)', playGuest: 'Chơi không đăng nhập',
@@ -153,7 +156,7 @@
       gameOver: 'Game Over', scoreLabel: 'Điểm',
       rankNew: '🥇 Kỷ lục mới!', rankTop: n => `Hạng ${n}`,
       nextLv: lv => `▶ Cấp ${lv}`, retryLv: lv => `🔄 Thử lại Cấp ${lv}`, playAgain: '🔄 Chơi lại',
-      homeBtn: '🏠 Trang chính',
+      homeBtn: '🏠 Trang chính', shareScore: '📤 Chia sẻ',
       fsEnter: 'Toàn màn hình', fsExit: 'Thoát toàn màn hình',
       copyright: y => `© ${y} allin1site.com — Mọi quyền được bảo lưu.`,
       youAtRank: r => `Bạn xếp hạng #${r}`,
@@ -209,6 +212,178 @@
     if (_theme === 'light') return '☀️';
     if (_theme === 'dark') return '🌙';
     return '⚙️'; // auto
+  }
+
+  // ── Sound FX (Web Audio, synthesized — zero asset files) ──────────────────
+  const _Sound = (() => {
+    let ctx = null;
+    let on = (localStorage.getItem('gp_sound') || 'on') !== 'off';
+    function _ctx() {
+      if (!ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        try { ctx = new AC(); } catch { return null; }
+      }
+      if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+      return ctx;
+    }
+    function _tone(freq, dur, type, when, gain) {
+      const c = _ctx(); if (!c) return;
+      const t0 = c.currentTime + (when || 0);
+      const osc = c.createOscillator();
+      const g = c.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(gain || 0.15, t0 + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      osc.connect(g); g.connect(c.destination);
+      osc.start(t0); osc.stop(t0 + dur + 0.03);
+    }
+    const SEQ = {
+      click:   () => _tone(660, 0.06, 'square', 0, 0.07),
+      win:     () => { _tone(523,0.12,'sine',0,0.16); _tone(659,0.12,'sine',0.10,0.16); _tone(784,0.24,'sine',0.20,0.18); },
+      lose:    () => { _tone(330,0.18,'sawtooth',0,0.12); _tone(247,0.30,'sawtooth',0.15,0.12); },
+      levelup: () => { _tone(523,0.09,'sine',0,0.15); _tone(659,0.09,'sine',0.08,0.15); _tone(784,0.09,'sine',0.16,0.15); _tone(1047,0.22,'sine',0.24,0.18); },
+      coin:    () => { _tone(988,0.07,'square',0,0.12); _tone(1319,0.14,'square',0.07,0.12); },
+      badge:   () => { _tone(784,0.10,'triangle',0,0.16); _tone(988,0.10,'triangle',0.10,0.16); _tone(1319,0.28,'triangle',0.20,0.18); },
+    };
+    function play(name) { if (!on) return; const f = SEQ[name]; if (f) { try { f(); } catch {} } }
+    function toggle() { on = !on; try { localStorage.setItem('gp_sound', on ? 'on' : 'off'); } catch {} if (on) play('click'); return on; }
+    function isOn() { return on; }
+    function icon() { return on ? '🔊' : '🔇'; }
+    return { play, toggle, isOn, icon };
+  })();
+
+  // ── Achievements catalog (local-first, cross-game) ────────────────────────
+  const _ACHIEVEMENTS = [
+    { id:'first_win', icon:'🎮',
+      name:{en:'First Steps',vi:'Bước Đầu',ja:'はじめの一歩'},
+      desc:{en:'Play your first game',vi:'Chơi game đầu tiên',ja:'初プレイ達成'},
+      check:c=>c.plays>=1 },
+    { id:'games_10', icon:'🕹️',
+      name:{en:'Getting Hooked',vi:'Nghiện Nhẹ',ja:'ハマってきた'},
+      desc:{en:'Play 10 games total',vi:'Chơi tổng cộng 10 ván',ja:'通算10プレイ'},
+      check:c=>c.plays>=10 },
+    { id:'games_50', icon:'🎯',
+      name:{en:'Dedicated',vi:'Tận Tâm',ja:'やり込み'},
+      desc:{en:'Play 50 games total',vi:'Chơi tổng cộng 50 ván',ja:'通算50プレイ'},
+      check:c=>c.plays>=50 },
+    { id:'games_100', icon:'💯',
+      name:{en:'Century',vi:'Trăm Trận',ja:'百戦錬磨'},
+      desc:{en:'Play 100 games total',vi:'Chơi tổng cộng 100 ván',ja:'通算100プレイ'},
+      check:c=>c.plays>=100 },
+    { id:'score_1k', icon:'⭐',
+      name:{en:'Four Figures',vi:'Nghìn Điểm',ja:'四桁突破'},
+      desc:{en:'Score 1,000+ in any game',vi:'Đạt 1.000+ điểm một ván',ja:'1ゲームで1,000点以上'},
+      check:c=>c.best>=1000 },
+    { id:'score_10k', icon:'🌟',
+      name:{en:'High Roller',vi:'Cao Thủ',ja:'ハイスコアラー'},
+      desc:{en:'Score 10,000+ in any game',vi:'Đạt 10.000+ điểm một ván',ja:'1ゲームで10,000点以上'},
+      check:c=>c.best>=10000 },
+    { id:'score_50k', icon:'💫',
+      name:{en:'Legendary',vi:'Huyền Thoại',ja:'伝説級'},
+      desc:{en:'Score 50,000+ in any game',vi:'Đạt 50.000+ điểm một ván',ja:'1ゲームで50,000点以上'},
+      check:c=>c.best>=50000 },
+    { id:'lvl_5', icon:'🏅',
+      name:{en:'Rising Star',vi:'Sao Mới',ja:'のぼり調子'},
+      desc:{en:'Clear Adventure Level 5',vi:'Qua Cấp 5 chế độ Phiêu Lưu',ja:'アドベンチャーLv5クリア'},
+      check:c=>c.maxLevel>=5 },
+    { id:'lvl_15', icon:'🥈',
+      name:{en:'Veteran',vi:'Lão Làng',ja:'熟練者'},
+      desc:{en:'Clear Adventure Level 15',vi:'Qua Cấp 15 chế độ Phiêu Lưu',ja:'アドベンチャーLv15クリア'},
+      check:c=>c.maxLevel>=15 },
+    { id:'finisher', icon:'🏆',
+      name:{en:'The Finisher',vi:'Phá Đảo',ja:'完全制覇'},
+      desc:{en:'Finish all levels of a game',vi:'Hoàn thành mọi cấp của một game',ja:'全レベルクリア'},
+      check:c=>!!c.finishedGame },
+    { id:'night_owl', icon:'🦉',
+      name:{en:'Night Owl',vi:'Cú Đêm',ja:'夜更かし'},
+      desc:{en:'Play between midnight and 5am',vi:'Chơi trong khoảng 0–5h sáng',ja:'深夜0〜5時にプレイ'},
+      check:c=>c.hour>=0&&c.hour<5 },
+    { id:'polyglot', icon:'🌍',
+      name:{en:'Polyglot',vi:'Đa Ngữ',ja:'多言語'},
+      desc:{en:'Play in all 3 languages',vi:'Chơi đủ 3 ngôn ngữ',ja:'3言語すべてでプレイ'},
+      check:c=>['en','vi','ja'].every(l=>c.langs.includes(l)) },
+    { id:'streak_3', icon:'🔥',
+      name:{en:'On Fire',vi:'Bốc Cháy',ja:'絶好調'},
+      desc:{en:'Reach a 3-day streak',vi:'Đạt chuỗi 3 ngày',ja:'3日連続プレイ'},
+      check:c=>c.streak>=3 },
+    { id:'streak_7', icon:'⚡',
+      name:{en:'Unstoppable',vi:'Bất Bại',ja:'止まらない'},
+      desc:{en:'Reach a 7-day streak',vi:'Đạt chuỗi 7 ngày',ja:'7日連続プレイ'},
+      check:c=>c.streak>=7 },
+  ];
+  function _getGStats() { return _getC('gp_global_stats', { plays:0, best:0, maxLevel:0, langs:[] }); }
+  function _getAch()    { return _getC('gp_global_achievements', { unlocked:{} }); }
+  async function _updateGlobalStats(score, clearedAdvLevel) {
+    const s = Object.assign({ plays:0, best:0, maxLevel:0, langs:[] }, _getGStats());
+    s.plays += 1;
+    s.best = Math.max(s.best || 0, score || 0);
+    if (clearedAdvLevel != null) s.maxLevel = Math.max(s.maxLevel || 0, clearedAdvLevel);
+    if (!s.langs.includes(_lang)) s.langs = s.langs.concat(_lang);
+    await _setC('gp_global_stats', s);
+    return s;
+  }
+  async function _checkAchievements(ctx) {
+    const ach = Object.assign({ unlocked:{} }, _getAch());
+    ach.unlocked = Object.assign({}, ach.unlocked);
+    const newly = [];
+    for (const a of _ACHIEVEMENTS) {
+      if (ach.unlocked[a.id]) continue;
+      let ok = false;
+      try { ok = !!a.check(ctx); } catch {}
+      if (ok) { ach.unlocked[a.id] = Date.now(); newly.push(a); }
+    }
+    if (newly.length) {
+      await _setC('gp_global_achievements', ach);
+      newly.forEach((a, i) => setTimeout(() => { _achToast(a); _Sound.play('badge'); }, i * 1300));
+    }
+    return newly;
+  }
+  function _achToast(a) {
+    if (!_stageEl) return;
+    const name = a.name[_lang] || a.name.en;
+    const t = _el('div', 'gp-toast gp-ach-toast',
+      `<span class="gp-ach-ic">${a.icon}</span><span class="gp-ach-tx"><b>${_T('achUnlocked')}</b><br>${_esc(name)}</span>`);
+    _stageEl.appendChild(t);
+    setTimeout(() => t.remove(), 3800);
+  }
+  function _badgesPreviewHtml() {
+    const ach = _getAch();
+    const unlocked = _ACHIEVEMENTS.filter(a => ach.unlocked && ach.unlocked[a.id]);
+    const icons = unlocked.slice(0, 6).map(a => `<span class="gp-bp-ic">${a.icon}</span>`).join('')
+                || `<span class="gp-bp-ic" style="opacity:.4">🔒</span>`;
+    return `<button class="gp-badges-preview" id="gpBadgesPrev">
+      <span class="gp-bp-row">${icons}</span>
+      <span class="gp-bp-label">🏅 ${_T('achTitle')} ${unlocked.length}/${_ACHIEVEMENTS.length} ›</span>
+    </button>`;
+  }
+  function _showAchievements() {
+    _Sound.play('click');
+    const ach = _getAch();
+    const n = Object.keys(ach.unlocked || {}).length;
+    const total = _ACHIEVEMENTS.length;
+    const screen = _el('div', 'gp-screen');
+    screen.innerHTML = `
+      <div class="gp-topbar">
+        <button class="gp-back-btn" id="gpAchBack">${_T('back')}</button>
+        <h2>${_T('achTitle')} <span style="opacity:.55;font-size:.78em;font-weight:600">${n}/${total}</span></h2>
+        <span style="width:54px"></span>
+      </div>
+      <div class="gp-ach-grid">
+        ${_ACHIEVEMENTS.map(a => {
+          const got = !!(ach.unlocked && ach.unlocked[a.id]);
+          return `<div class="gp-ach-card ${got ? 'got' : 'locked'}">
+            <div class="gp-ach-card-ic">${got ? a.icon : '🔒'}</div>
+            <div class="gp-ach-card-nm">${_esc(a.name[_lang] || a.name.en)}</div>
+            <div class="gp-ach-card-ds">${_esc(a.desc[_lang] || a.desc.en)}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+    _showScreen(screen);
+    screen.querySelector('#gpAchBack').onclick = _showHome;
   }
 
   // ── Runtime state ────────────────────────────────────────────────────────
@@ -578,6 +753,7 @@
         <a href="../../index.html" class="gp-back-hub">${_T('backHub')}</a>
         <div class="gp-topbar-right">
           <button class="gp-lang-toggle" id="gpThemeBtn">${_getThemeIcon()}</button>
+          <button class="gp-lang-toggle" id="gpSoundBtn" title="Sound">${_Sound.icon()}</button>
           <button class="gp-lang-toggle" id="gpLangBtn">🌐 ${_esc(_T('langNext'))}</button>
           <button class="gp-profile-pill" id="gpProfBtn">
             ${_prof
@@ -610,6 +786,7 @@
       <div class="gp-row gp-sub-row">
         <button class="gp-sbtn" id="gpHist">${_T('btnHistory')}</button>
         <button class="gp-sbtn" id="gpTop">${_T('btnTop')}</button>
+        <button class="gp-sbtn" id="gpAch">${_T('btnAwards')}</button>
         <button class="gp-sbtn" id="gpLdb">${_T('btnLeaderboard')}</button>
         <button class="gp-sbtn" id="gpHow">${_T('btnHowto')}</button>
       </div>
@@ -617,11 +794,14 @@
     _showScreen(screen);
 
     screen.querySelector('#gpThemeBtn').onclick = _cycleTheme;
+    const _sndBtn = screen.querySelector('#gpSoundBtn');
+    if (_sndBtn) _sndBtn.onclick = () => { _sndBtn.textContent = _Sound.toggle() ? '🔊' : '🔇'; };
     screen.querySelector('#gpLangBtn').onclick = _cycleLang;
     screen.querySelector('#gpProfBtn').onclick = _showProfile;
     if (screen.querySelector('#gpQuickLogin')) screen.querySelector('#gpQuickLogin').onclick = _showProfile;
     screen.querySelector('#gpHist').onclick = _showHistory;
     screen.querySelector('#gpTop').onclick  = _showTop;
+    screen.querySelector('#gpAch').onclick  = _showAchievements;
     screen.querySelector('#gpLdb').onclick  = _showLeaderboard;
     screen.querySelector('#gpHow').onclick  = _showHowTo;
 
@@ -721,6 +901,7 @@
           <div class="gp-prof-type">${_prof.type === 'google' ? '🔵 Google' : '⚪ Guest'}</div>
           ${_prof.email ? `<div class="gp-prof-email">${_esc(_prof.email)}</div>` : ''}
         </div>
+        ${_badgesPreviewHtml()}
         <button class="gp-sbtn gp-btn-danger" id="gpLogout">${_T('signOut')}</button>
       `;
       body.querySelector('#gpLogout').onclick = async () => {
@@ -735,6 +916,7 @@
       const hasGoogle = !!CFG.googleClientId;
       body.innerHTML = `
         <p class="gp-prof-hint">${_T('guestHint')}</p>
+        ${_badgesPreviewHtml()}
         <div class="gp-guest-form">
           <input class="gp-input" id="gpGuestName" type="text"
                  placeholder="${_esc(_T('namePlaceholder'))}" maxlength="20" autocomplete="off">
@@ -756,6 +938,8 @@
         _initGoogleButton(body.querySelector('#gpGoogleBtnHost'));
       }
     }
+    const _bp = body.querySelector('#gpBadgesPrev');
+    if (_bp) _bp.onclick = _showAchievements;
   }
 
   // ── HISTORY SCREEN ───────────────────────────────────────────────────────
@@ -929,18 +1113,98 @@
         <div class="gp-result-btns">
           ${canNext ? `<button class="gp-btn gp-btn-play" id="gpNextLv">${_T('nextLv')(_level + 2)}</button>` : ''}
           <button class="gp-btn gp-btn-play" id="gpReplay">${replayLabel}</button>
-          <button class="gp-sbtn" id="gpResHome">${_T('homeBtn')}</button>
+          <div class="gp-row gp-sub-row">
+            <button class="gp-sbtn" id="gpResHome">${_T('homeBtn')}</button>
+            <button class="gp-sbtn gp-sbtn-share" id="gpShare">${_T('shareScore')}</button>
+          </div>
         </div>
       </div>
     `;
     _showScreen(screen);
+    // Result sound: levelup > win > lose
+    if (isAdv && didPass && canNext) _Sound.play('levelup');
+    else if (didPass && score > 0)   _Sound.play('win');
+    else                             _Sound.play('lose');
     if (canNext) screen.querySelector('#gpNextLv').onclick = () => _doStart('adventure', _level + 1);
     screen.querySelector('#gpReplay').onclick  = () => _doStart(_mode, _level);
     screen.querySelector('#gpResHome').onclick = _showHome;
+    screen.querySelector('#gpShare').onclick   = () => _shareScore(_cfg.name || _gid, score, title, emoji);
+  }
+
+  // ── Share Score via Canvas + Web Share API ────────────────────────────────
+  function _shareScore(gameName, score, title, emoji) {
+    const W = 600, H = 360;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#09090f';
+    ctx.fillRect(0, 0, W, H);
+
+    // Gradient border
+    const grad = ctx.createLinearGradient(0, 0, W, 0);
+    grad.addColorStop(0, '#a78bfa');
+    grad.addColorStop(0.5, '#60a5fa');
+    grad.addColorStop(1, '#34d399');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 4;
+    ctx.strokeRect(2, 2, W - 4, H - 4);
+
+    // Emoji
+    ctx.font = '64px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(emoji, W / 2, 90);
+
+    // Game name
+    ctx.font = 'bold 26px -apple-system, Arial, sans-serif';
+    ctx.fillStyle = '#a78bfa';
+    ctx.fillText(gameName, W / 2, 140);
+
+    // Title (Level Clear / Game Over)
+    ctx.font = '18px -apple-system, Arial, sans-serif';
+    ctx.fillStyle = '#8888aa';
+    ctx.fillText(title, W / 2, 170);
+
+    // Score
+    ctx.font = 'bold 76px -apple-system, Arial, sans-serif';
+    const sg = ctx.createLinearGradient(W * 0.2, 0, W * 0.8, 0);
+    sg.addColorStop(0, '#f59e0b'); sg.addColorStop(1, '#ef4444');
+    ctx.fillStyle = sg;
+    ctx.fillText(score.toLocaleString(), W / 2, 265);
+
+    // Footer
+    ctx.font = '15px -apple-system, Arial, sans-serif';
+    ctx.fillStyle = '#555577';
+    ctx.fillText('allin1site.com · Mini Games', W / 2, 320);
+
+    canvas.toBlob(async blob => {
+      const file = new File([blob], 'score.png', { type: 'image/png' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: `${gameName} — ${score.toLocaleString()} pts`,
+            text: `I scored ${score.toLocaleString()} in ${gameName}! Can you beat it? 🎮`,
+            url: location.href,
+            files: [file],
+          });
+          return;
+        } catch (e) {
+          if (e.name === 'AbortError') return; // user cancelled
+        }
+      }
+      // Fallback: download PNG
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${gameName.replace(/\W+/g, '_')}_${score}.png`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    }, 'image/png');
   }
 
   // ── Game launch ──────────────────────────────────────────────────────────
   async function _doStart(mode, level) {
+    _Sound.play('click');
     _mode = mode; _level = level;
     await _clearPause();
     _hideOverlay();
@@ -1087,6 +1351,8 @@
     await _openDB();
     await _loadAll([
       'gp_global_profile',
+      'gp_global_stats',
+      'gp_global_achievements',
       _gkey('top'),
     ]);
     await _loadProfile();
@@ -1120,23 +1386,37 @@
     await _addHistory({ score, mode: _mode, level: _level, extra: result.extra });
     await _addTop    ({ score, mode: _mode, level: _level });
 
+    const cleared    = result.cleared !== false;          // default true for backwards compat
+    const levelsLen  = (_cfg.levels || []).length;
+    const clearedLvl = (_mode === 'adventure' && cleared) ? _level + 1 : null;
+    const gstats     = await _updateGlobalStats(score, clearedLvl);
+
     // Show interstitial BEFORE the result screen (logic-only by default)
     await _showInterstitial();
 
     if (_mode === 'adventure') {
-      const cleared = result.cleared !== false;          // default true for backwards compat
       const adv = Object.assign({ currentLevel:0, maxUnlocked:0, completed:[] }, _getAdv());
       adv.completed = adv.completed.slice();
       if (cleared) {
         adv.completed[_level] = true;
         const nxt = _level + 1;
-        if (nxt < (_cfg.levels || []).length) {
+        if (nxt < levelsLen) {
           adv.maxUnlocked  = Math.max(adv.maxUnlocked || 0, nxt);
           adv.currentLevel = nxt;
         }
       }
       await _saveAdv(adv);
     }
+
+    // Achievements (local-first, cross-game) — checked after stats update
+    let _streak = 0;
+    try { _streak = parseInt(localStorage.getItem('gp_streak_count') || '0', 10) || 0; } catch {}
+    await _checkAchievements({
+      plays: gstats.plays, best: gstats.best, maxLevel: gstats.maxLevel, langs: gstats.langs,
+      score, mode: _mode, level: _level, cleared,
+      finishedGame: (_mode === 'adventure' && cleared && _level + 1 === levelsLen),
+      streak: _streak, hour: new Date().getHours(),
+    });
 
     // Server sync (best-effort, non-blocking)
     if (_hasApi()) {
@@ -1156,6 +1436,7 @@
 
   window.GamePlatform = {
     init, pause, recordResult, showHome, getLang, setLang, getStageInner,
+    sound: { play: (n) => _Sound.play(n), toggle: () => _Sound.toggle(), isOn: () => _Sound.isOn() },
     _onGoogleLogin,  // exposed for legacy data-callback usage
   };
 })();
