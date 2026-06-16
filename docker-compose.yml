@@ -14,9 +14,9 @@ services:
     container_name: minigames
     restart: unless-stopped
     ports:
-      # Bind to localhost only — nginx on the host proxies 443 → 3333.
-      # Change to "3333:3333" if you need external direct access (not recommended).
-      - "127.0.0.1:3333:3333"
+      # Bind to localhost only — host nginx proxies 443 → 127.0.0.1:9210 → container 3333.
+      # mcp-80 deployment publishes on host port 9210 (do NOT change — nginx upstream depends on it).
+      - "127.0.0.1:9210:3333"
     environment:
       NODE_ENV: production
       PORT: "3333"
@@ -24,6 +24,10 @@ services:
       MYSQL_SSL: ${MYSQL_SSL:-true}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-}
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3333/healthz"]
       interval: 30s
