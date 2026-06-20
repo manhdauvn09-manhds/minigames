@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # =============================================================================
-#  MinigGames — DB Migration Script
+#  MinigGames — DB Migration Script [HISTORICAL — Run via MCP only]
 #  FROM: Vultr Managed MySQL (vultrdb.com:16751)
 #  TO:   Singapore self-host MySQL (149.28.152.221:3306)
 #  Schema: minigame
-#  Run ON app server: ssh root@62.238.28.106 "bash ~/minigames-migrate.sh"
+#  DEPRECATED: Direct SSH to old server (62.238.28.106 deleted 2026-06-04)
+#  Current deployment: Use CodeProvider MCP tool (mcp__CodeProvider_MCP__deploy)
 # =============================================================================
 set -euo pipefail
 

@@ -26,10 +26,15 @@
 #   - File .env exists in $RepoDir on VPS (or use -UploadEnv)
 # =====================================================================
 
+# ⚠️  DEPRECATED: Use CodeProvider MCP tool for deployment (2026-06-09+)
+# This PowerShell script is retained for historical reference only.
+# Old server (62.238.28.106) was deleted 2026-06-04.
+# See CLAUDE.md for current deployment method.
+
 [CmdletBinding()]
 param(
-  # VPS info
-  [string]$VpsHost   = "62.238.28.106",
+  # VPS info (DEPRECATED - see CLAUDE.md)
+  [string]$VpsHost   = "65.108.62.80",
   [string]$VpsUser   = "root",
   [string]$RepoDir   = "~/minigames",
   [string]$RepoUrl   = "git@github-minigames:manhdauvn09-manhds/minigames.git",

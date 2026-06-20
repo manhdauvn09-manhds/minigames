@@ -244,7 +244,7 @@
         🌍 URL: <strong>minigames.allin1site.com</strong><br>
         📦 Type: <strong>GenZ Web Game Factory</strong><br>
         💾 Database: <strong>MySQL (leaderboard + analytics)</strong><br>
-        🐳 Hosting: <strong>Docker container trên VPS private (62.238.28.106:3333)</strong>
+        🐳 Hosting: <strong>Docker container on mcp-80 (65.108.62.80:9210→3333) [Updated 2026-06-09]</strong>
       </div>
 
       <h3>Mục đích & Tính năng chính</h3>
@@ -1024,12 +1024,13 @@ function tableFor(gameId) {
     <section id="deployment">
       <h2>🚀 10. Deployment & VPS</h2>
 
-      <h3>Current Setup</h3>
+      <h3>Current Setup [Updated 2026-06-09]</h3>
       <div class="info-box">
-        <strong>VPS Host:</strong> 62.238.28.106:3333<br>
+        <strong>Server:</strong> mcp-80 (65.108.62.80) — CodeProvider consolidated<br>
+        <strong>Port Mapping:</strong> 9210 (external) → 3333 (internal Express)<br>
         <strong>Domain:</strong> minigames.allin1site.com (via Cloudflare)<br>
         <strong>Container:</strong> Docker (Node.js 20 + Express + MySQL2)<br>
-        <strong>Database:</strong> Hosted on same VPS or remote<br>
+        <strong>Database:</strong> 149.28.152.221:3306/minigame (Vultr Singapore self-host)<br>
         <strong>SSH Key:</strong> ~/.ssh/github_minigames (for GitHub clone)
       </div>
 
@@ -1037,13 +1038,17 @@ function tableFor(gameId) {
       <div class="code-block">
 # deploy-safe.ps1 — Multi-service safe deploy
 
-.\deploy-safe.ps1 -CloneIfMissing -UploadEnv
+mcp__CodeProvider_MCP__deploy --server-id=mcp-80 --app-id=minigames
 
-# What it does:
-1. SSH into VPS (62.238.28.106)
-2. Clone repo (if missing) or pull latest
-3. Upload .env (DATABASE_URL, CORS_ORIGIN, etc)
-4. Restart Docker container
+# What it does (NEW METHOD - 2026-06-09+):
+1. Connect to mcp-80 via MCP (secure remote execution)
+2. git pull latest from origin
+3. docker compose up -d --build (rebuilds minigames container)
+4. Health check via /healthz endpoint
+
+# Legacy method (DEPRECATED):
+# .\deploy-safe.ps1 -CloneIfMissing -UploadEnv
+# (Old VPS 62.238.28.106 was deleted 2026-06-04 — do not use)
 5. Verify health check (/healthz)
 6. Prune old images/containers safely
       </div>
@@ -1100,12 +1105,13 @@ docker run -d \
         <strong>Use:</strong> Docker health probe, load balancer checks
       </div>
 
-      <h3>Cloudflare Setup</h3>
+      <h3>Cloudflare Setup [Updated 2026-06-09]</h3>
       <ul style="margin-left: 20px;">
-        <li><strong>Reverse proxy:</strong> minigames.allin1site.com → 62.238.28.106:3333</li>
+        <li><strong>DNS:</strong> minigames A/CNAME record → mcp-80 origin (65.108.62.80)</li>
+        <li><strong>Reverse proxy:</strong> minigames.allin1site.com → mcp-80 nginx (port 9210 on host)</li>
         <li><strong>Cache rules:</strong> Static files (JS/CSS/images) 1h, HTML 5m</li>
         <li><strong>Security:</strong> Rate limiting, DDoS protection, WAF enabled</li>
-        <li><strong>SSL:</strong> Full (end-to-end encryption)</li>
+        <li><strong>SSL:</strong> Full (end-to-end encryption), cert at /etc/letsencrypt/live/</li>
       </ul>
 
       <div class="success">

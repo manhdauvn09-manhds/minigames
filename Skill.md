@@ -34,7 +34,7 @@ Hàng ngày tự động:
 
 | \*\*Games domain\*\* | https://minigames.allin1site.com/{ten-game}/ |
 
-| \*\*Server\*\* | 62.238.28.106 (Linux, Docker) |
+| \*\*Server\*\* | mcp-80 (65.108.62.80) — CodeProvider consolidated [Updated 2026-06-09] |
 
 | \*\*Design system\*\* | Kaya (warm neutrals + sumi red accent) |
 
@@ -1738,7 +1738,7 @@ STEP 6: Build (Docker compose)
 
 &#x20;        ↓
 
-STEP 7: Deploy → 62.238.28.106 (Python \_deploy\_helper.py)
+STEP 7: Deploy → mcp-80 (65.108.62.80) via CodeProvider MCP [Updated 2026-06-09]
 
 &#x20;        ↓
 
@@ -1776,15 +1776,15 @@ Message: "daily-genZ-games: YYYY-MM-DD – generated 10 games + shared styles"
 
 Server Configuration
 
-Host: 62.238.28.106
+Host: mcp-80 (65.108.62.80) [Updated 2026-06-09]
 
-Repo dir: /opt/allin1site/
+Repo dir: /opt/minigames/
 
 Portal: https://allin1site.com
 
 Games: https://minigames.allin1site.com/{ten-game}/
 
-Shared styles: /opt/allin1site/subapp/games/assets/shared/
+Shared styles: /opt/minigames/assets/shared/
 
 Deploy tool: python \_deploy\_helper.py
 
@@ -2048,13 +2048,15 @@ docker compose build
 
 docker images | grep allin1site
 
-🚀 STEP 6: DEPLOY TO 62.238.28.106
+🚀 STEP 6: DEPLOY TO mcp-80 (65.108.62.80) [Updated 2026-06-09 — Use MCP tool]
 
-6.1 Setup credentials
+6.1 Setup credentials (LEGACY — see CLAUDE.md for current method)
 
-cat > \~/.allin1\_creds << EOF
+mcp__CodeProvider_MCP__deploy --server-id=mcp-80 --app-id=minigames
 
-HOST=62.238.28.106
+# Legacy method (DEPRECATED):
+# cat > \~/.allin1\_creds << EOF
+# HOST=65.108.62.80
 
 USER=root
 
@@ -2156,7 +2158,7 @@ git commit -m "daily-genZ-games: YYYY-MM-DD – 10 games + Kaya styles deployed
 
 
 
-Deploy Status: ✅ LIVE on 62.238.28.106
+Deploy Status: ✅ LIVE on mcp-80 (65.108.62.80:9210→3333) [Updated 2026-06-09]
 
 
 
