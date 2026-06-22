@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniGames - Frontend User Manual</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --accent: #f59e0b;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --border: #e5e7eb;
+            --text: #374151;
+            --success: #10b981;
+            --warning: #f97316;
+            --info: #3b82f6;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+            border-radius: 12px;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            padding: 20px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        nav a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--light);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            border: 2px solid transparent;
+        }
+
+        nav a:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .content {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        section {
+            margin-bottom: 50px;
+            scroll-margin-top: 100px;
+        }
+
+        section:last-child {
+            margin-bottom: 0;
+        }
+
+        h2 {
+            font-size: 2em;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: var(--secondary);
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            font-size: 1.2em;
+            color: var(--dark);
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        /* Feature Cards */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #fff 100%);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+
+        .feature-card h4 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+
+        .feature-card .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        /* Games Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .game-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+            border-color: var(--primary);
+        }
+
+        .game-card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .game-card-header h4 {
+            color: white;
+            margin: 0;
+        }
+
+        .game-card-body {
+            padding: 20px;
+        }
+
+        .game-card-body p {
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        /* Steps */
+        .steps {
+            background: var(--light);
+            border-left: 4px solid var(--primary);
+            padding: 25px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
+        .step {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            margin-top: 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: var(--light);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        /* Code blocks */
+        pre {
+            background: #1f2937;
+            color: #f0f0f0;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+        .badge-success {
+            background: var(--success);
+        }
+
+        .badge-warning {
+            background: var(--warning);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+
+        footer p {
+            margin: 10px 0;
+            color: #e5e7eb;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            nav ul {
+                gap: 5px;
+            }
+
+            nav a {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            h3 {
+                font-size: 1.2em;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            nav {
+                position: static;
+            }
+
+            .content {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 MiniGames Frontend User Manual</h1>
+            <p>Your Complete Guide to Gaming, Leaderboards & Account Management</p>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#getting-started">Getting Started</a></li>
+                <li><a href="#games">Games</a></li>
+                <li><a href="#gameplay">Gameplay</a></li>
+                <li><a href="#account">Account</a></li>
+                <li><a href="#leaderboards">Leaderboards</a></li>
+                <li><a href="#storage">Data Storage</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <!-- Getting Started -->
+            <section id="getting-started">
+                <h2>🚀 Getting Started</h2>
+
+                <h3>Welcome to MiniGames!</h3>
+                <p>MiniGames is a free, browser-based gaming platform featuring 8+ professionally designed games. No installation required — just open and play!</p>
+
+                <div class="alert alert-info">
+                    <strong>💡 Tip:</strong> You can start playing immediately as a guest. Signing in with Google is optional and unlocks cloud save features.
+                </div>
+
+                <h3>Game Modes Available</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="icon">🎯</div>
+                        <h4>Normal Mode</h4>
+                        <p>Classic gameplay with standard rules and challenges. Perfect for casual play.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">🏆</div>
+                        <h4>Adventure Mode</h4>
+                        <p>Progressive difficulty with story-like progression. Unlock achievements and climb the ranks.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">⚡</div>
+                        <h4>Quick Play</h4>
+                        <p>Fast-paced sessions designed for players on the go. Play anytime, anywhere.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Games Section -->
+            <section id="games">
+                <h2>🎲 Available Games</h2>
+
+                <p>We offer 8 fully playable games, each with unique gameplay mechanics and 30 progressive levels:</p>
+
+                <div class="games-grid">
+                    <div class="game-card">
+                        <div class="game-card-header">
+                            <h4>🎈 BallMerge</h4>
+                        </div>
+                        <div class="game-card-body">
+                            <p><strong>Genre:</strong> Drop & Merge Puzzle</p>
+                            <p><strong>Gameplay:</strong> Drop balls, merge matching colors to clear the board.</p>
+                            <p><strong>Best for:</strong> Puzzle lovers seeking strategic gameplay.</p>
+                            <span class="badge badge-success">Popular</span>
+                        </div>
+                    </div>
+
+                    <div class="game-card">
+                        <div class="game-card-header">
+                            <h4>🎨 ChromaMatch</h4>
+                        </div>
+                        <div class="game-card-body">
+                            <p><strong>Genre:</strong> Match-3 Puzzle</p>
+                            <p><strong>Gameplay:</strong> Swap adjacent tiles to match 3+ colors.</p>
+                            <p><strong>Best for:</strong> Classic puzzle enthusiasts.</p>
+                            <span class="badge badge-success">Classic</span>
+                        </div>
+                    </div>
+
+                    <div class="game-card">
+                        <div class="game-card-header">
+                            <h4>🏗️ StackTower</h4>
+                        </div>
+                        <div class="game-card-body">
+                            <p><strong>Genre:</strong> Arcade Stacking</p>
+                            <p><strong>Gameplay:</strong> Tap to stack blocks as high as possible before they fall.</p>
+                            <p><strong>Best for:</strong> Quick reflexes and timing skills.</p>
+                            <span class="badge">Arcade</span>
+                        </div>
+                    </div>
+
+                    <div class="game-card">
+                        <div class="game-card-header">
+                            <h4>🧠 MemoryFlip</h4>
+                        </div>
+                        <div class="game-card-body">
+                            <p><strong>Genre:</strong> Memory/Matching</p>
+                            <p><strong>Gameplay:</strong> Flip cards to find matching pairs.</p>
+                            <p><strong>Best for:</strong> Brain training and concentration.</p>
+                            <span class="badge">Classic</span>
+                        </div>
+                    </div>
+
+                    <div class="game-card">
+                        <div class="game-card-header">
+                            <h4>🐍 SnakeRush</h4>
+                        </div>
+                        <div class="game-card-body">
+                            <p><strong>Genre:</strong> Classic Arcade</p>
+                            <p><strong>Gameplay:</strong> Control your snake, eat food, avoid obstacles.</p>
+                            <p><strong>Best for:</strong> Nostalgic arcade fans.</p>
+                            <span class="badge">Retro</span>
+                        </div>
+                    </div>
+
+                    <div class="game-card">
+                        <div class="game-card-header">
+                            <h4>💧 BubbleBlast</h4>
+                        </div>
+                        <div class="game-card-body">
+                            <p><strong>Genre:</strong> Bubble Shooter</p>
+                            <p><strong>Gameplay:</strong> Shoot bubbles to match colors and clear the board.</p>
+                            <p><strong>Best for:</strong> Strategy-based puzzle fans.</p>
+                            <span class="badge badge-success">Popular</span>
+                        </div>
+                    </div>
+
+                    <div class="game-card">
+                        <div class="game-card-header">
+                            <h4>🧱 ArkanoidX</h4>
+                        </div>
+                        <div class="game-card-body">
+                            <p><strong>Genre:</strong> Brick Breaker</p>
+                            <p><strong>Gameplay:</strong> Break bricks with bouncing balls. Collect power-ups!</p>
+                            <p><strong>Best for:</strong> Action lovers with quick reflexes.</p>
+                            <span class="badge">Action</span>
+                        </div>
+                    </div>
+
+                    <div class="game-card">
+                        <div class="game-card-header">
+                            <h4>🔢 NumberSlide</h4>
+                        </div>
+                        <div class="game-card-body">
+                            <p><strong>Genre:</strong> Sliding Puzzle</p>
+                            <p><strong>Gameplay:</strong> Slide numbered tiles to arrange them in order.</p>
+                            <p><strong>Best for:</strong> Logic and spatial reasoning enthusiasts.</p>
+                            <span class="badge">Puzzle</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>🚧 Coming Soon:</strong> Penumbra (line-tracing puzzle) & Sudoku (9×9 with daily challenges and 2-player modes) are in development and will be available soon!
+                </div>
+            </section>
+
+            <!-- Gameplay Section -->
+            <section id="gameplay">
+                <h2>🎮 How to Play</h2>
+
+                <h3>Starting a Game</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Choose a Game</h4>
+                            <p>Browse the game selection on the main portal and click on any game thumbnail.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Optional: Sign In</h4>
+                            <p>Click "Sign in with Google" to save your progress and compete on leaderboards. This is completely optional!</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Select a Level</h4>
+                            <p>Choose Normal or Adventure mode, then select your starting level (starts at Level 1).</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Play & Enjoy!</h4>
+                            <p>Follow the game's unique rules and try to get the highest score possible.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Game Controls</h3>
+                <table>
+                    <tr>
+                        <th>Action</th>
+                        <th>Desktop Control</th>
+                        <th>Mobile Control</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Move/Navigate</strong></td>
+                        <td>Arrow Keys or Mouse</td>
+                        <td>Touch & Swipe</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Select/Interact</strong></td>
+                        <td>Mouse Click or Space</td>
+                        <td>Tap</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pause</strong></td>
+                        <td>P Key or Pause Button</td>
+                        <td>Tap Pause Button</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fullscreen</strong></td>
+                        <td>F Key or Button</td>
+                        <td>Rotate Device</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Go Back</strong></td>
+                        <td>ESC or Back Button</td>
+                        <td>Tap Back Button</td>
+                    </tr>
+                </table>
+
+                <h3>Levels & Progression</h3>
+                <p>Each game features 30 progressive levels. As you advance:</p>
+                <ul style="margin-left: 20px;">
+                    <li><strong>Difficulty increases</strong> — More obstacles, faster gameplay, tighter time limits</li>
+                    <li><strong>New mechanics unlock</strong> — Power-ups, special tiles, and bonus features</li>
+                    <li><strong>Higher scores possible</strong> — Multipliers and combo bonuses</li>
+                    <li><strong>Achievements earned</strong> — Complete challenges to unlock special badges</li>
+                </ul>
+
+                <h3>Tips & Tricks</h3>
+                <div class="alert alert-success">
+                    <strong>💡 Pro Tips:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Plan ahead — Look for combo opportunities before making moves</li>
+                        <li>Use power-ups wisely — Save them for critical moments</li>
+                        <li>Take breaks — Step away if you're struggling with a level</li>
+                        <li>Watch videos — Check out gameplay videos for strategy tips</li>
+                        <li>Compete fairly — All players follow the same rules on leaderboards</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Account Section -->
+            <section id="account">
+                <h2>👤 Account Management</h2>
+
+                <h3>Play Modes</h3>
+                <table>
+                    <tr>
+                        <th>Mode</th>
+                        <th>Details</th>
+                        <th>Best For</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Guest Mode</strong> <span class="badge">Default</span></td>
+                        <td>Play without signing in. Progress saved locally on your device.</td>
+                        <td>Quick play, privacy-conscious players</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Google Sign-In</strong> <span class="badge-success">Recommended</span></td>
+                        <td>Sign in with your Google account. Cloud saves + leaderboard participation.</td>
+                        <td>Competitive players, multi-device play</td>
+                    </tr>
+                </table>
+
+                <h3>Signing In with Google</h3>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Click "Sign In with Google"</h4>
+                            <p>Look for the Google sign-in button at the top of any game.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Select Your Account</h4>
+                            <p>Choose the Google account you want to use (or sign in if needed).</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Grant Permissions</h4>
+                            <p>Allow MiniGames to access your basic profile info (name, email).</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Start Playing!</h4>
+                            <p>Your account is created and your scores will now be saved to the cloud.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Your Profile</h3>
+                <p>When signed in, your profile includes:</p>
+                <ul style="margin-left: 20px;">
+                    <li><strong>Display Name</strong> — From your Google account</li>
+                    <li><strong>Email Address</strong> — Used for account recovery and notifications</li>
+                    <li><strong>Account Type</strong> — Google or Guest</li>
+                    <li><strong>Join Date</strong> — When you first signed in</li>
+                    <li><strong>Last Activity</strong> — Your most recent game session</li>
+                </ul>
+
+                <h3>Sign Out</h3>
+                <p>To sign out, click your profile icon in the top-right corner and select "Sign Out". Your scores will be saved securely.</p>
+
+                <div class="alert alert-info">
+                    <strong>🔒 Privacy:</strong> Your email is never shared with other players. Only your display name appears on leaderboards.
+                </div>
+            </section>
+
+            <!-- Leaderboards Section -->
+            <section id="leaderboards">
+                <h2>🏆 Leaderboards & Scoring</h2>
+
+                <h3>What Are Leaderboards?</h3>
+                <p>Leaderboards show the top players for each game. Sign in to see how you rank globally and compete with others!</p>
+
+                <h3>Leaderboard Features</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="icon">🌍</div>
+                        <h4>Global Rankings</h4>
+                        <p>View the top 20 players worldwide for each game. See how you rank!</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">📅</div>
+                        <h4>All-Time & Weekly</h4>
+                        <p>Choose between all-time records or weekly rankings for fresh competition.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="icon">⭐</div>
+                        <h4>Best Score Tracking</h4>
+                        <p>Automatically tracks your best score and highest level for each game.</p>
+                    </div>
+                </div>
+
+                <h3>How Scoring Works</h3>
+                <table>
+                    <tr>
+                        <th>Factor</th>
+                        <th>Impact on Score</th>
+                        <th>Notes</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Base Score</strong></td>
+                        <td>100% (Points earned)</td>
+                        <td>Points from gameplay actions (matches, blocks, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Level Multiplier</strong></td>
+                        <td>1x - 3x</td>
+                        <td>Higher levels have higher point values</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Combo Bonus</strong></td>
+                        <td>+10% per combo</td>
+                        <td>Consecutive successful actions boost score</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Time Bonus</strong></td>
+                        <td>+5% per 10 sec remaining</td>
+                        <td>Finish quickly to earn bonus points</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Perfect Bonus</strong></td>
+                        <td>+50%</td>
+                        <td>Complete level without mistakes (if available)</td>
+                    </tr>
+                </table>
+
+                <h3>Competitive Play</h3>
+                <div class="alert alert-success">
+                    <strong>⚖️ Fair Play Policy:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>All players use the same rules and difficulty settings</li>
+                        <li>Scores are validated and recorded automatically</li>
+                        <li>No cheating tools or exploits are tolerated</li>
+                        <li>Suspicious scores may be reviewed or removed</li>
+                        <li>Report suspicious activity to support</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Data Storage Section -->
+            <section id="storage">
+                <h2>💾 Data & Storage</h2>
+
+                <h3>Where Is My Data Stored?</h3>
+                <table>
+                    <tr>
+                        <th>Data Type</th>
+                        <th>Guest Players</th>
+                        <th>Signed-In Players</th>
+                        <th>Duration</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Game Progress</strong></td>
+                        <td>Local Device (IndexedDB)</td>
+                        <td>Cloud + Local Backup</td>
+                        <td>Forever (unless deleted)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scores & Leaderboards</strong></td>
+                        <td>Local Only</td>
+                        <td>Cloud Server (Permanent)</td>
+                        <td>Permanently stored</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Play History</strong></td>
+                        <td>Local Device</td>
+                        <td>Cloud Server</td>
+                        <td>Last 30 days</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Session Data</strong></td>
+                        <td>30 min session timeout</td>
+                        <td>Until sign out</td>
+                        <td>30 minutes</td>
+                    </tr>
+                </table>
+
+                <h3>Local Storage (IndexedDB)</h3>
+                <p>Your browser automatically stores game data locally using IndexedDB technology:</p>
+                <ul style="margin-left: 20px;">
+                    <li>✅ Works offline — Play without internet connection</li>
+                    <li>✅ Fast access — Data loads instantly from your device</li>
+                    <li>✅ Private — Only accessible from your browser</li>
+                    <li>⚠️ Device-specific — Data doesn't sync to other devices (unless you sign in)</li>
+                    <li>⚠️ Clearing browser cache may delete local saves</li>
+                </ul>
+
+                <h3>Cloud Storage (When Signed In)</h3>
+                <p>When you sign in with Google, your data is synced to our secure cloud servers:</p>
+                <ul style="margin-left: 20px;">
+                    <li>✅ Sync across devices — Play on phone, tablet, or desktop</li>
+                    <li>✅ Permanent backup — Scores saved indefinitely</li>
+                    <li>✅ Leaderboard tracking — Compete globally with verified scores</li>
+                    <li>✅ Account recovery — Restore your profile if needed</li>
+                </ul>
+
+                <h3>Clearing Local Data</h3>
+                <p><strong>To clear locally stored data:</strong></p>
+                <ol style="margin-left: 20px;">
+                    <li>Open browser DevTools (F12 or Right-click → Inspect)</li>
+                    <li>Go to Application/Storage tab</li>
+                    <li>Find "IndexedDB" → minigames</li>
+                    <li>Right-click and select "Delete" to clear local storage</li>
+                    <li>Refresh the page</li>
+                </ol>
+
+                <div class="alert alert-warning">
+                    <strong>⚠️ Important:</strong> Clearing local storage removes game progress saved on this device only. Cloud scores (if signed in) are not affected.
+                </div>
+
+                <h3>Data Privacy & Security</h3>
+                <ul style="margin-left: 20px;">
+                    <li>🔒 Data encrypted in transit (HTTPS/SSL)</li>
+                    <li>🔒 Secure database with access controls</li>
+                    <li>🔒 Your email never shown on leaderboards</li>
+                    <li>🔒 No ads or tracking cookies</li>
+                    <li>🔒 No data sold to third parties</li>
+                </ul>
+            </section>
+
+            <!-- FAQ Section -->
+            <section id="faq">
+                <h2>❓ Frequently Asked Questions</h2>
+
+                <h3>Gameplay Questions</h3>
+                <h4>Can I play offline?</h4>
+                <p>Yes! Games work offline if you've played them before (data cached locally). However, leaderboard submission requires internet connection.</p>
+
+                <h4>Do I need to sign in to play?</h4>
+                <p>No, signing in is completely optional. You can play all games as a guest, though your scores won't appear on global leaderboards.</p>
+
+                <h4>What happens if I lose internet during gameplay?</h4>
+                <p>Your local progress is saved. When reconnected, your score will sync to the cloud (if signed in).</p>
+
+                <h4>Can I play the same level multiple times?</h4>
+                <p>Yes! Replay any level anytime. Only your best score is recorded for leaderboards.</p>
+
+                <h3>Account & Sign-In Questions</h3>
+                <h4>Is my email safe?</h4>
+                <p>Yes! Your email is never shared publicly or used for marketing. Only your display name appears on leaderboards.</p>
+
+                <h4>Can I sign in with other accounts?</h4>
+                <p>Currently we support Google Sign-In only. Other methods may be added in the future.</p>
+
+                <h4>How do I change my display name?</h4>
+                <p>Your name comes from your Google account. Update it in Google Account Settings and it will reflect here automatically.</p>
+
+                <h4>Can I delete my account?</h4>
+                <p>Currently, account deletion must be done through your Google Account settings. Contact support for assistance.</p>
+
+                <h3>Leaderboard & Scoring Questions</h3>
+                <h4>Why isn't my score on the leaderboard?</h4>
+                <p>Scores are recorded for signed-in players only. If you're signed in, it may take a few seconds to appear (page refresh helps).</p>
+
+                <h4>Can scores be lost or reset?</h4>
+                <p>Once recorded, scores are permanent. They're only removed if detected as fraudulent or by special request.</p>
+
+                <h4>How often do leaderboards update?</h4>
+                <p>Leaderboards update in real-time as new scores are submitted. Weekly rankings reset every Monday.</p>
+
+                <h3>Technical Questions</h3>
+                <h4>What browsers are supported?</h4>
+                <p>Chrome, Firefox, Safari, Edge (latest versions recommended). Mobile browsers fully supported.</p>
+
+                <h4>Why is the game running slow?</h4>
+                <p>Check: (1) Internet connection, (2) Browser performance (close other tabs), (3) Device storage (clear cache if full).</p>
+
+                <h4>Can I access games on mobile?</h4>
+                <p>Absolutely! All games are fully responsive and optimized for phones and tablets.</p>
+
+                <h4>Do games have ads?</h4>
+                <p>No intrusive ads! The platform is completely ad-free for a clean gaming experience.</p>
+
+                <h3>Still Have Questions?</h3>
+                <p>Contact us at <strong>support@minigames.allin1site.com</strong> or visit our website for more help.</p>
+            </section>
+        </div>
+
+        <footer>
+            <p><strong>🎮 MiniGames</strong> — Free, browser-based gaming platform</p>
+            <p>Play anytime, anywhere. No download required. 100% free.</p>
+            <p style="margin-top: 20px; opacity: 0.8; font-size: 0.9em;">
+                © 2026 MiniGames Platform. All rights reserved. |
+                <a href="/" style="color: #f0f0f0;">Home</a> |
+                <a href="#" style="color: #f0f0f0;">Privacy</a> |
+                <a href="#" style="color: #f0f0f0;">Terms</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
