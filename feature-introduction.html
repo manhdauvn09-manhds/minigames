@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniGames - Feature Introduction & Admin Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --accent: #f59e0b;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --border: #e5e7eb;
+            --text: #374151;
+            --success: #10b981;
+            --warning: #f97316;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: move 20s linear infinite;
+        }
+
+        @keyframes move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: var(--light);
+            color: var(--text);
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .tab-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Main Content */
+        .content {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 2.2em;
+            color: var(--primary);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        h3 {
+            font-size: 1.5em;
+            color: var(--secondary);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            font-size: 1.2em;
+            color: var(--dark);
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        /* Feature Blocks */
+        .feature-block {
+            background: linear-gradient(135deg, #f5f7fa 0%, #fff 100%);
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .feature-block.highlight {
+            background: linear-gradient(135deg, #fef3c7 0%, #fef9e7 100%);
+            border-left-color: var(--accent);
+        }
+
+        .feature-block.success {
+            background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+            border-left-color: var(--success);
+        }
+
+        .feature-block.danger {
+            background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+            border-left-color: var(--danger);
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+            border-color: var(--primary);
+        }
+
+        .card h4 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+
+        .card-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            font-size: 0.95em;
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: var(--light);
+        }
+
+        td code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: var(--danger);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid;
+            background: white;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #7f1d1d;
+        }
+
+        /* Code Block */
+        pre {
+            background: #1f2937;
+            color: #f0f0f0;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-size: 0.9em;
+            border: 1px solid #374151;
+        }
+
+        /* Credentials Box */
+        .credentials-box {
+            background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+            border: 2px solid var(--danger);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .credentials-box h3 {
+            color: var(--danger);
+            margin-top: 0;
+        }
+
+        .credential-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 4px solid var(--danger);
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+
+        .credential-label {
+            color: var(--text);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .credential-value {
+            color: var(--danger);
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 0 5px 5px 0;
+        }
+
+        .badge-success {
+            background: var(--success);
+        }
+
+        .badge-warning {
+            background: var(--warning);
+        }
+
+        .badge-danger {
+            background: var(--danger);
+        }
+
+        .badge-accent {
+            background: var(--accent);
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+
+        footer h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        footer p {
+            margin: 8px 0;
+            color: #e5e7eb;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            h3 {
+                font-size: 1.2em;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+                text-align: left;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+
+            pre {
+                font-size: 0.8em;
+                padding: 15px;
+            }
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 MiniGames Platform</h1>
+            <p>Complete Feature Overview & Administration Guide (Admin Only - Local)</p>
+        </header>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'features')">📋 Features</button>
+            <button class="tab-btn" onclick="switchTab(event, 'admin')">🔐 Admin Guide</button>
+            <button class="tab-btn" onclick="switchTab(event, 'api')">⚙️ API Reference</button>
+            <button class="tab-btn" onclick="switchTab(event, 'deployment')">🚀 Deployment</button>
+        </div>
+
+        <div class="content">
+            <!-- TAB 1: Features -->
+            <div id="features" class="tab-content active">
+                <h2>📋 Platform Features</h2>
+
+                <h3>1. Game Library</h3>
+                <p>MiniGames offers a diverse collection of games across multiple genres:</p>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-icon">🎯</div>
+                        <h4>Puzzle Games</h4>
+                        <p><strong>4 Games:</strong> BallMerge, ChromaMatch, MemoryFlip, NumberSlide</p>
+                        <p>Strategy-based gameplay with progressive difficulty levels.</p>
+                        <span class="badge badge-success">Popular</span>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">⚡</div>
+                        <h4>Arcade Games</h4>
+                        <p><strong>3 Games:</strong> StackTower, SnakeRush, ArkanoidX</p>
+                        <p>Fast-paced action requiring quick reflexes and timing.</p>
+                        <span class="badge badge-accent">Action</span>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">💧</div>
+                        <h4>Skill Games</h4>
+                        <p><strong>1 Game:</strong> BubbleBlast</p>
+                        <p>Shooter mechanics combined with puzzle-solving strategy.</p>
+                        <span class="badge badge-warning">Strategy</span>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">🚧</div>
+                        <h4>Coming Soon</h4>
+                        <p><strong>2 Games:</strong> Penumbra, Sudoku</p>
+                        <p>Advanced games with daily challenges and multiplayer modes.</p>
+                        <span class="badge">In Development</span>
+                    </div>
+                </div>
+
+                <h3>2. Game Progression System</h3>
+                <ul>
+                    <li><strong>30 Levels per game</strong> — Progressive difficulty scaling</li>
+                    <li><strong>Multiple Modes</strong> — Normal and Adventure modes for varied gameplay</li>
+                    <li><strong>Level Unlocking</strong> — Complete levels sequentially or jump to any level</li>
+                    <li><strong>Score Multipliers</strong> — Higher levels offer increased point rewards</li>
+                    <li><strong>Achievements</strong> — Special badges for completing milestones</li>
+                </ul>
+
+                <h3>3. Leaderboard System</h3>
+                <div class="feature-block">
+                    <strong>🏆 Global Leaderboards</strong>
+                    <ul style="margin-top: 10px;">
+                        <li><strong>Top 20 Players</strong> — Per-game rankings</li>
+                        <li><strong>All-Time Records</strong> — Cumulative best scores</li>
+                        <li><strong>Weekly Rankings</strong> — Fresh competition with reset every Monday</li>
+                        <li><strong>Real-Time Updates</strong> — Scores update instantly</li>
+                        <li><strong>Verified Players</strong> — Only signed-in users appear on leaderboards</li>
+                    </ul>
+                </div>
+
+                <h3>4. User Authentication</h3>
+                <table>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Details</th>
+                        <th>Benefits</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Google OAuth 2.0</strong></td>
+                        <td>Secure third-party authentication</td>
+                        <td>No password management, verified identity</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Guest Mode</strong></td>
+                        <td>Anonymous play without sign-in</td>
+                        <td>Instant access, low barrier to entry</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Session Management</strong></td>
+                        <td>30-min timeout for inactive sessions</td>
+                        <td>Security + resource efficiency</td>
+                    </tr>
+                    <tr>
+                        <td><strong>User Profiles</strong></td>
+                        <td>Name, email, account type, join date</td>
+                        <td>Personalization + leaderboard tracking</td>
+                    </tr>
+                </table>
+
+                <h3>5. Data Persistence</h3>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-icon">💾</div>
+                        <h4>Local Storage (IndexedDB)</h4>
+                        <p><strong>For Guest Players:</strong> Game progress stored locally on device</p>
+                        <ul style="margin-top: 10px; margin-bottom: 0;">
+                            <li>Works offline</li>
+                            <li>Fast access</li>
+                            <li>Device-specific</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">☁️</div>
+                        <h4>Cloud Storage (MySQL)</h4>
+                        <p><strong>For Signed-In Players:</strong> Scores synced to secure cloud</p>
+                        <ul style="margin-top: 10px; margin-bottom: 0;">
+                            <li>Multi-device sync</li>
+                            <li>Permanent backup</li>
+                            <li>Leaderboard eligible</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>6. Analytics & Tracking</h3>
+                <ul>
+                    <li><strong>Visitor Tracking</strong> — Site-wide visitor counts with 30-min sessions</li>
+                    <li><strong>Game Statistics</strong> — Per-game plays, unique players, active players</li>
+                    <li><strong>Presence Tracking</strong> — Real-time online player count per game</li>
+                    <li><strong>Play History</strong> — Detailed game session records (30-day retention)</li>
+                    <li><strong>Aggregate Counters</strong> — Total pageviews and visitor metrics</li>
+                </ul>
+
+                <h3>7. Multi-Platform Support</h3>
+                <div class="feature-block highlight">
+                    <strong>✅ Responsive Design</strong>
+                    <ul style="margin-top: 10px;">
+                        <li>Desktop browsers (Chrome, Firefox, Safari, Edge)</li>
+                        <li>Mobile devices (iOS & Android)</li>
+                        <li>Tablets (iPad, Android tablets)</li>
+                        <li>Fullscreen mode for immersive play</li>
+                        <li>Touch & mouse input support</li>
+                    </ul>
+                </div>
+
+                <h3>8. Localization</h3>
+                <ul>
+                    <li><strong>Multi-Language Support</strong> — English, Japanese, Vietnamese</li>
+                    <li><strong>Auto-Detection</strong> — Browser language preference</li>
+                    <li><strong>Manual Override</strong> — User can select preferred language</li>
+                    <li><strong>Translated UI</strong> — All game interfaces translated</li>
+                </ul>
+
+                <h3>9. Game-Specific Features</h3>
+                <table>
+                    <tr>
+                        <th>Game</th>
+                        <th>Unique Features</th>
+                        <th>Best For</th>
+                    </tr>
+                    <tr>
+                        <td><strong>BallMerge</strong></td>
+                        <td>Drop & merge mechanics, cascade combos</td>
+                        <td>Puzzle enthusiasts</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ChromaMatch</strong></td>
+                        <td>Match-3 grid, power-ups, tile swapping</td>
+                        <td>Classic puzzle fans</td>
+                    </tr>
+                    <tr>
+                        <td><strong>StackTower</strong></td>
+                        <td>Tap-to-stack timing, height tracking</td>
+                        <td>Arcade action players</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BubbleBlast</strong></td>
+                        <td>Hex grid, color matching, power-ups</td>
+                        <td>Shooter game fans</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ArkanoidX</strong></td>
+                        <td>Brick breaking, ball physics, power-ups</td>
+                        <td>Classic arcade lovers</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- TAB 2: Admin Guide -->
+            <div id="admin" class="tab-content">
+                <h2>🔐 Administration Guide</h2>
+
+                <div class="alert alert-danger">
+                    <strong>⚠️ IMPORTANT:</strong> MiniGames is a public-facing gaming platform with NO DEDICATED ADMIN PANEL. There are no admin user accounts for game management. The platform is fully automated and self-service.
+                </div>
+
+                <h3>1. Platform Architecture</h3>
+                <p>MiniGames follows a <strong>public, self-service model</strong>:</p>
+                <ul>
+                    <li>No admin user accounts or login system</li>
+                    <li>No backend admin panel for game management</li>
+                    <li>No moderation tools (all data auto-generated by users)</li>
+                    <li>No game upload/configuration interface</li>
+                    <li>All games deployed via code updates (Git + Docker)</li>
+                </ul>
+
+                <h3>2. Deployment & Infrastructure</h3>
+                <div class="feature-block success">
+                    <strong>✅ Current Production Setup</strong>
+                </div>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Configuration</th>
+                        <th>Location</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Server</strong></td>
+                        <td>mcp-80 (65.108.62.80)</td>
+                        <td>CodeProvider consolidated</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Container</strong></td>
+                        <td>Docker (minigames)</td>
+                        <td>Port 3333 (Express.js)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reverse Proxy</strong></td>
+                        <td>Nginx</td>
+                        <td>Port 9210 → 3333</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Database</strong></td>
+                        <td>MySQL 8+ (Vultr)</td>
+                        <td>149.28.152.221:3306</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Domain</strong></td>
+                        <td>minigames.allin1site.com</td>
+                        <td>Cloudflare (proxied)</td>
+                    </tr>
+                </table>
+
+                <h3>3. Environment Configuration</h3>
+                <p><strong>Location on Server:</strong> <code>/opt/minigames/.env</code> (NOT in git repository)</p>
+
+                <div class="feature-block">
+                    <strong>Environment Variables</strong>
+                </div>
+
+                <table>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Example Value</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td><code>DATABASE_URL</code></td>
+                        <td><code>mysql://user:pass@host:3306/db</code></td>
+                        <td>MySQL connection string</td>
+                    </tr>
+                    <tr>
+                        <td><code>MYSQL_SSL</code></td>
+                        <td><code>false</code></td>
+                        <td>SSL for same-VPC connection</td>
+                    </tr>
+                    <tr>
+                        <td><code>GOOGLE_CLIENT_ID</code></td>
+                        <td><code>xxxxxxxxxx.apps.googleusercontent.com</code></td>
+                        <td>OAuth 2.0 client ID (optional)</td>
+                    </tr>
+                    <tr>
+                        <td><code>CORS_ORIGIN</code></td>
+                        <td><code>https://minigames.allin1site.com</code></td>
+                        <td>Allowed CORS origin</td>
+                    </tr>
+                    <tr>
+                        <td><code>PORT</code></td>
+                        <td><code>3333</code></td>
+                        <td>Express.js listening port</td>
+                    </tr>
+                    <tr>
+                        <td><code>NODE_ENV</code></td>
+                        <td><code>production</code></td>
+                        <td>Runtime environment</td>
+                    </tr>
+                </table>
+
+                <h3>4. Database Schema</h3>
+                <p>MySQL database: <strong>minigame</strong></p>
+
+                <div class="feature-block">
+                    <strong>Core Tables</strong>
+                </div>
+
+                <ul>
+                    <li><strong>users</strong> — User profiles (name, email, account type)</li>
+                    <li><strong>scores_ballmerge</strong> — BallMerge scores</li>
+                    <li><strong>scores_chromamatch</strong> — ChromaMatch scores</li>
+                    <li><strong>scores_stacktower</strong> — StackTower scores</li>
+                    <li><strong>scores_memoryflip</strong> — MemoryFlip scores</li>
+                    <li><strong>scores_snakerush</strong> — SnakeRush scores</li>
+                    <li><strong>scores_bubbleblast</strong> — BubbleBlast scores</li>
+                    <li><strong>scores_arkanoidx</strong> — ArkanoidX scores</li>
+                    <li><strong>scores_numberslide</strong> — NumberSlide scores</li>
+                    <li><strong>presence</strong> — Online player tracking (heartbeat)</li>
+                    <li><strong>visitor_sessions</strong> — Site visitor sessions (30-min)</li>
+                    <li><strong>game_visitor_sessions</strong> — Per-game visitor sessions</li>
+                    <li><strong>site_counters</strong> — Aggregate site statistics</li>
+                    <li><strong>game_counters</strong> — Per-game statistics</li>
+                </ul>
+
+                <h3>5. Deployment Method</h3>
+                <div class="alert alert-info">
+                    <strong>✅ Current Method (Active):</strong> CodeProvider MCP tool
+                </div>
+
+                <p><strong>Deploy Command:</strong></p>
+                <pre>mcp__CodeProvider_MCP__deploy \
+  --server-id=mcp-80 \
+  --app-id=minigames</pre>
+
+                <p><strong>What it does:</strong></p>
+                <ol>
+                    <li><code>cd /opt/minigames && git pull</code> — Fetch latest code from repo</li>
+                    <li><code>docker compose up -d --build minigames</code> — Rebuild container</li>
+                    <li>Health check: <code>curl 127.0.0.1:9210/healthz</code></li>
+                </ol>
+
+                <div class="alert alert-warning">
+                    <strong>❌ Deprecated Methods:</strong>
+                    <ul style="margin-top: 10px; margin-bottom: 0;">
+                        <li>deploy.ps1 (PowerShell script) — DEPRECATED 2026-06-09</li>
+                        <li>deploy-safe.ps1 (PowerShell script) — DEPRECATED 2026-06-09</li>
+                        <li>Direct SSH to old servers — INVALID (servers deleted)</li>
+                    </ul>
+                </div>
+
+                <h3>6. Server Management Commands</h3>
+                <table>
+                    <tr>
+                        <th>Task</th>
+                        <th>Command</th>
+                        <th>Notes</th>
+                    </tr>
+                    <tr>
+                        <td>View logs</td>
+                        <td><code>docker logs -f minigames</code></td>
+                        <td>Real-time log streaming</td>
+                    </tr>
+                    <tr>
+                        <td>Restart container</td>
+                        <td><code>docker restart minigames</code></td>
+                        <td>Graceful restart</td>
+                    </tr>
+                    <tr>
+                        <td>Shell access</td>
+                        <td><code>docker exec -it minigames sh</code></td>
+                        <td>Interactive shell inside container</td>
+                    </tr>
+                    <tr>
+                        <td>Check status</td>
+                        <td><code>docker ps | grep minigames</code></td>
+                        <td>Container running status</td>
+                    </tr>
+                    <tr>
+                        <td>Health check</td>
+                        <td><code>curl http://127.0.0.1:9210/healthz</code></td>
+                        <td>Returns: {"ok":true,"ts":...}</td>
+                    </tr>
+                </table>
+
+                <h3>7. Database Operations</h3>
+                <p><strong>Connect to Database:</strong></p>
+                <pre>mysql -h 149.28.152.221 -u minigames_user -p minigame</pre>
+
+                <p><strong>Common Queries:</strong></p>
+                <table>
+                    <tr>
+                        <th>Query</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td><code>SELECT * FROM users LIMIT 10;</code></td>
+                        <td>View recent users</td>
+                    </tr>
+                    <tr>
+                        <td><code>SELECT COUNT(*) FROM scores_ballmerge;</code></td>
+                        <td>Count total BallMerge scores</td>
+                    </tr>
+                    <tr>
+                        <td><code>SELECT * FROM leaderboard LIMIT 20;</code></td>
+                        <td>View top 20 players</td>
+                    </tr>
+                    <tr>
+                        <td><code>SHOW TABLES;</code></td>
+                        <td>List all tables in database</td>
+                    </tr>
+                </table>
+
+                <h3>8. Monitoring & Health Checks</h3>
+                <div class="feature-block success">
+                    <strong>Health Check Endpoint</strong>
+                </div>
+
+                <p><strong>URL:</strong> <code>GET /api/healthz</code></p>
+                <p><strong>Response (Success):</strong></p>
+                <pre>{"ok": true, "ts": 1718491234}</pre>
+
+                <p><strong>URL:</strong> <code>GET /api/stats?all=1</code></p>
+                <p><strong>Response (All Game Stats):</strong></p>
+                <pre>{
+  "games": [
+    {
+      "game": "ballmerge",
+      "players": 1250,
+      "plays": 5840,
+      "online": 15,
+      "visitors": 1200,
+      "views": 5000
+    }
+  ],
+  "totalVisitors": 8500,
+  "totalPageviews": 45000
+}</pre>
+
+                <h3>9. Troubleshooting</h3>
+                <table>
+                    <tr>
+                        <th>Issue</th>
+                        <th>Diagnosis</th>
+                        <th>Solution</th>
+                    </tr>
+                    <tr>
+                        <td>Port 9210 not responding</td>
+                        <td><code>docker ps | grep minigames</code></td>
+                        <td>Restart container or check logs</td>
+                    </tr>
+                    <tr>
+                        <td>Database connection refused</td>
+                        <td>Check .env DATABASE_URL</td>
+                        <td>Verify IP 149.28.152.221 is reachable</td>
+                    </tr>
+                    <tr>
+                        <td>Nginx SSL error</td>
+                        <td>Check cert at /etc/letsencrypt/live/</td>
+                        <td>Renew certificate if expired</td>
+                    </tr>
+                    <tr>
+                        <td>Old server IPs in code</td>
+                        <td>Grep for 62.238.28.106, 77.42.35.9</td>
+                        <td>Remove — those servers DELETED 2026-06-04</td>
+                    </tr>
+                    <tr>
+                        <td>Slow performance</td>
+                        <td>Check disk/memory on mcp-80</td>
+                        <td>Monitor system resources</td>
+                    </tr>
+                </table>
+
+                <h3>10. Backup & Recovery</h3>
+                <div class="feature-block highlight">
+                    <strong>Database Backups</strong>
+                    <ul style="margin-top: 10px;">
+                        <li>Daily automated backups to Vultr Singapore</li>
+                        <li>Recovery point objective: 24 hours</li>
+                        <li>Contact support for restore requests</li>
+                    </ul>
+                </div>
+
+                <h3>11. Security Checklist</h3>
+                <ul>
+                    <li>✅ HTTPS/SSL enforced (Cloudflare + Nginx)</li>
+                    <li>✅ Google OAuth 2.0 for authentication</li>
+                    <li>✅ Parameterized SQL queries (injection prevention)</li>
+                    <li>✅ Input validation on all endpoints</li>
+                    <li>✅ CORS whitelist (only minigames.allin1site.com)</li>
+                    <li>✅ Rate limiting on API endpoints (30-sec heartbeat limit)</li>
+                    <li>✅ No hardcoded credentials in code</li>
+                    <li>✅ Environment variables for secrets (.env on server)</li>
+                </ul>
+            </div>
+
+            <!-- TAB 3: API Reference -->
+            <div id="api" class="tab-content">
+                <h2>⚙️ API Reference</h2>
+
+                <p>All API endpoints are located at: <code>https://minigames.allin1site.com/api/*</code></p>
+
+                <div class="alert alert-info">
+                    <strong>📌 Base URL:</strong> <code>https://minigames.allin1site.com/api</code>
+                    <br><strong>Method:</strong> REST + JSON
+                    <br><strong>CORS:</strong> Enabled for minigames.allin1site.com
+                </div>
+
+                <h3>1. POST /api/score — Record Game Score</h3>
+                <p><strong>Purpose:</strong> Submit a game result and update user leaderboard position</p>
+
+                <p><strong>Request Body:</strong></p>
+                <pre>{
+  "game": "ballmerge",
+  "userId": "google_103948134",
+  "name": "John Doe",
+  "email": "john@example.com",
+  "score": 8500,
+  "level": 15,
+  "mode": "normal",
+  "extra": "{\"combos\": 5, \"powerups\": 2}"
+}</pre>
+
+                <p><strong>Response (Success):</strong></p>
+                <pre>{"ok": true}</pre>
+
+                <p><strong>Response (Error):</strong></p>
+                <pre>{"ok": false, "error": "Invalid game ID"}</pre>
+
+                <h3>2. GET /api/leaderboard — Fetch Top Players</h3>
+                <p><strong>Purpose:</strong> Retrieve top 20 players for a specific game</p>
+
+                <p><strong>Query Parameters:</strong></p>
+                <pre>?game=ballmerge&period=all
+?game=chromamatch&period=week</pre>
+
+                <p><strong>Response:</strong></p>
+                <pre>{
+  "rows": [
+    {
+      "user_id": "google_103948134",
+      "name": "John Doe",
+      "best_score": 12500,
+      "best_level": 30,
+      "last_play": "2026-06-21T10:30:00Z"
+    }
+  ],
+  "period": "all"
+}</pre>
+
+                <h3>3. GET /api/stats — Game Statistics</h3>
+                <p><strong>Purpose:</strong> Get analytics for a specific game or all games</p>
+
+                <p><strong>Single Game Stats:</strong></p>
+                <pre>GET /api/stats?game=ballmerge</pre>
+
+                <p><strong>All Games Stats:</strong></p>
+                <pre>GET /api/stats?all=1</pre>
+
+                <h3>4. POST /api/user — Create/Upsert User</h3>
+                <p><strong>Purpose:</strong> Create or update user profile</p>
+
+                <h3>5. POST /api/heartbeat — Online Presence Ping</h3>
+                <p><strong>Purpose:</strong> Track active players (called every 30 seconds during gameplay)</p>
+
+                <h3>6. POST /api/track — Visitor Tracking</h3>
+                <p><strong>Purpose:</strong> Track site visitors and pageviews</p>
+
+                <h3>7. GET /api/healthz — Health Check</h3>
+                <p><strong>Purpose:</strong> Verify API server is running and healthy</p>
+
+                <p><strong>Response (Healthy):</strong></p>
+                <pre>{"ok": true, "ts": 1718491234}</pre>
+            </div>
+
+            <!-- TAB 4: Deployment -->
+            <div id="deployment" class="tab-content">
+                <h2>🚀 Deployment Guide</h2>
+
+                <div class="alert alert-success">
+                    <strong>✅ Current Status:</strong> Production live on mcp-80 (65.108.62.80)
+                    <br><strong>Uptime:</strong> 4+ days (healthy)
+                    <br><strong>Last Deploy:</strong> 2026-06-09 (migration complete)
+                </div>
+
+                <h3>1. Deployment Architecture</h3>
+                <div class="feature-block">
+                    <strong>System Overview</strong>
+                    <ul style="margin-top: 10px;">
+                        <li><strong>Frontend:</strong> Static HTML + Vanilla JS (games)</li>
+                        <li><strong>Backend:</strong> Node.js + Express.js</li>
+                        <li><strong>Database:</strong> MySQL 8+ (Vultr Singapore)</li>
+                        <li><strong>Orchestration:</strong> Docker + Docker Compose</li>
+                        <li><strong>Reverse Proxy:</strong> Nginx (port 9210→3333)</li>
+                        <li><strong>DNS:</strong> Cloudflare (CDN + SSL)</li>
+                    </ul>
+                </div>
+
+                <h3>2. Server Configuration</h3>
+                <table>
+                    <tr>
+                        <th>Item</th>
+                        <th>Configuration</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Host Server</strong></td>
+                        <td>mcp-80 (65.108.62.80) — CodeProvider consolidated</td>
+                    </tr>
+                    <tr>
+                        <td><strong>OS</strong></td>
+                        <td>Linux (custom VPS image)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Container Runtime</strong></td>
+                        <td>Docker 20.10+</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Work Directory</strong></td>
+                        <td>/opt/minigames</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Config File</strong></td>
+                        <td>/opt/minigames/.env (secrets, not in git)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nginx Vhost</strong></td>
+                        <td>/etc/nginx/sites-enabled/minigames.allin1site.com.conf</td>
+                    </tr>
+                </table>
+
+                <h3>3. Pre-Deployment Checklist</h3>
+                <ul>
+                    <li>✅ Code committed to repository</li>
+                    <li>✅ All tests passing locally</li>
+                    <li>✅ No sensitive data in code</li>
+                    <li>✅ Environment variables configured on server</li>
+                    <li>✅ Database migration scripts run</li>
+                    <li>✅ Domain DNS pointing to correct IP</li>
+                    <li>✅ SSL certificate valid (Cloudflare/Let's Encrypt)</li>
+                </ul>
+
+                <h3>4. Post-Deployment Verification</h3>
+                <table>
+                    <tr>
+                        <th>Check</th>
+                        <th>Command/URL</th>
+                        <th>Expected Result</th>
+                    </tr>
+                    <tr>
+                        <td>Container running</td>
+                        <td><code>docker ps | grep minigames</code></td>
+                        <td>minigames container listed as "Up"</td>
+                    </tr>
+                    <tr>
+                        <td>Port listening</td>
+                        <td><code>netstat -tlnp | grep 9210</code></td>
+                        <td>127.0.0.1:9210 LISTEN</td>
+                    </tr>
+                    <tr>
+                        <td>Health check (local)</td>
+                        <td><code>curl http://127.0.0.1:9210/healthz</code></td>
+                        <td>{"ok":true,"ts":...}</td>
+                    </tr>
+                    <tr>
+                        <td>Health check (public)</td>
+                        <td><code>curl https://minigames.allin1site.com/healthz</code></td>
+                        <td>{"ok":true,"ts":...}</td>
+                    </tr>
+                    <tr>
+                        <td>Database connection</td>
+                        <td><code>docker logs -f minigames</code></td>
+                        <td>No connection error messages</td>
+                    </tr>
+                </table>
+
+                <h3>5. Rollback Procedure</h3>
+                <p><strong>If deployment fails or introduces bugs:</strong></p>
+                <ol>
+                    <li>SSH to mcp-80: <code>ssh root@65.108.62.80</code></li>
+                    <li>Check last commit: <code>cd /opt/minigames && git log -n 2</code></li>
+                    <li>Revert if needed: <code>git revert HEAD</code> or <code>git reset --hard &lt;commit&gt;</code></li>
+                    <li>Redeploy: <code>docker compose up -d --build minigames</code></li>
+                    <li>Verify: <code>curl http://127.0.0.1:9210/healthz</code></li>
+                </ol>
+
+                <h3>6. Monitoring & Logs</h3>
+                <p><strong>View real-time logs:</strong></p>
+                <pre>docker logs -f minigames</pre>
+
+                <p><strong>View last 50 lines:</strong></p>
+                <pre>docker logs --tail 50 minigames</pre>
+
+                <p><strong>Search logs for errors:</strong></p>
+                <pre>docker logs minigames 2>&1 | grep -i error</pre>
+            </div>
+        </div>
+
+        <footer>
+            <h3>🎮 MiniGames Administration</h3>
+            <p><strong>Platform:</strong> Free, browser-based gaming platform</p>
+            <p><strong>Server:</strong> mcp-80 (65.108.62.80) | <strong>Database:</strong> Vultr Singapore (149.28.152.221:3306)</p>
+            <p><strong>Domain:</strong> minigames.allin1site.com | <strong>Status:</strong> ✅ Live & Healthy</p>
+            <p style="margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
+                <strong>📚 Documentation:</strong>
+                <br>📖 <a href="fe-user-manual.html">Frontend User Manual</a> — Available for public users
+                <br>📘 <a href="feature-introduction.html">This Admin Guide</a> — Local development only
+            </p>
+            <p style="margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
+                <strong>Documentation Generated:</strong> 2026-06-21
+                <br><strong>Last Updated:</strong> Post-migration complete (2026-06-09)
+                <br>For support: Contact infrastructure team
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        function switchTab(event, tabName) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            document.querySelector('.content').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('pre').forEach(block => {
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.textContent = 'Copy';
+            copyBtn.onclick = () => {
+                const text = block.textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
+                });
+            };
+            block.parentElement.insertBefore(copyBtn, block);
+        });
+    </script>
+</body>
+</html>
