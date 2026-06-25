@@ -324,6 +324,18 @@
           <h2 class="section-title" id="games"><span data-i="gamesHeading">All Games</span></h2>
           <div id="games-container" class="games-grid"></div>
 
+          <!-- Partner Games Section -->
+          <h2 class="section-title" style="margin-top:32px" id="partner"><span data-i="partnerHeading">🎪 Games from Games-Core</span> <span class="pill" style="background:linear-gradient(135deg,#60a5fa,#34d399)">30+ GAMES</span></h2>
+
+          <h3 style="margin-top:20px;margin-bottom:12px;font-size:1em;color:var(--gp-text-secondary);font-weight:700;display:flex;align-items:center;gap:8px" data-i="boardGamesHeading">♟️ Board Games</h3>
+          <div id="board-container" class="games-grid"></div>
+
+          <h3 style="margin-top:24px;margin-bottom:12px;font-size:1em;color:var(--gp-text-secondary);font-weight:700;display:flex;align-items:center;gap:8px" data-i="puzzleGamesHeading">🧩 Puzzle & Match</h3>
+          <div id="puzzle-container" class="games-grid"></div>
+
+          <h3 style="margin-top:24px;margin-bottom:12px;font-size:1em;color:var(--gp-text-secondary);font-weight:700;display:flex;align-items:center;gap:8px" data-i="actionGamesHeading">⚡ Action & Casual</h3>
+          <div id="action-container" class="games-grid"></div>
+
           <!-- Why play section (good for SEO content) -->
           <section style="margin-top:28px;padding:18px;background:rgba(255,255,255,.04);border-radius:14px;border:1px solid rgba(255,255,255,.08)">
             <h2 style="color:#a78bfa;font-size:1.1em;margin-bottom:8px" data-i="whyTitle">Why allin1site Games?</h2>
@@ -355,9 +367,9 @@
   <script>
     // ── i18n ────────────────────────────────────────────────────────────
     const TXT = {
-      en: { title:'allin1site Mini Games', tagline:'11 fresh browser games · progressive levels · plays on every screen', navGames:'🎮 Games', navManual:'📖 Manual', navHome:'🏠 Home', play:'Play Now →', viewMockup:'👁 View Mockup →', featuredHeading:'🔥 Featured', gamesHeading:'All Games', whyTitle:'Why allin1site Games?', whyBody:'Free, no signup required. Hand-tuned progressive difficulty. Online leaderboards via Google sign-in (optional). Works on any phone, tablet, or desktop browser. No ads in the MVP — pure gameplay.', footManual:'📖 User Manual', footSitemap:'Sitemap', rights:'All rights reserved', players:'players', online:'online', plays:'plays', visitors:'visitors', views:'views', wipBadge:'🚧 WIP', mockupBadge:'Mockup', wipNote:'⚠ Mockup only — game logic still in development. UI preview available.', dailyLabel:'Daily Challenge', dailySub:'One puzzle a day. Keep your streak alive.', dailyPlayed:'✓ Played today', streakLabel:'Your Streak', streakDays:'days', streakSub:'Play any game today to extend it.', streakNew:'Start your streak today!' },
-      vi: { title:'allin1site Mini Games', tagline:'11 game miễn phí · cấp độ tăng dần · chơi trên mọi thiết bị', navGames:'🎮 Game', navManual:'📖 Hướng dẫn', navHome:'🏠 Trang chủ', play:'Chơi ngay →', viewMockup:'👁 Xem Mockup →', featuredHeading:'🔥 Nổi bật', gamesHeading:'Tất cả game', whyTitle:'Tại sao chọn allin1site Games?', whyBody:'Miễn phí, không cần đăng ký. Cấp độ tăng dần được tinh chỉnh kỹ. Bảng xếp hạng online qua Google (tùy chọn). Chạy trên mọi điện thoại, tablet, máy tính. Không quảng cáo phiền phức — chỉ thuần gameplay.', footManual:'📖 Hướng dẫn', footSitemap:'Sơ đồ trang', rights:'Mọi quyền được bảo lưu', players:'người chơi', online:'đang online', plays:'lượt chơi', visitors:'lượt truy cập', views:'lượt xem', wipBadge:'🚧 Đang làm', mockupBadge:'Mockup', wipNote:'⚠ Mới chỉ có Mockup — game đang phát triển, chưa chơi được. Xem trước giao diện.', dailyLabel:'Thử thách ngày', dailySub:'Mỗi ngày một puzzle. Giữ chuỗi không đứt.', dailyPlayed:'✓ Đã chơi hôm nay', streakLabel:'Chuỗi của bạn', streakDays:'ngày', streakSub:'Chơi bất kỳ game nào hôm nay để nối tiếp.', streakNew:'Bắt đầu chuỗi của bạn hôm nay!' },
-      ja: { title:'allin1site ミニゲーム', tagline:'11の無料ゲーム · 累進レベル · あらゆる画面で遊べる', navGames:'🎮 ゲーム', navManual:'📖 取扱説明', navHome:'🏠 ホーム', play:'プレイする →', viewMockup:'👁 モックアップを見る →', featuredHeading:'🔥 注目', gamesHeading:'全ゲーム', whyTitle:'なぜ allin1site Games？', whyBody:'無料・登録不要。難易度漸進。Googleログインでオンランク参加（任意）。スマホ・タブレット・PCで動作。MVP は広告なし、純粋なゲームプレイ。', footManual:'📖 取扱説明', footSitemap:'サイトマップ', rights:'無断複製禁止', players:'プレイヤー', online:'オンライン', plays:'プレイ', visitors:'訪問者', views:'閲覧数', wipBadge:'🚧 開発中', mockupBadge:'モックアップ', wipNote:'⚠ モックアップのみ — ゲームロジック開発中。UIプレビュー可能。', dailyLabel:'デイリーチャレンジ', dailySub:'1日1パズル。連続記録を守ろう。', dailyPlayed:'✓ 今日プレイ済み', streakLabel:'連続日数', streakDays:'日', streakSub:'今日どれかをプレイして継続！', streakNew:'今日から連続記録をスタート！' },
+      en: { title:'allin1site Mini Games', tagline:'40+ free browser games · progressive levels · plays on every screen', navGames:'🎮 Games', navManual:'📖 Manual', navHome:'🏠 Home', play:'Play Now →', viewMockup:'👁 View Mockup →', featuredHeading:'🔥 Featured', gamesHeading:'All Games', partnerHeading:'🎪 Games from Games-Core', boardGamesHeading:'♟️ Board Games', puzzleGamesHeading:'🧩 Puzzle & Match', actionGamesHeading:'⚡ Action & Casual', whyTitle:'Why allin1site Games?', whyBody:'Free, no signup required. Hand-tuned progressive difficulty. Online leaderboards via Google sign-in (optional). Works on any phone, tablet, or desktop browser. No ads in the MVP — pure gameplay.', footManual:'📖 User Manual', footSitemap:'Sitemap', rights:'All rights reserved', players:'players', online:'online', plays:'plays', visitors:'visitors', views:'views', wipBadge:'🚧 WIP', mockupBadge:'Mockup', wipNote:'⚠ Mockup only — game logic still in development. UI preview available.', dailyLabel:'Daily Challenge', dailySub:'One puzzle a day. Keep your streak alive.', dailyPlayed:'✓ Played today', streakLabel:'Your Streak', streakDays:'days', streakSub:'Play any game today to extend it.', streakNew:'Start your streak today!' },
+      vi: { title:'allin1site Mini Games', tagline:'40+ game miễn phí · cấp độ tăng dần · chơi trên mọi thiết bị', navGames:'🎮 Game', navManual:'📖 Hướng dẫn', navHome:'🏠 Trang chủ', play:'Chơi ngay →', viewMockup:'👁 Xem Mockup →', featuredHeading:'🔥 Nổi bật', gamesHeading:'Tất cả game', partnerHeading:'🎪 Game từ Games-Core', boardGamesHeading:'♟️ Game cờ', puzzleGamesHeading:'🧩 Xếp hình & Match', actionGamesHeading:'⚡ Hành động & Casual', whyTitle:'Tại sao chọn allin1site Games?', whyBody:'Miễn phí, không cần đăng ký. Cấp độ tăng dần được tinh chỉnh kỹ. Bảng xếp hạng online qua Google (tùy chọn). Chạy trên mọi điện thoại, tablet, máy tính. Không quảng cáo phiền phức — chỉ thuần gameplay.', footManual:'📖 Hướng dẫn', footSitemap:'Sơ đồ trang', rights:'Mọi quyền được bảo lưu', players:'người chơi', online:'đang online', plays:'lượt chơi', visitors:'lượt truy cập', views:'lượt xem', wipBadge:'🚧 Đang làm', mockupBadge:'Mockup', wipNote:'⚠ Mới chỉ có Mockup — game đang phát triển, chưa chơi được. Xem trước giao diện.', dailyLabel:'Thử thách ngày', dailySub:'Mỗi ngày một puzzle. Giữ chuỗi không đứt.', dailyPlayed:'✓ Đã chơi hôm nay', streakLabel:'Chuỗi của bạn', streakDays:'ngày', streakSub:'Chơi bất kỳ game nào hôm nay để nối tiếp.', streakNew:'Bắt đầu chuỗi của bạn hôm nay!' },
+      ja: { title:'allin1site ミニゲーム', tagline:'40以上の無料ゲーム · 累進レベル · あらゆる画面で遊べる', navGames:'🎮 ゲーム', navManual:'📖 取扱説明', navHome:'🏠 ホーム', play:'プレイする →', viewMockup:'👁 モックアップを見る →', featuredHeading:'🔥 注目', gamesHeading:'全ゲーム', partnerHeading:'🎪 Games-Coreのゲーム', boardGamesHeading:'♟️ ボードゲーム', puzzleGamesHeading:'🧩 パズル & マッチ', actionGamesHeading:'⚡ アクション & カジュアル', whyTitle:'なぜ allin1site Games？', whyBody:'無料・登録不要。難易度漸進。Googleログインでオンランク参加（任意）。スマホ・タブレット・PCで動作。MVP は広告なし、純粋なゲームプレイ。', footManual:'📖 取扱説明', footSitemap:'サイトマップ', rights:'無断複製禁止', players:'プレイヤー', online:'オンライン', plays:'プレイ', visitors:'訪問者', views:'閲覧数', wipBadge:'🚧 開発中', mockupBadge:'モックアップ', wipNote:'⚠ モックアップのみ — ゲームロジック開発中。UIプレビュー可能。', dailyLabel:'デイリーチャレンジ', dailySub:'1日1パズル。連続記録を守ろう。', dailyPlayed:'✓ 今日プレイ済み', streakLabel:'連続日数', streakDays:'日', streakSub:'今日どれかをプレイして継続！', streakNew:'今日から連続記録をスタート！' },
     };
     const urlLang = new URLSearchParams(location.search).get('lang');
     let lang = (() => {
@@ -370,7 +382,7 @@
       return 'en';
     })();
 
-    // ── Games: 3 NEW featured + 8 live + 2 WIP mockups ─────────────────
+    // ── Games: 3 NEW featured + 8 live + 30+ external partner games ─────
     const FEATURED = [
       { id:'sodoku',      name:'🔢 Sodoku',     featured:true, href:'games/sodoku/',
         tag:{ en:'Classic Sudoku 9×9 with 5 difficulty levels, daily challenge & 2-player race!',
@@ -391,6 +403,40 @@
       { id:'arkanoidx',   name:'🏓 ArkanoidX',   tag:{ en:'Modern breakout — 30 levels, 5 power-ups, combo multiplier!', vi:'Breakout hiện đại — 30 cấp, 5 power-up, nhân combo!', ja:'モダンブロック崩し — 30レベル、5種パワーアップ。' } },
       { id:'numberslide', name:'🔢 NumberSlide', tag:{ en:'Slide tiles into order! 3 sizes — fewest moves wins.', vi:'Trượt ô vào thứ tự! 3 cỡ — ít bước nhất thắng.', ja:'タイルを順番にスライド！少ない手数で勝利！' } },
     ];
+
+    // ── Partner games from games-core.com ─────────────────────────────
+    const PARTNER_GAMES = {
+      board: [
+        { id:'xiangqi',    name:'🐴 Cờ Tướng',      href:'https://xiangqi.games-core.com', tag:{ en:'Chinese Chess — classic strategy game', vi:'Cờ Tướng — trò chơi chiến lược kinh điển', ja:'シャンチー — 古典的な戦略ゲーム' } },
+        { id:'chess',      name:'♟️ Cờ Vua',        href:'https://chess.games-core.com', tag:{ en:'International Chess with 5 AI levels', vi:'Cờ vua quốc tế — 5 mức AI', ja:'国際チェス — 5段階のAI' } },
+        { id:'caro',       name:'⚫ Cờ Caro',        href:'https://caro.games-core.com', tag:{ en:'Gomoku Five-in-a-row strategy game', vi:'Cờ Caro 5-in-a-row chiến lược', ja:'ゴモク五目並べ戦略' } },
+        { id:'cocangua',   name:'🐎 Cờ Cá Ngựa',    href:'https://cocangua.games-core.com', tag:{ en:'Race & Capture board game', vi:'Trò chơi cờ đua & bắt', ja:'レース & キャプチャゲーム' } },
+        { id:'oanquan',    name:'🎲 Ô Ấn Quan',     href:'https://oanquan.games-core.com', tag:{ en:'Vietnamese traditional game', vi:'Trò chơi truyền thống Việt', ja:'ベトナムの伝統ゲーム' } },
+        { id:'baucua',     name:'🎪 Bầu Cua',       href:'https://baucua.games-core.com', tag:{ en:'Vietnamese dice gambling game', vi:'Trò chơi xúc xắc Việt truyền thống', ja:'ベトナムのサイコロゲーム' } },
+      ],
+      puzzle: [
+        { id:'2048',       name:'🔢 2048',          href:'https://2048.games-core.com', tag:{ en:'Slide & merge numbers to reach 2048!', vi:'Trượt & gộp số đến 2048!', ja:'スライド＆マージで2048達成！' } },
+        { id:'tetris',     name:'🧱 Tetris',        href:'https://tetris.games-core.com', tag:{ en:'Classic Tetris with power-ups', vi:'Tetris kinh điển với power-up', ja:'パワーアップ付きクラシックテトリス' } },
+        { id:'mahjong',    name:'🀄 Mát Chước',     href:'https://mahjong.games-core.com', tag:{ en:'Traditional Mahjong matching game', vi:'Trò chơi xếp Mát Chước truyền thống', ja:'伝統麻雀マッチング' } },
+        { id:'suika',      name:'🍈 Suika',         href:'https://suika.games-core.com', tag:{ en:'Merge fruits into watermelon!', vi:'Gộp trái cây thành dưa hấu!', ja:'スイカまで果物をマージ！' } },
+        { id:'puyo',       name:'🔵 Puyo Puyo',     href:'https://puyo.games-core.com', tag:{ en:'Match colored blobs for combos', vi:'Khớp các khối màu để combo', ja:'カラーブロブをマッチさせてコンボ' } },
+        { id:'nonogram',   name:'📊 Nonogram',      href:'https://nonogram.games-core.com', tag:{ en:'Logic puzzle grid game', vi:'Trò chơi lưới đố logic', ja:'ロジックパズルグリッド' } },
+        { id:'blockpuzzle',name:'🧩 Block Puzzle',  href:'https://blockpuzzle.games-core.com', tag:{ en:'Fit blocks into the grid', vi:'Xếp khối vào lưới', ja:'グリッドにブロックをフィット' } },
+        { id:'tilematch',  name:'🎯 Tile Match',    href:'https://tilematch.games-core.com', tag:{ en:'Match tiles for high scores', vi:'Khớp gạch để được điểm cao', ja:'高得点のためにタイルマッチ' } },
+        { id:'watersort',  name:'💧 Water Sort',    href:'https://watersort.games-core.com', tag:{ en:'Sort colored water into tubes', vi:'Xếp nước màu vào ống', ja:'色付き水をチューブに仕分け' } },
+        { id:'onet',       name:'🎪 Pikachu Onet',  href:'https://pikachu.games-core.com', tag:{ en:'Connect matching pairs puzzle', vi:'Kết nối các cặp khớp', ja:'マッチングペアを接続' } },
+      ],
+      action: [
+        { id:'flappy',     name:'🐦 Flappy',        href:'https://flappy.games-core.com', tag:{ en:'Tap to fly through pipes', vi:'Nhấp để bay qua ống', ja:'タップして管を飛ぶ' } },
+        { id:'type',       name:'⌨️ Luyện Gõ',      href:'https://type.games-core.com', tag:{ en:'Type fast racing game', vi:'Trò chơi đua gõ nhanh', ja:'高速タイピングレース' } },
+        { id:'taiko',      name:'🥁 Taiko Rhythm',  href:'https://taikorhythm.games-core.com', tag:{ en:'Rhythm drumming game', vi:'Trò chơi trống nhạc điệu', ja:'リズムドラムゲーム' } },
+        { id:'otoshi',     name:'⬇️ Otoshi',        href:'https://otoshi.games-core.com', tag:{ en:'Drop and match blocks', vi:'Thả & khớp khối', ja:'ブロックを落としてマッチ' } },
+        { id:'jumphop',    name:'🦘 Jump Hop',      href:'https://jumphop.games-core.com', tag:{ en:'Jump over obstacles', vi:'Nhảy qua chướng ngại vật', ja:'障害物を飛び越える' } },
+        { id:'vampire',    name:'🧛 Vampire Survivor', href:'https://vampire.games-core.com', tag:{ en:'Survive endless waves', vi:'Sống sót qua các làn sóng vô tận', ja:'無限の波から生き残る' } },
+        { id:'anipang',    name:'🎮 Anipang',       href:'https://anipang.games-core.com', tag:{ en:'Match animal bubbles fast', vi:'Khớp bóng vật nhanh chóng', ja:'動物バブルをマッチさせる' } },
+        { id:'dalgona',    name:'🍬 Dalgona',       href:'https://dalgona.games-core.com', tag:{ en:'Crack sugar candy puzzle', vi:'Bẻ mẻ kẹo đường', ja:'砂糖菓子をひび割れさせる' } },
+      ],
+    };
     let STATS = {}; // populated by /api/stats?all=1
 
     function fmtNum(n) {
@@ -438,9 +484,20 @@
       const T = TXT[lang] || TXT.en;
       const featEl = document.getElementById('featured-container');
       const allEl  = document.getElementById('games-container');
+      const boardEl = document.getElementById('board-container');
+      const puzzleEl = document.getElementById('puzzle-container');
+      const actionEl = document.getElementById('action-container');
+
       featEl.innerHTML = ''; allEl.innerHTML = '';
+      boardEl.innerHTML = ''; puzzleEl.innerHTML = ''; actionEl.innerHTML = '';
+
       FEATURED.forEach(g => featEl.appendChild(_buildCard(g, T)));
       GAMES.forEach(g => allEl.appendChild(_buildCard(g, T)));
+
+      // Partner games
+      PARTNER_GAMES.board.forEach(g => boardEl.appendChild(_buildCard(g, T)));
+      PARTNER_GAMES.puzzle.forEach(g => puzzleEl.appendChild(_buildCard(g, T)));
+      PARTNER_GAMES.action.forEach(g => actionEl.appendChild(_buildCard(g, T)));
     }
 
     function applyI18n() {
