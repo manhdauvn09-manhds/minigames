@@ -10,7 +10,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: minigames:2.1.0
+    image: minigames:2.1.1
     container_name: minigames
     restart: unless-stopped
     ports:

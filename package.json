@@ -1,6 +1,6 @@
 {
   "name": "allin1site-minigames",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "private": true,
   "description": "GenZ Web Game Factory — independent Docker container (static + Express API + MySQL leaderboard).",
   "type": "module",
