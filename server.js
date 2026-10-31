@@ -3,6 +3,7 @@
  * Single Node process, suitable for a stand-alone Docker container.
  */
 import express from 'express';
+import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -12,6 +13,9 @@ import user        from './api/user.js';
 import heartbeat   from './api/heartbeat.js';
 import stats       from './api/stats.js';
 import track       from './api/track.js';
+import admin       from './api/admin.js';
+import push        from './api/push.js';
+import { attachMultiplayer } from './ws-server.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -39,6 +43,9 @@ app.post('/api/heartbeat',   wrap(heartbeat));
 app.post('/api/track',       wrap(track));
 app.get ('/api/leaderboard', wrap(leaderboard));
 app.get ('/api/stats',       wrap(stats));
+app.get ('/api/admin',       wrap(admin));
+app.get ('/api/push',        wrap(push));
+app.post('/api/push',        wrap(push));
 
 // Health check (for docker / nginx upstream)
 app.get('/healthz', (_req, res) => res.json({ ok: true, ts: Date.now() }));
@@ -72,6 +79,11 @@ app.use((err, _req, res, _next) => {
 });
 
 const PORT = parseInt(process.env.PORT, 10) || 3333;
-app.listen(PORT, '0.0.0.0', () => {
+const server = http.createServer(app);
+
+// Real-time multiplayer (Kaya/Caro) over WebSocket at /ws
+attachMultiplayer(server);
+
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`[minigames] listening on :${PORT}`);
 });

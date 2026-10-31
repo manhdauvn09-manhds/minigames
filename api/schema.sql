@@ -76,6 +76,16 @@ CREATE TABLE IF NOT EXISTS game_counters (
   PRIMARY KEY (game_id, counter_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Web Push subscriptions (one row per browser endpoint).
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  endpoint    VARCHAR(500)  NOT NULL PRIMARY KEY,
+  p256dh      VARCHAR(200)  NOT NULL,
+  auth        VARCHAR(100)  NOT NULL,
+  user_id     VARCHAR(64)   NULL,
+  created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS scores_chromamatch LIKE scores_ballmerge;
 CREATE TABLE IF NOT EXISTS scores_stacktower  LIKE scores_ballmerge;
 CREATE TABLE IF NOT EXISTS scores_memoryflip  LIKE scores_ballmerge;

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'minigames-v2';
+const CACHE_NAME = 'minigames-v3';
 const PRECACHE = [
   '/',
   '/game-platform.js',
@@ -22,6 +22,30 @@ self.addEventListener('activate', e => {
         keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
+  );
+});
+
+// ── Web Push ──────────────────────────────────────────────────────────────
+self.addEventListener('push', e => {
+  let data = { title: 'MiniGames', body: '', url: '/' };
+  try { if (e.data) data = Object.assign(data, e.data.json()); } catch { if (e.data) data.body = e.data.text(); }
+  e.waitUntil(self.registration.showNotification(data.title, {
+    body: data.body,
+    icon: '/favicon.svg',
+    badge: '/favicon.svg',
+    data: { url: data.url || '/' },
+    vibrate: [80, 40, 80],
+  }));
+});
+
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const target = (e.notification.data && e.notification.data.url) || '/';
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      for (const c of list) { if ('focus' in c) { c.navigate(target); return c.focus(); } }
+      return self.clients.openWindow(target);
+    })
   );
 });
 

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://*.gstatic.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https:; connect-src 'self'; frame-src https://accounts.google.com; base-uri 'self'; form-action 'self';">
+<title>MiniGames — Admin Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a12;color:#e0e0f0;padding:18px;line-height:1.5}
+h1{color:#a78bfa;font-size:1.5em;margin-bottom:2px}
+.sub{color:#777;font-size:.82em;margin-bottom:18px}
+.signin{max-width:360px;margin:60px auto;text-align:center;background:#12121f;border:1px solid #23233a;border-radius:14px;padding:32px 24px}
+.signin h2{color:#a78bfa;font-size:1.1em;margin-bottom:6px}
+.signin p{color:#888;font-size:.85em;margin-bottom:18px}
+#gbtn{display:flex;justify-content:center}
+.hidden{display:none!important}
+.bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.bar .me{color:#aaa;font-size:.85em}
+.bar .me b{color:#e0e0f0}
+button.act{background:#1e1b4b;color:#a78bfa;border:1px solid #3a3470;border-radius:8px;padding:7px 14px;font-size:.85em;font-weight:600;cursor:pointer}
+button.act:hover{background:#2a2560}
+button.danger{background:#2e1a1a;color:#f87171;border-color:#5a3030}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+.kpi{background:#12121f;border:1px solid #23233a;border-radius:12px;padding:14px 16px}
+.kpi .v{font-size:1.7em;font-weight:800;color:#fff}
+.kpi .l{font-size:.78em;color:#888;margin-top:2px}
+.kpi.on .v{color:#34d399}
+.card{background:#12121f;border:1px solid #23233a;border-radius:12px;padding:16px;margin-bottom:18px}
+.card h3{color:#a78bfa;font-size:.95em;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:.84em}
+th{text-align:left;color:#8b8ba8;font-weight:600;padding:7px 8px;border-bottom:1px solid #23233a}
+td{padding:7px 8px;border-bottom:1px solid #18182a;vertical-align:middle}
+tr:hover td{background:#16162a}
+.mono{font-family:'Courier New',monospace}
+.pill{display:inline-block;padding:1px 7px;border-radius:6px;font-size:.74em;font-weight:600}
+.pill.g{background:#1e1b4b;color:#a78bfa}.pill.q{background:#2e2a1a;color:#fbbf24}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#34d399;margin-right:5px}
+.muted{color:#666}
+input,textarea{width:100%;background:#0a0a12;border:1px solid #2a2a44;color:#e0e0f0;border-radius:8px;padding:9px 11px;font-size:.86em;margin-bottom:9px;font-family:inherit}
+textarea{resize:vertical;min-height:60px}
+.note{font-size:.78em;color:#777;margin-top:6px}
+.err{color:#f87171;font-size:.85em;margin:10px 0}
+.ok{color:#34d399;font-size:.85em;margin:10px 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:560px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<h1>🎛️ MiniGames Admin</h1>
+<p class="sub">allin1site-minigames · dashboard quản trị</p>
+
+<div id="signin" class="signin">
+  <h2>Đăng nhập quản trị</h2>
+  <p>Chỉ email trong <span class="mono">ADMIN_EMAILS</span> mới truy cập được.</p>
+  <div id="gbtn"></div>
+  <div id="signinErr" class="err"></div>
+</div>
+
+<div id="dash" class="hidden">
+  <div class="bar">
+    <span class="me">👤 <b id="meName"></b> <span id="meEmail" class="muted"></span></span>
+    <button class="act" id="refreshBtn">↻ Làm mới</button>
+    <button class="act danger" id="logoutBtn">Đăng xuất</button>
+    <span id="stamp" class="muted" style="font-size:.78em;margin-left:auto"></span>
+  </div>
+
+  <div class="grid" id="kpis"></div>
+
+  <div class="card">
+    <h3>🎮 Theo từng game</h3>
+    <div style="overflow-x:auto">
+      <table id="gamesTbl">
+        <thead><tr><th>Game</th><th>Online</th><th>Players</th><th>Plays</th><th>Max score</th><th>Top player</th><th>Lần chơi cuối</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🆕 Người dùng gần đây</h3>
+    <div style="overflow-x:auto">
+      <table id="usersTbl">
+        <thead><tr><th>Tên</th><th>Email</th><th>Loại</th><th>Last seen</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔔 Gửi thông báo đẩy (broadcast)</h3>
+    <p class="note" id="pushCount"></p>
+    <div class="two">
+      <input id="pTitle" maxlength="80" placeholder="Tiêu đề (vd: 🎁 Quà ngày mới!)">
+      <input id="pUrl" maxlength="200" placeholder="URL mở khi click (mặc định /)">
+    </div>
+    <textarea id="pBody" maxlength="180" placeholder="Nội dung thông báo…"></textarea>
+    <button class="act" id="sendPush">Gửi cho tất cả</button>
+    <div id="pushResult" class="ok"></div>
+  </div>
+</div>
+
+<script>
+const CLIENT_ID = '781592547104-970ld4c6lb6l8ev4hhvlg3k0943k8t3j.apps.googleusercontent.com';
+let idToken = sessionStorage.getItem('admin_idtoken') || null;
+
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function ago(ts){ if(!ts) return '—'; const d=new Date(ts), now=Date.now(), s=(now-d.getTime())/1000;
+  if(s<60) return Math.floor(s)+'s'; if(s<3600) return Math.floor(s/60)+'m';
+  if(s<86400) return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
+
+window.onGoogleCred = (resp) => {
+  idToken = resp.credential;
+  sessionStorage.setItem('admin_idtoken', idToken);
+  load();
+};
+
+function initGsi(){
+  if(!(window.google && google.accounts && google.accounts.id)){ setTimeout(initGsi, 300); return; }
+  google.accounts.id.initialize({ client_id: CLIENT_ID, callback: window.onGoogleCred, ux_mode:'popup' });
+  google.accounts.id.renderButton($('#gbtn'), { type:'standard', theme:'filled_blue', size:'large', text:'signin_with' });
+}
+
+async function api(path, opts){
+  opts = opts || {};
+  opts.headers = Object.assign({ 'Authorization':'Bearer '+idToken }, opts.headers||{});
+  const r = await fetch(path, opts);
+  return { status:r.status, body: await r.json().catch(()=>({})) };
+}
+
+async function load(){
+  $('#signinErr').textContent = '';
+  const { status, body } = await api('/api/admin');
+  if(status === 403){ $('#signinErr').textContent = 'Email này không có quyền admin.'; logout(false); return; }
+  if(status !== 200 || !body.ok){ $('#signinErr').textContent = 'Lỗi tải dữ liệu ('+status+').'; return; }
+  render(body);
+}
+
+function render(d){
+  $('#signin').classList.add('hidden');
+  $('#dash').classList.remove('hidden');
+  $('#meName').textContent = d.admin.name || 'Admin';
+  $('#meEmail').textContent = d.admin.email || '';
+  $('#stamp').textContent = 'cập nhật ' + new Date(d.generatedAt).toLocaleTimeString();
+
+  const kpi = [
+    ['on', d.site.onlineNow, 'Đang online'],
+    ['', d.users.total, 'Tổng user'],
+    ['', d.users.google, 'Google'],
+    ['', d.users.guest, 'Guest'],
+    ['', d.site.visitors, 'Lượt khách'],
+    ['', d.site.pageviews, 'Pageviews'],
+    ['', d.pushSubs, 'Push subs'],
+  ];
+  $('#kpis').innerHTML = kpi.map(([c,v,l]) =>
+    `<div class="kpi ${c}"><div class="v">${Number(v).toLocaleString()}</div><div class="l">${l}</div></div>`).join('');
+
+  $('#gamesTbl tbody').innerHTML = d.games.sort((a,b)=>b.plays-a.plays).map(g =>
+    `<tr><td><b>${esc(g.game)}</b></td>
+      <td>${g.online?('<span class="dot"></span>'+g.online):'<span class="muted">0</span>'}</td>
+      <td>${g.players.toLocaleString()}</td><td>${g.plays.toLocaleString()}</td>
+      <td>${g.maxScore.toLocaleString()}</td>
+      <td>${g.topName?esc(g.topName)+' <span class="muted">('+g.topScore.toLocaleString()+')</span>':'<span class="muted">—</span>'}</td>
+      <td class="muted">${ago(g.lastPlayed)}</td></tr>`).join('');
+
+  $('#usersTbl tbody').innerHTML = (d.recent||[]).map(u =>
+    `<tr><td>${esc(u.name)}</td><td class="muted">${esc(u.email)||'—'}</td>
+      <td><span class="pill ${u.type==='google'?'g':'q'}">${u.type}</span></td>
+      <td class="muted">${ago(u.last_seen)}</td></tr>`).join('');
+
+  $('#pushCount').textContent = d.pushSubs + ' thiết bị đã đăng ký nhận thông báo.';
+}
+
+function logout(clear){
+  if(clear!==false){ idToken=null; sessionStorage.removeItem('admin_idtoken'); }
+  $('#dash').classList.add('hidden');
+  $('#signin').classList.remove('hidden');
+}
+
+$('#refreshBtn').onclick = load;
+$('#logoutBtn').onclick = () => logout(true);
+$('#sendPush').onclick = async () => {
+  const title = $('#pTitle').value.trim();
+  if(!title){ $('#pushResult').textContent='Cần tiêu đề.'; return; }
+  $('#sendPush').disabled = true; $('#pushResult').textContent = 'Đang gửi…';
+  const { status, body } = await api('/api/push', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'send', title, body:$('#pBody').value.trim(), url:$('#pUrl').value.trim()||'/' })
+  });
+  $('#sendPush').disabled = false;
+  if(status===200 && body.ok) $('#pushResult').textContent = `✅ Gửi ${body.sent}/${body.total} (pruned ${body.pruned}).`;
+  else if(status===503) $('#pushResult').textContent = '⚠️ VAPID chưa cấu hình trên server (.env).';
+  else $('#pushResult').textContent = '❌ Lỗi gửi ('+status+').';
+};
+
+initGsi();
+if(idToken) load();
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</body>
+</html>

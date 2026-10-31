@@ -1,11 +1,11 @@
 # =====================================================================
 # allin1site Mini Games — independent Docker image
-# Single-stage Node 20 alpine. Express serves static + /api/* + MySQL.
+# Single-stage Node 22 alpine. Express serves static + /api/* + MySQL.
 # Build:   docker build -t minigames:latest .
 # Run:     docker run -d -p 3333:3333 --env-file .env --name minigames minigames:latest
 # Compose: docker compose up -d
 # =====================================================================
-FROM node:20-alpine AS runtime
+FROM node:22-alpine AS runtime
 
 # Run as non-root for security
 RUN addgroup -S app && adduser -S app -G app
